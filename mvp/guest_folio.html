@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Guest Folio FOL-0041</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;font-size:14px}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f5f3;
+  --color-background-tertiary:#eeede8;
+  --color-text-primary:#1a1a18;
+  --color-text-secondary:#5f5e5a;
+  --color-text-tertiary:#888780;
+  --color-border-tertiary:rgba(0,0,0,0.12);
+  --color-border-secondary:rgba(0,0,0,0.22);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+}
+/* ── App shell ─────────────────────────────── */
+.app{display:flex;min-height:100vh}
+/* ── Sidebar ───────────────────────────────── */
+.sb{width:200px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sb-logo{padding:16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+.logo-mark{width:28px;height:28px;background:#185FA5;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:500;font-size:13px}
+.sb-app-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sb-app-sub{font-size:11px;color:var(--color-text-tertiary)}
+.sb-nav{padding:12px 8px;flex:1}
+.sb-section{font-size:11px;color:var(--color-text-tertiary);padding:8px 8px 4px;letter-spacing:.5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--border-radius-md);color:var(--color-text-secondary);font-size:13px}
+.sb-item:hover{background:var(--color-background-secondary)}
+.sb-item.active{background:#E6F1FB;color:#0C447C;font-weight:500}
+.sb-item i{font-size:15px}
+.sb-footer{padding:10px 8px;border-top:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+.sb-user-av{width:28px;height:28px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#185FA5;flex-shrink:0}
+/* ── Main ──────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:48px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary)}
+.bc a{color:var(--color-text-secondary);text-decoration:none}
+.bc a:hover{color:#185FA5}
+.bc-sep{color:var(--color-text-tertiary)}
+.bc span{color:var(--color-text-primary);font-weight:500}
+/* ── Buttons ───────────────────────────────── */
+.btn{padding:8px 14px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.btn-primary:hover{background:#0c447c;border-color:#0c447c}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger-outline{color:#A32D2D;border-color:rgba(163,45,45,.3)}
+.btn-danger-outline:hover{background:#FCEBEB}
+.btn-success{background:#3B6D11;color:#fff;border-color:#3B6D11}
+.btn i{font-size:14px}
+/* ── Content ───────────────────────────────── */
+.page{padding:24px;flex:1;overflow-y:auto}
+/* ── Page header ───────────────────────────── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.ph-left{}
+.ph-label{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ph-title{font-size:22px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:10px}
+.ph-sub{font-size:13px;color:var(--color-text-secondary);margin-top:3px}
+.ph-actions{display:flex;gap:8px;align-items:center}
+/* ── Status badges ─────────────────────────── */
+.badge{font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:var(--border-radius-md)}
+.badge-active{background:#EAF3DE;color:#3B6D11;border:0.5px solid rgba(59,109,17,.25)}
+.badge-locked{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.badge-pending{background:#FFF4E0;color:#C57B00;border:0.5px solid rgba(197,123,0,.25)}
+/* ── Stay summary strip ────────────────────── */
+.stay-strip{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 20px;margin-bottom:14px;display:flex;gap:28px;flex-wrap:wrap}
+.ss-field{display:flex;flex-direction:column;gap:3px}
+.ss-label{font-size:11px;color:var(--color-text-tertiary)}
+.ss-value{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ss-sep{width:0.5px;background:var(--color-border-tertiary);align-self:stretch}
+/* ── Stat cards ────────────────────────────── */
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.sc-label{font-size:11.5px;color:var(--color-text-secondary);margin-bottom:4px}
+.sc-amount{font-size:22px;font-weight:500;color:var(--color-text-primary);letter-spacing:-.5px}
+.sc-amount.green{color:#3B6D11}
+.sc-amount.blue{color:#185FA5}
+.sc-amount.amber{color:#C57B00}
+.sc-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+/* ── Alert banners ─────────────────────────── */
+.alert{border-radius:var(--border-radius-lg);padding:14px 16px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px}
+.alert-void{background:#FCEBEB;border:0.5px solid rgba(163,45,45,.25)}
+.alert-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.alert-void .alert-title{color:#A32D2D}
+.alert-body{font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.alert-body strong{color:var(--color-text-primary)}
+.alert-body em{color:#A32D2D;font-style:italic}
+.alert-actions{display:flex;gap:8px}
+/* ── Add charge form ───────────────────────── */
+.add-charge-card{background:var(--color-background-primary);border:0.5px solid #185FA5;border-radius:var(--border-radius-lg);margin-bottom:14px;overflow:hidden}
+.ac-head{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ac-body{padding:14px 16px}
+.ac-fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.ac-field{display:flex;flex-direction:column;gap:5px}
+.ac-label{font-size:12px;color:var(--color-text-secondary)}
+.ac-label .req{color:#A32D2D}
+.ac-input{height:34px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:0 10px;font-size:13px;font-family:inherit;color:var(--color-text-primary);background:var(--color-background-primary);outline:none}
+.ac-input:focus{border-color:#185FA5}
+.ac-select{height:34px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:0 10px;font-size:13px;font-family:inherit;background:var(--color-background-primary);outline:none}
+.ac-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:4px;border-top:0.5px solid var(--color-border-tertiary)}
+/* ── Folio table ───────────────────────────── */
+.folio-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.fc-head{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;background:var(--color-background-secondary)}
+.fc-head-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px}
+table.folio-table{width:100%;border-collapse:collapse}
+.folio-table th{padding:10px 18px;text-align:left;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.folio-table th:last-child{text-align:right}
+.folio-table th.right{text-align:right}
+.folio-table td{padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;font-size:13px}
+.folio-table tr:last-child td{border-bottom:none}
+.folio-table tr.voided td{opacity:.45}
+.folio-table tr.voided .fl-desc{text-decoration:line-through}
+/* date col */
+.fl-date{font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+.fl-time{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+/* desc col */
+.fl-desc{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.fl-meta{font-size:11.5px;color:var(--color-text-tertiary);margin-top:2px}
+/* category chip */
+.cat-chip{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500}
+.cat-accom{background:#E6F1FB;color:#0C447C}
+.cat-addon{background:#FAEEDA;color:#7A4800}
+.cat-transport{background:#EEEDFE;color:#534AB7}
+.cat-fb{background:#EAF3DE;color:#2B5A0A}
+.cat-misc{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.cat-deposit{background:#EAF3DE;color:#2B5A0A}
+.cat-payment{background:#EAF3DE;color:#2B5A0A}
+.cat-laundry{background:#FAEEDA;color:#7A4800}
+/* amount col */
+.fl-amount{text-align:right;font-weight:500;white-space:nowrap}
+.fl-amount.debit{color:var(--color-text-primary)}
+.fl-amount.credit{color:#3B6D11}
+.fl-amount.voided-amt{color:var(--color-text-tertiary);text-decoration:line-through}
+/* action col */
+.fl-action{text-align:right}
+.action-label{font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md)}
+.al-system{background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+.al-paid{background:#EAF3DE;color:#3B6D11}
+.al-voided{background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+/* pending-void row highlight */
+.row-pending{background:#FFFBF0}
+.row-pending td{border-bottom:0.5px solid rgba(197,123,0,.15)}
+/* ── Folio footer ──────────────────────────── */
+.folio-footer{padding:14px 18px;border-top:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);display:flex;justify-content:flex-end;gap:32px}
+.ff-col{display:flex;flex-direction:column;gap:3px;text-align:right}
+.ff-label{font-size:11px;color:var(--color-text-tertiary)}
+.ff-amount{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.ff-amount.green{color:#3B6D11}
+.ff-amount.blue{color:#185FA5;font-size:18px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── Sidebar ─────────────────────────────── -->
+<div class="sb">
+  <div class="sb-logo">
+    <div class="logo-mark">FD</div>
+    <div>
+      <div class="sb-app-name">Front Desk</div>
+      <div class="sb-app-sub">HVMS App</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Core Operations</div>
+    <div class="sb-item"><i class="ti ti-calendar-event"></i> Reservations</div>
+    <div class="sb-item"><i class="ti ti-login"></i> Check-in</div>
+    <div class="sb-item"><i class="ti ti-logout"></i> Check-out</div>
+    <div class="sb-item active"><i class="ti ti-file-invoice"></i> Guest folio</div>
+    <div class="sb-item"><i class="ti ti-users"></i> Guest profiles</div>
+    <div class="sb-section">Housekeeping</div>
+    <div class="sb-item"><i class="ti ti-layout-grid"></i> Room status</div>
+    <div class="sb-item"><i class="ti ti-checklist"></i> HK tasks</div>
+    <div class="sb-section">Settings</div>
+    <div class="sb-item"><i class="ti ti-settings"></i> Settings</div>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user-av">R</div>
+    <div>
+      <div style="font-size:12.5px;font-weight:500">Rina Kusuma</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Front Desk</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main ────────────────────────────────── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="bc">
+      <i class="ti ti-home" style="font-size:14px"></i>
+      <span class="bc-sep">›</span>
+      <a href="#">Front Desk</a>
+      <span class="bc-sep">›</span>
+      <a href="#">Reservations</a>
+      <span class="bc-sep">›</span>
+      <span>Folio — RSV-2026-0041</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-sm"><i class="ti ti-printer"></i> Print</button>
+      <button class="btn btn-sm btn-primary"><i class="ti ti-logout"></i> Check-out</button>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="ph-left">
+        <div class="ph-label">Guest folio</div>
+        <div class="ph-title">
+          FOL-0041
+          <span class="badge badge-active"><i class="ti ti-circle-filled" style="font-size:8px"></i> Active</span>
+        </div>
+        <div class="ph-sub">RSV-2026-0041 &nbsp;·&nbsp; Auto-created at check-in &nbsp;·&nbsp; 24 May 2026 · 14:23</div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-sm"><i class="ti ti-download"></i> Export CSV</button>
+        <button class="btn btn-sm"><i class="ti ti-plus"></i> Add charge</button>
+      </div>
+    </div>
+
+    <!-- Stay summary strip -->
+    <div class="stay-strip">
+      <div class="ss-field">
+        <div class="ss-label">Guest</div>
+        <div class="ss-value">Hendrick Willems</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Room</div>
+        <div class="ss-value">V-03 &nbsp;·&nbsp; 2BR Pool Villa</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Check-in</div>
+        <div class="ss-value">24 May 2026</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Check-out</div>
+        <div class="ss-value">27 May 2026</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Nights</div>
+        <div class="ss-value">3</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Guests</div>
+        <div class="ss-value">2A · 1C</div>
+      </div>
+      <div class="ss-sep"></div>
+      <div class="ss-field">
+        <div class="ss-label">Reservation</div>
+        <div class="ss-value" style="color:#185FA5">RSV-2026-0041 ↗</div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="sc-label">Total charges</div>
+        <div class="sc-amount">11,200,000</div>
+        <div class="sc-sub">IDR · 4 charge lines</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Total payments</div>
+        <div class="sc-amount green">1,000,000</div>
+        <div class="sc-sub">IDR · deposit collected</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(24,95,165,.25);background:#E6F1FB">
+        <div class="sc-label" style="color:#0C447C">Balance due</div>
+        <div class="sc-amount blue">10,200,000</div>
+        <div class="sc-sub" style="color:#185FA5">IDR · collect at check-out</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Deposit credit</div>
+        <div class="sc-amount green">1,000,000</div>
+        <div class="sc-sub">IDR · cash · Ref DEP-0041</div>
+      </div>
+    </div>
+
+    <!-- Pending void alert -->
+    <div class="alert alert-void">
+      <div class="alert-title">
+        <i class="ti ti-alert-triangle" style="font-size:16px"></i>
+        Pending void approval &mdash; Manager action required
+      </div>
+      <div class="alert-body">
+        Front Desk agent <strong>Rina Kusuma</strong> requested to void <strong>IDR 750,000</strong> (Airport transfer &mdash; V-03 to Ngurah Rai).<br>
+        This exceeds the IDR 500,000 threshold. Reason: <em>"Guest cancelled transfer last minute"</em>
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm btn-success"><i class="ti ti-check"></i> Approve void</button>
+        <button class="btn btn-sm btn-danger-outline"><i class="ti ti-x"></i> Reject</button>
+      </div>
+    </div>
+
+    <!-- Add charge form -->
+    <div class="add-charge-card">
+      <div class="ac-head">
+        <i class="ti ti-plus" style="color:#185FA5;font-size:15px"></i>
+        Add charge to folio
+      </div>
+      <div class="ac-body">
+        <div class="ac-fields">
+          <div class="ac-field">
+            <div class="ac-label">Description <span class="req">*</span></div>
+            <input class="ac-input" placeholder="e.g. Room service, Laundry" style="width:100%">
+          </div>
+          <div class="ac-field">
+            <div class="ac-label">Category <span class="req">*</span></div>
+            <select class="ac-select" style="width:100%">
+              <option>— Select —</option>
+              <option>Laundry</option>
+              <option>Minibar</option>
+              <option>F&B</option>
+              <option>Transport</option>
+              <option>Spa</option>
+              <option>Phone</option>
+              <option>Late checkout fee</option>
+              <option>Misc</option>
+            </select>
+          </div>
+          <div class="ac-field">
+            <div class="ac-label">Amount (IDR) <span class="req">*</span></div>
+            <input class="ac-input" placeholder="0" style="text-align:right;width:100%">
+          </div>
+        </div>
+        <div class="ac-footer">
+          <button class="btn btn-sm">Cancel</button>
+          <button class="btn btn-sm btn-primary">Post charge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Folio table -->
+    <div class="folio-card">
+      <div class="fc-head">
+        <span class="fc-head-title">Folio charges &amp; payments</span>
+        <span style="font-size:12px;color:var(--color-text-tertiary)">Sorted by posting time · oldest first</span>
+      </div>
+      <table class="folio-table">
+        <thead>
+          <tr>
+            <th style="width:110px">Date</th>
+            <th>Description</th>
+            <th style="width:120px">Category</th>
+            <th class="right" style="width:130px">Amount (IDR)</th>
+            <th class="right" style="width:80px">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Accommodation — auto-posted -->
+          <tr>
+            <td>
+              <div class="fl-date">24 May 2026</div>
+              <div class="fl-time">14:23</div>
+            </td>
+            <td>
+              <div class="fl-desc">Accommodation &mdash; Standard Rate</div>
+              <div class="fl-meta">3 nights × IDR 3,500,000 &nbsp;·&nbsp; Auto-posted at check-in</div>
+            </td>
+            <td><span class="cat-chip cat-accom">Accommodation</span></td>
+            <td class="fl-amount debit">10,500,000</td>
+            <td class="fl-action"><span class="action-label al-system">System</span></td>
+          </tr>
+
+          <!-- Airport transfer — pending void -->
+          <tr class="row-pending">
+            <td>
+              <div class="fl-date">24 May 2026</div>
+              <div class="fl-time">15:10</div>
+            </td>
+            <td>
+              <div class="fl-desc">Airport transfer &mdash; V-03 to Ngurah Rai</div>
+              <div class="fl-meta">Added by Rina Kusuma &nbsp;·&nbsp; <span style="color:#C57B00;font-weight:500"><i class="ti ti-clock" style="font-size:11px"></i> Void pending Manager approval</span></div>
+            </td>
+            <td><span class="cat-chip cat-transport">Transport</span></td>
+            <td class="fl-amount debit" style="color:#C57B00">750,000</td>
+            <td class="fl-action"><button class="btn btn-sm btn-danger-outline" style="font-size:11px;padding:3px 8px">Void</button></td>
+          </tr>
+
+          <!-- Welcome dinner -->
+          <tr>
+            <td>
+              <div class="fl-date">24 May 2026</div>
+              <div class="fl-time">16:45</div>
+            </td>
+            <td>
+              <div class="fl-desc">Welcome dinner &mdash; 3 pax</div>
+              <div class="fl-meta">Added by Rina Kusuma</div>
+            </td>
+            <td><span class="cat-chip cat-fb">F&amp;B</span></td>
+            <td class="fl-amount debit">450,000</div>
+            <td class="fl-action"><button class="btn btn-sm btn-danger-outline" style="font-size:11px;padding:3px 8px">Void</button></td>
+          </tr>
+
+          <!-- Minibar restock — voided -->
+          <tr class="voided">
+            <td>
+              <div class="fl-date">24 May 2026</div>
+              <div class="fl-time">17:30</div>
+            </td>
+            <td>
+              <div class="fl-desc">Minibar restock</div>
+              <div class="fl-meta">Voided &nbsp;·&nbsp; "Charged to wrong folio"</div>
+            </td>
+            <td><span class="cat-chip cat-misc">Misc</span></td>
+            <td class="fl-amount voided-amt">150,000</td>
+            <td class="fl-action"><span class="action-label al-voided">Voided</span></td>
+          </tr>
+
+          <!-- Deposit credit -->
+          <tr>
+            <td>
+              <div class="fl-date">24 May 2026</div>
+              <div class="fl-time">14:23</div>
+            </td>
+            <td>
+              <div class="fl-desc">Deposit payment</div>
+              <div class="fl-meta">Cash &nbsp;·&nbsp; Collected at reservation &nbsp;·&nbsp; Ref DEP-0041</div>
+            </td>
+            <td><span class="cat-chip cat-deposit">Deposit</span></td>
+            <td class="fl-amount credit">&minus;1,000,000</td>
+            <td class="fl-action"><span class="action-label al-paid">Paid</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- Footer totals -->
+      <div class="folio-footer">
+        <div class="ff-col">
+          <div class="ff-label">Total charges</div>
+          <div class="ff-amount">IDR 11,200,000</div>
+        </div>
+        <div class="ff-col">
+          <div class="ff-label">Payments received</div>
+          <div class="ff-amount green">&minus;IDR 1,000,000</div>
+        </div>
+        <div class="ff-col">
+          <div class="ff-label">Balance due</div>
+          <div class="ff-amount blue">IDR 10,200,000</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+</div><!-- /main -->
+</div><!-- /app -->
+</body>
+</html>
