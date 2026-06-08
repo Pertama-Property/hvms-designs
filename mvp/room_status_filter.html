@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Room Status with Filters</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f5f7;color:#172b4d;font-size:14px}
+
+/* ── App shell matching reference exactly ─── */
+.app{display:flex;height:100vh;background:#f4f5f7}
+
+/* Sidebar */
+.sb{width:200px;background:#fff;border-right:1px solid #e2e4e8;flex-shrink:0;display:flex;flex-direction:column}
+.sb-logo{padding:14px 16px;border-bottom:1px solid #e2e4e8;display:flex;align-items:center;gap:8px}
+.sb-mark{width:30px;height:30px;background:#0052cc;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+.sb-title{font-size:14px;font-weight:600;color:#172b4d}
+.sb-nav{padding:10px 0;flex:1}
+.sb-section{font-size:10.5px;font-weight:600;color:#8993a4;padding:10px 16px 4px;text-transform:uppercase;letter-spacing:.6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13.5px;color:#42526e;cursor:pointer}
+.sb-item:hover{background:#f4f5f7}
+.sb-item.active{background:#e8f0fe;color:#0052cc;font-weight:500}
+.sb-item::before{content:'';width:4px;height:16px;border-radius:2px;background:transparent;flex-shrink:0}
+.sb-item.active::before{background:#0052cc}
+.sb-footer{padding:12px 16px;border-top:1px solid #e2e4e8;display:flex;align-items:center;gap:8px}
+.sb-user-av{width:28px;height:28px;border-radius:50%;background:#e8f0fe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#0052cc;flex-shrink:0}
+.sb-uname{font-size:12.5px;font-weight:500}
+.sb-urole{font-size:11px;color:#8993a4}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:44px;background:#fff;border-bottom:1px solid #e2e4e8;display:flex;align-items:center;padding:0 24px;gap:8px;font-size:13px;justify-content:space-between;flex-shrink:0}
+.bc{display:flex;align-items:center;gap:6px;color:#42526e}
+.bc a{color:#0052cc;text-decoration:none;font-weight:500}
+.bc-sep{color:#b3bac5}
+.topbar-right{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#57d9a3;font-weight:500}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#57d9a3}
+
+.page{flex:1;overflow-y:auto;padding:20px 24px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.page-title{font-size:22px;font-weight:600;color:#172b4d;margin-bottom:3px}
+.page-sub{font-size:13px;color:#8993a4}
+.btn-bulk{padding:8px 18px;background:#0052cc;color:#fff;border:none;border-radius:5px;font-size:13.5px;font-weight:500;cursor:pointer}
+
+/* ── Status filter row (existing) ─────────── */
+.status-filter{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.sf-pill{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:5px;border:1.5px solid #dfe1e6;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:#42526e}
+.sf-pill.active{border-color:#0052cc;background:#e8f0fe;color:#0052cc}
+.sf-count{font-size:13px;font-weight:600}
+.sf-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-all{background:#8993a4}
+.dot-avail{background:#36b37e}
+.dot-occ{background:#ff8b00}
+.dot-dirty{background:#ff5630}
+.dot-clean{background:#0052cc}
+.dot-inspect{background:#6554c0}
+.dot-ooo{background:#8993a4}
+
+/* ── NEW: spatial filter row ──────────────── */
+.spatial-filter{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#fff;border:1.5px solid #0052cc;border-radius:8px;margin-bottom:10px;flex-wrap:wrap}
+.sf-label{font-size:11.5px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;white-space:nowrap}
+.sf-divider{width:1px;height:22px;background:#dfe1e6;flex-shrink:0}
+.sf-group{display:flex;align-items:center;gap:6px}
+.sf-group-label{font-size:12px;font-weight:500;color:#42526e;white-space:nowrap}
+.sf-select{height:30px;border:1px solid #dfe1e6;border-radius:5px;padding:0 24px 0 8px;font-size:12.5px;color:#172b4d;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238993a4' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center;-webkit-appearance:none;cursor:pointer;outline:none}
+.sf-select:focus{border-color:#0052cc}
+.sf-select.applied{border-color:#0052cc;background-color:#f0f4ff;color:#0052cc;font-weight:500;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%230052cc' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+
+/* Room type chips (multi-select) */
+.rt-chips{display:flex;gap:4px;flex-wrap:wrap}
+.rt-chip{padding:4px 10px;border-radius:20px;font-size:12px;border:1px solid #dfe1e6;color:#42526e;cursor:pointer;background:#fff;font-weight:400}
+.rt-chip.on{background:#e8f0fe;border-color:#0052cc;color:#0052cc;font-weight:500}
+
+.sf-clear{font-size:12px;color:#0052cc;cursor:pointer;font-weight:500;white-space:nowrap;margin-left:auto}
+
+/* ── Active filter chips ──────────────────── */
+.active-filters{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.af-label{font-size:12px;color:#8993a4}
+.af-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:#e8f0fe;border:1px solid #b3c5e8;border-radius:20px;font-size:12px;font-weight:500;color:#0052cc}
+.af-chip button{background:none;border:none;color:#0052cc;cursor:pointer;font-size:13px;line-height:1;padding:0;margin-left:2px;display:flex;align-items:center}
+.af-count{font-size:12px;color:#8993a4;margin-left:4px}
+
+/* ── Grid summary ─────────────────────────── */
+.grid-meta{font-size:12.5px;color:#8993a4;margin-bottom:10px;display:flex;align-items:center;gap:4px}
+.grid-meta strong{color:#172b4d}
+
+/* ── Room grid ────────────────────────────── */
+.room-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.room-tile{border-radius:8px;padding:14px;cursor:pointer;border:2px solid transparent;transition:all .15s;position:relative}
+.room-tile:hover{border-color:#b3c5e8;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.rt-code{font-size:19px;font-weight:700;color:#172b4d;margin-bottom:2px}
+.rt-type{font-size:12px;color:#42526e;margin-bottom:8px}
+.rt-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:4px}
+.rt-since{font-size:11px;color:#8993a4;margin-top:5px}
+.rt-guest{font-size:12.5px;font-weight:500;color:#172b4d;margin-top:4px}
+.rt-co{font-size:11.5px;color:#ff8b00;font-weight:500}
+.rt-rsv{font-size:11px;color:#0052cc;margin-top:2px}
+
+/* Floor divider */
+.floor-div{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:4px 0}
+.floor-div-label{font-size:11px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;background:#f4f5f7;padding:0 8px}
+.floor-div-line{flex:1;height:1px;background:#dfe1e6}
+
+/* tile colours */
+.tile-avail{background:#e3fcef;border-color:#abf5d1}
+.tile-occ{background:#fff8e6;border-color:#ffe380}
+.tile-dirty{background:#ffebe6;border-color:#ffbdad}
+.tile-clean{background:#e8f0fe;border-color:#b3c5e8}
+.tile-inspect{background:#eae6ff;border-color:#c0b6f2}
+.tile-ooo{background:#f4f5f7;border-color:#dfe1e6}
+.tile-avail:hover{border-color:#36b37e}
+.tile-occ:hover{border-color:#ff8b00}
+
+/* status badges */
+.badge-avail{background:#e3fcef;color:#006644}
+.badge-occ{background:#fff8e6;color:#974F0C}
+.badge-dirty{background:#ffebe6;color:#bf2600}
+.badge-clean{background:#e8f0fe;color:#0747a6}
+.badge-inspect{background:#eae6ff;color:#403294}
+.badge-ooo{background:#f4f5f7;color:#42526e}
+
+/* dimmed tiles (filtered out) */
+.tile-dimmed{opacity:.15;pointer-events:none}
+
+/* building tag on tile */
+.rt-building{font-size:10.5px;color:#8993a4;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar — exact match reference -->
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-mark">H</div>
+    <div class="sb-title">HVMS</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Front Desk</div>
+    <div class="sb-item">Reservations</div>
+    <div class="sb-item">Check-in</div>
+    <div class="sb-item">Check-out</div>
+    <div class="sb-item">Guest folio</div>
+    <div class="sb-section">Housekeeping</div>
+    <div class="sb-item active">Room status</div>
+    <div class="sb-item">HK tasks</div>
+    <div class="sb-section">Settings</div>
+    <div class="sb-item">Settings</div>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user-av">R</div>
+    <div><div class="sb-uname">Rina Kusuma</div><div class="sb-urole">Front Desk</div></div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="bc">
+      <a href="#">Housekeeping</a>
+      <span class="bc-sep">›</span>
+      <span style="color:#172b4d;font-weight:500">Room status</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-dot"></div>
+      Live · Updated just now
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Room status</div>
+        <div class="page-sub">Tap a room to update its status · <strong style="color:#172b4d">3 rooms shown</strong> of 12 · Pertama Villa Seminyak</div>
+      </div>
+      <button class="btn-bulk">Bulk update</button>
+    </div>
+
+    <!-- Status filter pills (existing) -->
+    <div class="status-filter">
+      <div class="sf-pill active"><span class="sf-dot dot-all"></span>All<span class="sf-count">3</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-avail"></span>Available<span class="sf-count">1</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-occ"></span>Occupied<span class="sf-count">2</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-dirty"></span>Dirty<span class="sf-count">0</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-clean"></span>Cleaning<span class="sf-count">0</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-inspect"></span>Inspect<span class="sf-count">0</span></div>
+      <div class="sf-pill"><span class="sf-dot dot-ooo"></span>Out of order<span class="sf-count">0</span></div>
+    </div>
+
+    <!-- NEW: Spatial filter row -->
+    <div class="spatial-filter">
+      <span class="sf-label">Filter</span>
+      <div class="sf-divider"></div>
+
+      <div class="sf-group">
+        <span class="sf-group-label">Building</span>
+        <select class="sf-select applied">
+          <option>Wing A</option>
+          <option>Wing B</option>
+          <option>Main Building</option>
+          <option>All buildings</option>
+        </select>
+      </div>
+
+      <div class="sf-divider"></div>
+
+      <div class="sf-group">
+        <span class="sf-group-label">Floor</span>
+        <select class="sf-select applied">
+          <option>Ground floor</option>
+          <option>1st floor</option>
+          <option>All floors</option>
+        </select>
+      </div>
+
+      <div class="sf-divider"></div>
+
+      <div class="sf-group">
+        <span class="sf-group-label">Room type</span>
+        <div class="rt-chips">
+          <span class="rt-chip on">2BR Pool Villa</span>
+          <span class="rt-chip">3BR Villa</span>
+          <span class="rt-chip">Standard</span>
+          <span class="rt-chip">Suite</span>
+        </div>
+      </div>
+
+      <span class="sf-clear">Clear all</span>
+    </div>
+
+    <!-- Active filter chips -->
+    <div class="active-filters">
+      <span class="af-label">Active filters:</span>
+      <span class="af-chip">Wing A <button>×</button></span>
+      <span class="af-chip">Ground floor <button>×</button></span>
+      <span class="af-chip">2BR Pool Villa <button>×</button></span>
+      <span class="af-count">3 of 12 rooms shown</span>
+    </div>
+
+    <!-- Room grid — Wing A / Ground floor / 2BR only -->
+    <div class="room-grid">
+
+      <!-- Floor label -->
+      <div class="floor-div">
+        <span class="floor-div-label">Wing A · Ground floor</span>
+        <div class="floor-div-line"></div>
+      </div>
+
+      <!-- V-01 Available -->
+      <div class="room-tile tile-avail">
+        <div class="rt-code">V-01</div>
+        <div class="rt-type">2BR Pool Villa · Max 4</div>
+        <div class="rt-building">Wing A · Ground</div>
+        <div class="rt-badge badge-avail"><span style="width:8px;height:8px;border-radius:50%;background:#36b37e;display:inline-block"></span>Available</div>
+        <div class="rt-since">Since 10:32</div>
+      </div>
+
+      <!-- V-03 Occupied -->
+      <div class="room-tile tile-occ">
+        <div class="rt-code">V-03</div>
+        <div class="rt-type">2BR Pool Villa · Max 4</div>
+        <div class="rt-building">Wing A · Ground</div>
+        <div class="rt-badge badge-occ"><span style="width:8px;height:8px;border-radius:50%;background:#ff8b00;display:inline-block"></span>Occupied</div>
+        <div class="rt-guest">Hendrick Willems</div>
+        <div class="rt-co">CO today 12:00</div>
+        <div class="rt-rsv">RSV-2026-0041</div>
+      </div>
+
+      <!-- V-05 Occupied -->
+      <div class="room-tile tile-occ">
+        <div class="rt-code">V-05</div>
+        <div class="rt-type">2BR Pool Villa · Max 4</div>
+        <div class="rt-building">Wing A · Ground</div>
+        <div class="rt-badge badge-occ"><span style="width:8px;height:8px;border-radius:50%;background:#ff8b00;display:inline-block"></span>Occupied</div>
+        <div class="rt-guest">Tanaka Group</div>
+        <div class="rt-co">CO 27 May</div>
+        <div class="rt-rsv">RSV-2026-0055</div>
+      </div>
+
+    </div>
+
+    <!-- Dimmed rooms (not matching filter — faded in background to show filtering effect) -->
+    <div style="margin-top:6px;padding:10px;background:#fff;border-radius:6px;border:1px dashed #dfe1e6;display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:#8993a4"><strong style="color:#172b4d">9 rooms</strong> hidden by active filters (Wing B, 1st floor, 3BR Villa, Standard, Suite) · <a href="#" style="color:#0052cc;text-decoration:none">Clear all filters</a> to see all rooms</span>
+    </div>
+
+  </div>
+</div>
+
+</div>
+</body>
+</html>
