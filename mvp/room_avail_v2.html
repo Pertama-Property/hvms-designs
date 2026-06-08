@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Room Availability Check</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f5f7;color:#172b4d;font-size:14px}
+
+/* ── Sidebar — exact Room Status match ──────── */
+.sb{width:200px;flex-shrink:0;background:#fff;border-right:1px solid #e2e4e9;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sb-logo{padding:13px 16px;border-bottom:1px solid #e2e4e9;display:flex;align-items:center;gap:9px}
+.sb-h{width:30px;height:30px;background:#0052cc;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700;color:#172b4d}
+.sb-nav{padding:10px 0;flex:1;overflow-y:auto}
+.sb-sec{font-size:10.5px;font-weight:600;color:#97a0af;padding:10px 16px 4px;text-transform:uppercase;letter-spacing:.6px}
+.sb-item{display:flex;align-items:center;padding:8px 16px;font-size:13.5px;color:#42526e;cursor:pointer;border-left:3px solid transparent;margin:0 0 1px}
+.sb-item:hover{background:#f4f5f7;color:#172b4d}
+.sb-item.on{background:#e6efff;color:#0052cc;font-weight:500;border-left-color:#0052cc}
+
+/* ── Main ─────────────────────────────────── */
+.main{margin-left:200px;display:flex;flex-direction:column;min-height:100vh;background:#f4f5f7}
+.topbar{background:#fff;border-bottom:1px solid #e2e4e9;height:44px;display:flex;align-items:center;padding:0 24px;justify-content:space-between;position:sticky;top:0;z-index:50}
+.bc{display:flex;align-items:center;gap:5px;font-size:13px;color:#42526e}
+.bc a{color:#0052cc;text-decoration:none;font-weight:500}
+.bc a:hover{text-decoration:underline}
+.bc-sep{color:#c1c7d0}
+.topbar-live{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#57d9a3;font-weight:500}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#57d9a3}
+
+/* ── Page content ─────────────────────────── */
+.page{padding:20px 24px;flex:1}
+
+/* Page header */
+.page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.ph-title{font-size:22px;font-weight:600;color:#172b4d;margin-bottom:3px}
+.ph-sub{font-size:13px;color:#8993a4}
+.btn-new{padding:9px 18px;background:#0052cc;color:#fff;border:none;border-radius:5px;font-size:13.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-new::before{content:"+";font-size:17px;font-weight:400;line-height:1}
+.btn-ref{padding:9px 14px;background:#fff;border:1.5px solid #dfe1e6;border-radius:5px;font-size:13px;color:#42526e;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+
+/* Stat summary bar — same pill style */
+.stat-row{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.stat-pill{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:5px;border:1.5px solid #dfe1e6;background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:#42526e}
+.stat-pill.hi{border-color:#0052cc;background:#e6efff;color:#0052cc}
+.stat-pill .count{font-size:14px;font-weight:700}
+.st-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.d-all{background:#8993a4}
+.d-vr{background:#36b37e}
+.d-occ{background:#ff8b00}
+.d-vd{background:#ff5630}
+.d-cl{background:#0052cc}
+.d-ins{background:#6554c0}
+.d-maint{background:#97a0af}
+
+/* Filter bar — same white card style */
+.filter-bar{background:#fff;border:1.5px solid #dfe1e6;border-radius:7px;padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fb-lbl{font-size:11.5px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.fb-sep{width:1px;height:22px;background:#e2e4e9}
+.fb-sel{height:32px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 26px 0 9px;font-size:13px;color:#172b4d;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238993a4' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center;-webkit-appearance:none;cursor:pointer}
+.fb-sel:focus{border-color:#0052cc;outline:none}
+.rt-chips{display:flex;gap:5px;flex-wrap:wrap}
+.rt-c{padding:5px 11px;border-radius:20px;font-size:12.5px;border:1.5px solid #dfe1e6;color:#42526e;cursor:pointer;background:#fff;font-weight:500}
+.rt-c.on{background:#e6efff;border-color:#0052cc;color:#0052cc}
+.fb-spacer{flex:1}
+/* Date nav */
+.date-nav{display:flex;align-items:center;gap:7px}
+.nav-btn{width:30px;height:30px;border:1.5px solid #dfe1e6;border-radius:5px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#42526e;font-size:17px;font-weight:300}
+.nav-btn:hover{background:#f4f5f7}
+.date-rng{font-size:13px;font-weight:500;color:#172b4d;white-space:nowrap;min-width:150px;text-align:center}
+.today-btn{padding:5px 11px;border:1.5px solid #0052cc;border-radius:5px;font-size:12.5px;color:#0052cc;background:#e6efff;cursor:pointer;font-weight:500}
+
+/* Legend row */
+.legend{display:flex;align-items:center;gap:16px;margin-bottom:10px}
+.lg-i{display:flex;align-items:center;gap:5px;font-size:12px;color:#42526e}
+.lg-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.lq-vr{background:#e3fcef;border:1.5px solid #abf5d1}
+.lq-oc{background:#fff3cd;border:1.5px solid #ffe380}
+.lq-vd{background:#ffebe6;border:1.5px solid #ffbdad}
+.lq-cl{background:#e6efff;border:1.5px solid #b3c5e8}
+.lq-ins{background:#f3f0ff;border:1.5px solid #c0b6f2}
+.lq-mn{background:#f4f5f7;border:1.5px solid #c1c7d0}
+.lg-hint{margin-left:auto;font-size:12px;color:#97a0af}
+
+/* ── Calendar grid ────────────────────────── */
+.grid-outer{background:#fff;border:1.5px solid #dfe1e6;border-radius:8px;overflow:hidden}
+.grid-scroll{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 340px)}
+table.cal{border-collapse:collapse;width:max-content;min-width:100%}
+/* sticky thead */
+.cal thead th{position:sticky;top:0;z-index:20;background:#f4f5f7;border-bottom:1.5px solid #dfe1e6}
+.cal .col-room{position:sticky;left:0;z-index:30;background:#f4f5f7}
+.cal .col-type{position:sticky;left:88px;z-index:30;background:#f4f5f7}
+.cal .td-room{position:sticky;left:0;z-index:10;background:#fff}
+.cal .td-type{position:sticky;left:88px;z-index:10;background:#fff}
+/* header cells */
+.th-room-inner{padding:10px 12px;font-size:11px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.4px;min-width:88px;border-right:1px solid #e2e4e9}
+.th-type-inner{padding:10px 12px;font-size:11px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.4px;min-width:110px;border-right:1px solid #e2e4e9}
+.th-date{min-width:82px;padding:8px 4px;text-align:center}
+.th-date.today-hd{background:#e6efff}
+.th-date .dn{font-size:14px;font-weight:600;color:#172b4d}
+.th-date .dd{font-size:11px;color:#8993a4;margin-top:1px}
+.th-date.today-hd .dn{color:#0052cc}
+.th-date.today-hd .dd{color:#0052cc}
+/* floor divider */
+.floor-row td{background:#f4f5f7;padding:5px 12px;font-size:11px;font-weight:600;color:#8993a4;text-transform:uppercase;letter-spacing:.5px;border-top:1px solid #e2e4e9;border-bottom:1px solid #e2e4e9}
+/* data rows */
+.cal tbody tr:not(.floor-row):hover td{background:#f8f9fa}
+.cal tbody tr:not(.floor-row):hover .td-room,
+.cal tbody tr:not(.floor-row):hover .td-type{background:#f8f9fa}
+.td-room{padding:9px 12px;border-bottom:1px solid #e2e4e9;font-size:13.5px;font-weight:600;color:#172b4d;white-space:nowrap;border-right:1px solid #e2e4e9;min-width:88px}
+.td-type{padding:9px 12px;border-bottom:1px solid #e2e4e9;font-size:12.5px;color:#42526e;border-right:1px solid #e2e4e9;white-space:nowrap;min-width:110px}
+.td-cell{padding:5px 4px;border-bottom:1px solid #e2e4e9;border-right:1px solid #e2e4e9;text-align:center;vertical-align:middle;min-width:82px;cursor:pointer}
+.td-cell:hover{background:#e6efff!important}
+.td-cell.today-col{background:#eff4ff}
+.td-cell.today-col:hover{background:#ddeaff!important}
+/* status badges — same style as Room Status tiles */
+.sb-vr{display:inline-flex;align-items:center;gap:4px;background:#e3fcef;color:#006644;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.sb-oc{display:inline-flex;align-items:center;gap:4px;background:#fff3cd;color:#7a4100;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.sb-vd{display:inline-flex;align-items:center;gap:4px;background:#ffebe6;color:#bf2600;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.sb-cl{display:inline-flex;align-items:center;gap:4px;background:#e6efff;color:#0747a6;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.sb-ins{display:inline-flex;align-items:center;gap:4px;background:#f3f0ff;color:#403294;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.sb-mn{display:inline-flex;align-items:center;gap:4px;background:#f4f5f7;color:#42526e;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:500}
+.s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sd-vr{background:#36b37e}.sd-oc{background:#ff8b00}.sd-vd{background:#ff5630}
+.sd-cl{background:#0052cc}.sd-ins{background:#6554c0}.sd-mn{background:#97a0af}
+/* available dot for future cells */
+.avail-dot{width:10px;height:10px;border-radius:50%;background:#36b37e;display:inline-block}
+/* reservation bar (occupied span) */
+.res-span{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:4px 7px;border-radius:4px;background:#fff3cd;border-left:3px solid #ff8b00;width:100%;cursor:pointer}
+.rs-guest{font-size:11.5px;font-weight:600;color:#7a4100}
+.rs-meta{font-size:10px;color:#ff8b00;margin-top:1px}
+.res-cont{background:#fffcf0}
+/* OOS span */
+.oos-span{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:4px 0;background:#f4f5f7;border-radius:4px;font-size:11px;color:#97a0af;font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- Sidebar — identical to Room Status board -->
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-h">H</div>
+    <div class="sb-name">HVMS</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">Front Desk</div>
+    <div class="sb-item on">Room Availability Check</div>
+    <div class="sb-item">Reservations</div>
+    <div class="sb-item">Group Reservation</div>
+    <div class="sb-item">Check In</div>
+    <div class="sb-item">Group Check-In</div>
+    <div class="sb-item">Check Out</div>
+    <div class="sb-item">Departures</div>
+    <div class="sb-item">Room Change</div>
+    <div class="sb-sec">Folio &amp; Billing</div>
+    <div class="sb-item">Guest Folio</div>
+    <div class="sb-item">Deposit</div>
+    <div class="sb-sec">In-Room Services</div>
+    <div class="sb-item">Additional Charge</div>
+    <div class="sb-sec">Housekeeping</div>
+    <div class="sb-item">Room Status</div>
+    <div class="sb-item">HK Tasks</div>
+    <div class="sb-sec">Settings</div>
+    <div class="sb-item">Settings</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="bc">
+      <a href="#">Front Desk</a>
+      <span class="bc-sep">›</span>
+      <span style="color:#172b4d;font-weight:500">Room Availability Check</span>
+    </div>
+    <div class="topbar-live">
+      <div class="live-dot"></div>
+      Live · Updated just now
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- Page header -->
+    <div class="page-hd">
+      <div>
+        <div class="ph-title">Room Availability Check</div>
+        <div class="ph-sub">22 rooms · Pertama Villa Seminyak · Showing 8 Jun – 17 Jun 2026</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ref">↻ Refresh</button>
+        <button class="btn-new">New Reservation</button>
+      </div>
+    </div>
+
+    <!-- Status summary pills -->
+    <div class="stat-row">
+      <div class="stat-pill hi"><span class="st-dot d-all"></span>All<span class="count">22</span></div>
+      <div class="stat-pill"><span class="st-dot d-vr"></span>Vacant Ready<span class="count">6</span></div>
+      <div class="stat-pill"><span class="st-dot d-occ"></span>Occupied<span class="count">10</span></div>
+      <div class="stat-pill"><span class="st-dot d-vd"></span>Vacant Dirty<span class="count">3</span></div>
+      <div class="stat-pill"><span class="st-dot d-cl"></span>Cleaning<span class="count">2</span></div>
+      <div class="stat-pill"><span class="st-dot d-ins"></span>Inspect<span class="count">0</span></div>
+      <div class="stat-pill"><span class="st-dot d-maint"></span>Out of service<span class="count">1</span></div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <span class="fb-lbl">Filter</span>
+      <div class="fb-sep"></div>
+      <span class="fb-lbl" style="font-weight:500;text-transform:none;letter-spacing:0;color:#42526e">Building</span>
+      <select class="fb-sel">
+        <option>All buildings</option>
+        <option>Wing A</option>
+        <option>Wing B</option>
+      </select>
+      <div class="fb-sep"></div>
+      <span class="fb-lbl" style="font-weight:500;text-transform:none;letter-spacing:0;color:#42526e">Floor</span>
+      <select class="fb-sel">
+        <option>All floors</option>
+        <option>Ground (1xx)</option>
+        <option>2nd (2xx)</option>
+        <option>3rd (3xx)</option>
+        <option>4th (4xx)</option>
+        <option>5th (5xx)</option>
+      </select>
+      <div class="fb-sep"></div>
+      <span class="fb-lbl" style="font-weight:500;text-transform:none;letter-spacing:0;color:#42526e">Room type</span>
+      <div class="rt-chips">
+        <span class="rt-c on">All</span>
+        <span class="rt-c">Standard</span>
+        <span class="rt-c">Deluxe</span>
+        <span class="rt-c">Studio</span>
+        <span class="rt-c">Double</span>
+        <span class="rt-c">Suite</span>
+      </div>
+      <div class="fb-spacer"></div>
+      <!-- Date navigation -->
+      <div class="date-nav">
+        <button class="nav-btn">&#8249;</button>
+        <span class="date-rng">8 Jun – 17 Jun 2026</span>
+        <button class="nav-btn">&#8250;</button>
+        <span class="today-btn">Today</span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <span class="lg-i"><span class="lg-sq lq-vr"></span>Vacant Ready</span>
+      <span class="lg-i"><span class="lg-sq lq-oc"></span>Occupied</span>
+      <span class="lg-i"><span class="lg-sq lq-vd"></span>Vacant Dirty</span>
+      <span class="lg-i"><span class="lg-sq lq-cl"></span>Cleaning</span>
+      <span class="lg-i"><span class="lg-sq lq-ins"></span>Inspect</span>
+      <span class="lg-i"><span class="lg-sq lq-mn"></span>Out of service</span>
+      <span class="lg-hint">● Tap an available cell to create a reservation</span>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="grid-outer">
+      <div class="grid-scroll">
+        <table class="cal">
+          <thead>
+            <tr>
+              <th class="col-room"><div class="th-room-inner">Room</div></th>
+              <th class="col-type"><div class="th-type-inner">Type</div></th>
+              <th><div class="th-date today-hd"><div class="dn">8</div><div class="dd">Mon · Today</div></div></th>
+              <th><div class="th-date"><div class="dn">9</div><div class="dd">Tue</div></div></th>
+              <th><div class="th-date"><div class="dn">10</div><div class="dd">Wed</div></div></th>
+              <th><div class="th-date"><div class="dn">11</div><div class="dd">Thu</div></div></th>
+              <th><div class="th-date"><div class="dn">12</div><div class="dd">Fri</div></div></th>
+              <th><div class="th-date"><div class="dn">13</div><div class="dd">Sat</div></div></th>
+              <th><div class="th-date"><div class="dn">14</div><div class="dd">Sun</div></div></th>
+              <th><div class="th-date"><div class="dn">15</div><div class="dd">Mon</div></div></th>
+              <th><div class="th-date"><div class="dn">16</div><div class="dd">Tue</div></div></th>
+              <th><div class="th-date"><div class="dn">17</div><div class="dd">Wed</div></div></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- Ground floor -->
+            <tr class="floor-row"><td colspan="12">Ground Floor · 1xx rooms</td></tr>
+            <tr>
+              <td class="td-room col-room">101A</td><td class="td-type col-type">Deluxe</td>
+              <td class="td-cell today-col"><span class="sb-vd"><span class="s-dot sd-vd"></span>Vacant Dirty</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">101B</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-vd"><span class="s-dot sd-vd"></span>Vacant Dirty</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">101C</td><td class="td-type col-type">Studio</td>
+              <td class="td-cell today-col"><span class="sb-vr"><span class="s-dot sd-vr"></span>Vacant Ready</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">101D</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell res-cont"><div class="res-span"><span class="rs-guest">Tanaka Group</span><span class="rs-meta">RSV-2026-0055 · CO 10 Jun</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">101E</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">101F</td><td class="td-type col-type">Studio</td>
+              <td class="td-cell today-col"><span class="sb-cl"><span class="s-dot sd-cl"></span>Cleaning</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+
+            <!-- 2nd floor -->
+            <tr class="floor-row"><td colspan="12">2nd Floor · 2xx rooms</td></tr>
+            <tr>
+              <td class="td-room col-room">201</td><td class="td-type col-type">Deluxe</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell res-cont"><div class="res-span"><span class="rs-guest">Rina Guest</span><span class="rs-meta">RSV-2026-0044 · CO 9 Jun 12:00</span></div></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">202</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-cl"><span class="s-dot sd-cl"></span>Cleaning</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">203</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-mn"><span class="s-dot sd-mn"></span>Out of service</span></td>
+              <td class="td-cell"><span class="oos-span">OOS</span></td>
+              <td class="td-cell"><span class="oos-span">OOS</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+
+            <!-- 3rd floor -->
+            <tr class="floor-row"><td colspan="12">3rd Floor · 3xx rooms</td></tr>
+            <tr>
+              <td class="td-room col-room">301</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">302</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-vr"><span class="s-dot sd-vr"></span>Vacant Ready</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">303</td><td class="td-type col-type">Standard</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+
+            <!-- 4th floor -->
+            <tr class="floor-row"><td colspan="12">4th Floor · 4xx rooms</td></tr>
+            <tr>
+              <td class="td-room col-room">401</td><td class="td-type col-type">Deluxe</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">402</td><td class="td-type col-type">Deluxe</td>
+              <td class="td-cell today-col"><span class="sb-vr"><span class="s-dot sd-vr"></span>Vacant Ready</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">404</td><td class="td-type col-type">Double</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell res-cont"><div class="res-span"><span class="rs-guest">Budi Santoso</span><span class="rs-meta">RSV-2026-0041 · CO 12 Jun</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell res-cont"><div class="res-span"><span style="color:transparent;font-size:11px">·</span></div></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+
+            <!-- 5th floor -->
+            <tr class="floor-row"><td colspan="12">5th Floor · 5xx rooms</td></tr>
+            <tr>
+              <td class="td-room col-room">501</td><td class="td-type col-type">Suite</td>
+              <td class="td-cell today-col"><span class="sb-mn"><span class="s-dot sd-mn"></span>Maintenance</span></td>
+              <td class="td-cell"><span class="oos-span">Maint.</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+            <tr>
+              <td class="td-room col-room">502</td><td class="td-type col-type">Suite</td>
+              <td class="td-cell today-col"><span class="sb-oc"><span class="s-dot sd-oc"></span>Occupied</span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td><td class="td-cell"><span class="avail-dot"></span></td>
+              <td class="td-cell"><span class="avail-dot"></span></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+</div><!-- /main -->
+</body>
+</html>
