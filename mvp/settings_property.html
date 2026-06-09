@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Settings · Property</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+     background:#f4f5f7;color:#172b4d;font-size:13.5px;display:flex;min-height:100vh}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.sb{width:188px;flex-shrink:0;background:#fff;border-right:1px solid #dfe1e6;
+    display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh}
+.sb-logo{padding:12px 14px;border-bottom:1px solid #dfe1e6;display:flex;align-items:center;gap:8px}
+.sb-h{width:28px;height:28px;background:#0052cc;border-radius:5px;display:flex;align-items:center;
+      justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.sb-name{font-size:13.5px;font-weight:700;color:#172b4d}
+.sb-nav{padding:8px 0;flex:1;overflow-y:auto}
+.sb-sec{font-size:10px;font-weight:600;color:#97a0af;padding:8px 14px 3px;
+        text-transform:uppercase;letter-spacing:.6px}
+.sb-item{padding:7px 14px;font-size:13px;color:#42526e;border-left:3px solid transparent;cursor:pointer}
+.sb-item:hover{background:#f4f5f7}
+.sb-item.on{background:#e6efff;color:#0052cc;font-weight:500;border-left-color:#0052cc}
+
+/* ── Settings sidebar (sub-nav) ────────────────────────── */
+.settings-nav{width:190px;flex-shrink:0;background:#fff;border-right:1px solid #dfe1e6;
+              position:fixed;top:0;left:188px;height:100vh;padding-top:44px}
+.sn-sec{font-size:10px;font-weight:600;color:#97a0af;padding:12px 16px 4px;
+        text-transform:uppercase;letter-spacing:.6px}
+.sn-item{padding:8px 16px;font-size:13px;color:#42526e;cursor:pointer;display:flex;
+         align-items:center;gap:8px;border-left:3px solid transparent}
+.sn-item:hover{background:#f4f5f7}
+.sn-item.on{background:#e6efff;color:#0052cc;font-weight:500;border-left-color:#0052cc}
+.sn-dot{width:6px;height:6px;border-radius:50%;background:#dfe1e6;flex-shrink:0}
+.sn-item.on .sn-dot{background:#0052cc}
+
+/* ── Main ──────────────────────────────────────────────── */
+.main{margin-left:378px;flex:1;display:flex;flex-direction:column}
+.topbar{height:44px;background:#fff;border-bottom:1px solid #dfe1e6;display:flex;
+        align-items:center;padding:0 24px;justify-content:space-between;
+        position:sticky;top:0;z-index:50}
+.bc{display:flex;align-items:center;gap:6px;font-size:13px;color:#42526e}
+.bc a{color:#0052cc;text-decoration:none;font-weight:500}
+.bc-sep{color:#c1c7d0}
+
+/* ── Page ──────────────────────────────────────────────── */
+.page{padding:24px;display:flex;flex-direction:column;gap:0;max-width:860px}
+.ph{margin-bottom:20px}
+.ph-title{font-size:21px;font-weight:600;color:#172b4d;margin-bottom:3px}
+.ph-sub{font-size:13px;color:#97a0af}
+
+/* ── Settings section card ─────────────────────────────── */
+.s-card{background:#fff;border:1px solid #dfe1e6;border-radius:8px;overflow:hidden;margin-bottom:16px}
+.sc-head{padding:16px 20px;border-bottom:1px solid #f4f5f7;display:flex;align-items:flex-start;justify-content:space-between;background:#f8f9fa}
+.sch-l{}
+.sch-icon{font-size:18px;margin-right:8px}
+.sch-title{font-size:14px;font-weight:600;color:#172b4d;display:flex;align-items:center}
+.sch-sub{font-size:12px;color:#97a0af;margin-top:3px}
+.sch-badge{font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:3px;margin-left:8px}
+.badge-mvp{background:#e3fcef;color:#006644}
+.badge-p2{background:#f3f0ff;color:#403294}
+.sc-body{padding:20px}
+
+/* ── Field rows ────────────────────────────────────────── */
+.field-section{margin-bottom:20px}
+.fs-title{font-size:11px;font-weight:600;color:#97a0af;text-transform:uppercase;
+          letter-spacing:.5px;margin-bottom:12px;padding-bottom:6px;
+          border-bottom:1px solid #f4f5f7}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field.full{grid-column:1/-1}
+.f-lbl{font-size:12px;font-weight:500;color:#42526e;display:flex;align-items:center;gap:6px}
+.f-lbl .req{color:#ff5630}
+.f-lbl .hint{font-size:11px;color:#97a0af;font-weight:400}
+/* inputs */
+.f-input{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 10px;
+         font-size:13px;font-family:inherit;background:#fff;color:#172b4d;outline:none}
+.f-input:focus{border-color:#0052cc}
+.f-input.readonly{background:#f8f9fa;color:#97a0af;cursor:not-allowed}
+.f-select{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 24px 0 10px;
+          font-size:13px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238993a4' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center;-webkit-appearance:none;outline:none}
+.f-select:focus{border-color:#0052cc}
+.f-note{font-size:11.5px;color:#97a0af;margin-top:3px;line-height:1.5}
+.f-note.green{color:#006644}
+.f-note.amber{color:#c47d0e}
+/* derived field */
+.f-derived{height:34px;border:1.5px dashed #dfe1e6;border-radius:5px;padding:0 10px;
+           font-size:13px;background:#f8f9fa;color:#42526e;display:flex;align-items:center;
+           gap:6px}
+.f-derived .derived-lbl{font-size:11px;background:#e6efff;color:#0052cc;padding:1px 6px;
+                        border-radius:3px;font-weight:500;flex-shrink:0}
+/* toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;
+            padding:10px 12px;background:#f8f9fa;border-radius:5px;gap:16px}
+.tr-text{}
+.tr-label{font-size:13px;font-weight:500;color:#172b4d;margin-bottom:1px}
+.tr-sub{font-size:12px;color:#97a0af}
+.toggle{width:36px;height:20px;border-radius:10px;position:relative;cursor:pointer;flex-shrink:0}
+.toggle.on{background:#36b37e}
+.toggle.off{background:#dfe1e6}
+.toggle::after{content:'';position:absolute;top:3px;width:14px;height:14px;
+               border-radius:50%;background:#fff;transition:left .15s}
+.toggle.on::after{left:19px}
+.toggle.off::after{left:3px}
+/* number+unit input */
+.input-unit{display:flex;gap:0}
+.iu-input{flex:1;height:34px;border:1.5px solid #dfe1e6;border-radius:5px 0 0 5px;
+          padding:0 10px;font-size:13px;font-family:inherit;background:#fff;outline:none}
+.iu-input:focus{border-color:#0052cc}
+.iu-unit{height:34px;padding:0 12px;background:#f4f5f7;border:1.5px solid #dfe1e6;
+         border-left:none;border-radius:0 5px 5px 0;display:flex;align-items:center;
+         font-size:12.5px;color:#97a0af;white-space:nowrap}
+/* tax preview box */
+.tax-preview{background:#f0fdf4;border:1px solid #b7dfc0;border-radius:5px;
+             padding:12px 14px;margin-top:12px}
+.tp-title{font-size:11px;font-weight:600;color:#006644;text-transform:uppercase;
+          letter-spacing:.4px;margin-bottom:8px}
+.tp-row{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;
+        border-bottom:1px solid rgba(0,102,68,.1)}
+.tp-row:last-child{border-bottom:none;font-weight:600;font-size:13px;padding-top:6px}
+.tp-l{color:#42526e}
+.tp-r{color:#172b4d;font-family:monospace;font-weight:500}
+.tp-r.green{color:#006644}
+/* locked Phase 2 field */
+.locked-field{display:flex;align-items:center;gap:8px;padding:9px 12px;
+              background:#f3f0ff;border:1.5px solid #c0b6f2;border-radius:5px}
+.lf-val{font-size:13.5px;font-weight:600;color:#403294;font-family:monospace;flex:1}
+.lf-badge{font-size:10.5px;background:#403294;color:#fff;padding:2px 7px;
+          border-radius:3px;font-weight:500;white-space:nowrap}
+.lf-note{font-size:11.5px;color:#6554c0;margin-top:4px}
+/* deposit type selector */
+.dep-type-row{display:flex;gap:8px;flex-wrap:wrap}
+.dt-card{flex:1;min-width:120px;border:1.5px solid #dfe1e6;border-radius:5px;
+         padding:10px 12px;cursor:pointer}
+.dt-card.on{border-color:#0052cc;background:#f0f4ff}
+.dt-radio{width:14px;height:14px;border-radius:50%;border:2px solid #dfe1e6;
+          display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:6px;vertical-align:-2px}
+.dt-radio.on{border-color:#0052cc;background:#0052cc}
+.dt-radio.on::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff}
+.dt-label{font-size:12.5px;font-weight:500;color:#172b4d}
+.dt-sub{font-size:11.5px;color:#97a0af;margin-top:3px}
+/* section footer save bar */
+.save-bar{padding:12px 20px;background:#f8f9fa;border-top:1px solid #dfe1e6;
+          display:flex;align-items:center;justify-content:space-between}
+.sb-hint{font-size:12px;color:#97a0af}
+.btn-save{padding:8px 20px;background:#0052cc;color:#fff;border:none;border-radius:5px;
+          font-size:13px;font-weight:500;cursor:pointer}
+.btn-cancel{padding:8px 14px;background:#fff;border:1.5px solid #dfe1e6;border-radius:5px;
+            font-size:13px;color:#42526e;cursor:pointer;margin-right:8px}
+/* Impact note */
+.impact{background:#fff8ed;border-left:3px solid #ff991f;border-radius:0 5px 5px 0;
+        padding:8px 12px;font-size:12px;color:#7a4100;line-height:1.6;margin-bottom:12px}
+/* Sub-fields conditional */
+.sub-fields{border-left:3px solid #0052cc;padding-left:14px;margin-top:10px;
+            display:flex;flex-direction:column;gap:10px}
+</style>
+</head>
+<body>
+
+<!-- App Sidebar -->
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-h">H</div>
+    <div class="sb-name">HVMS</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">Front Desk</div>
+    <div class="sb-item">Check-in</div>
+    <div class="sb-item">Reservations</div>
+    <div class="sb-item">Check-out</div>
+    <div class="sb-item">Guest folio</div>
+    <div class="sb-sec">Housekeeping</div>
+    <div class="sb-item">Room status</div>
+    <div class="sb-item">HK tasks</div>
+    <div class="sb-sec">Settings</div>
+    <div class="sb-item on">Settings</div>
+  </div>
+</div>
+
+<!-- Settings Sub-nav -->
+<div class="settings-nav">
+  <div class="sn-sec">Property</div>
+  <div class="sn-item on"><span class="sn-dot"></span>General info</div>
+  <div class="sn-item"><span class="sn-dot"></span>Check-in &amp; check-out</div>
+  <div class="sn-item"><span class="sn-dot"></span>Tax &amp; service charge</div>
+  <div class="sn-item"><span class="sn-dot"></span>Deposit</div>
+  <div class="sn-item"><span class="sn-dot"></span>Buildings &amp; floors</div>
+  <div class="sn-sec">Rooms &amp; Rates</div>
+  <div class="sn-item"><span class="sn-dot"></span>Room types</div>
+  <div class="sn-item"><span class="sn-dot"></span>Rooms</div>
+  <div class="sn-item"><span class="sn-dot"></span>Rate plans</div>
+  <div class="sn-sec">Users &amp; System</div>
+  <div class="sn-item"><span class="sn-dot"></span>Users &amp; roles</div>
+  <div class="sn-item"><span class="sn-dot"></span>Email (SMTP)</div>
+  <div class="sn-item"><span class="sn-dot"></span>Charge types</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="bc">
+      <a href="#">Settings</a>
+      <span class="bc-sep">›</span>
+      <span style="color:#172b4d;font-weight:500">Property configuration</span>
+    </div>
+    <div style="font-size:12px;color:#97a0af">Last saved: Today 09:14 · Rina Kusuma</div>
+  </div>
+
+  <div class="page">
+    <div class="ph">
+      <div class="ph-title">Property configuration</div>
+      <div class="ph-sub">Pertama Villa Seminyak · Master settings for check-in/out times, tax, and deposit rules</div>
+    </div>
+
+    <!-- ══ SECTION 1: CHECK-IN & CHECK-OUT ══════════════════════════════════ -->
+    <div class="s-card">
+      <div class="sc-head">
+        <div class="sch-l">
+          <div class="sch-title">⏰ Check-in &amp; Check-out times
+            <span class="sch-badge badge-mvp">MVP</span>
+          </div>
+          <div class="sch-sub">Default times used across the system — reservation wizard, no-show cutoff, checkout reminder</div>
+        </div>
+      </div>
+      <div class="sc-body">
+
+        <div class="impact">These times are property-wide defaults. Individual reservations can override the check-in time (e.g. for late arrivals). The no-show cutoff is always <strong>CI time + 2 hours</strong>.</div>
+
+        <!-- Default times -->
+        <div class="field-section">
+          <div class="fs-title">Default times</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl">Default check-in time <span class="req">*</span>
+                <span class="hint">— pre-fills reservation wizard</span>
+              </div>
+              <div class="input-unit">
+                <input class="iu-input" type="time" value="14:00">
+                <div class="iu-unit">WIB (UTC+8)</div>
+              </div>
+              <div class="f-note">Used in: reservation wizard, no-show cutoff, availability display</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Default check-out time <span class="req">*</span>
+                <span class="hint">— pre-fills reservation wizard</span>
+              </div>
+              <div class="input-unit">
+                <input class="iu-input" type="time" value="12:00">
+                <div class="iu-unit">WIB (UTC+8)</div>
+              </div>
+              <div class="f-note">Used in: checkout wizard, no-show reversal window, departure list</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Derived / computed values -->
+        <div class="field-section">
+          <div class="fs-title">Derived values (auto-calculated)</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl">No-show cutoff</div>
+              <div class="f-derived">
+                <span class="derived-lbl">Auto</span>
+                CI time + 2 hours = 16:00 today
+              </div>
+              <div class="f-note">Fixed rule — not configurable in MVP. Activates the Mark no-show button.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">No-show reversal window</div>
+              <div class="f-derived">
+                <span class="derived-lbl">Auto</span>
+                Until scheduled CO time (12:00)
+              </div>
+              <div class="f-note">Manager can reverse a no-show up until the guest's scheduled checkout time.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- On-hold expiry & late CI -->
+        <div class="field-section" style="margin-bottom:0">
+          <div class="fs-title">Reservation holds</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl">On-hold reservation expiry <span class="req">*</span></div>
+              <div class="input-unit">
+                <input class="iu-input" type="number" value="24" style="width:80px;flex:none">
+                <div class="iu-unit">hours after creation</div>
+              </div>
+              <div class="f-note">After this period, On Hold reservations are flagged for follow-up. No auto-cancel.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Minimum stay</div>
+              <div class="input-unit">
+                <input class="iu-input" type="number" value="1" style="width:80px;flex:none">
+                <div class="iu-unit">night(s)</div>
+              </div>
+              <div class="f-note">Reservations shorter than this will be blocked. Set to 1 for no minimum.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Late checkout / early checkin (Phase 2) -->
+        <div class="field-section" style="margin-top:16px;margin-bottom:0">
+          <div class="fs-title">Early check-in &amp; late check-out fees
+            <span class="sch-badge badge-p2" style="font-size:10px;margin-left:6px">Phase 2</span>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl" style="color:#97a0af">Early check-in fee (Phase 2)</div>
+              <div class="locked-field">
+                <span class="lf-val">—</span>
+                <span class="lf-badge">Phase 2</span>
+              </div>
+              <div class="lf-note">Phase 2: configurable early CI fee applied automatically when guest arrives before 14:00.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl" style="color:#97a0af">Late check-out fee (Phase 2)</div>
+              <div class="locked-field">
+                <span class="lf-val">—</span>
+                <span class="lf-badge">Phase 2</span>
+              </div>
+              <div class="lf-note">Phase 2: configurable late CO fee. In MVP, agent posts manually to folio before settlement.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-bar">
+        <div class="sb-hint">Changes apply to all new reservations. Existing reservations keep their current times.</div>
+        <div><button class="btn-cancel">Cancel</button><button class="btn-save">Save times</button></div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 2: TAX & SERVICE CHARGE ══════════════════════════════════ -->
+    <div class="s-card">
+      <div class="sc-head">
+        <div class="sch-l">
+          <div class="sch-title">🧾 Tax &amp; service charge
+            <span class="sch-badge badge-mvp">MVP</span>
+          </div>
+          <div class="sch-sub">PPN/VAT and service charge rates shown on PDF receipts and folio totals</div>
+        </div>
+      </div>
+      <div class="sc-body">
+
+        <div class="impact">Indonesia standard hotel rates: PPN 11% + Service charge 10% = <strong>21% total ("++")</strong>. Tax applies to accommodation and all folio charges unless a charge type is marked as tax-exempt.</div>
+
+        <!-- Tax rates -->
+        <div class="field-section">
+          <div class="fs-title">Tax &amp; service charge rates</div>
+          <div class="field-grid-3">
+            <div class="field">
+              <div class="f-lbl">PPN / VAT rate <span class="req">*</span></div>
+              <div class="input-unit">
+                <input class="iu-input" type="number" value="11" step="0.1">
+                <div class="iu-unit">%</div>
+              </div>
+              <div class="f-note">Indonesian PPN rate. Current standard: 11%.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Service charge rate <span class="req">*</span></div>
+              <div class="input-unit">
+                <input class="iu-input" type="number" value="10" step="0.1">
+                <div class="iu-unit">%</div>
+              </div>
+              <div class="f-note">Applied before PPN. Standard hotel rate: 10%.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Combined rate</div>
+              <div class="f-derived">
+                <span class="derived-lbl">Auto</span>
+                21.1% total ("++" rate)
+              </div>
+              <div class="f-note">Service charge + PPN on service charge. Shown on receipts as "++".</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tax mode -->
+        <div class="field-section">
+          <div class="fs-title">How rates are entered in the system</div>
+          <div class="dep-type-row">
+            <div class="dt-card on">
+              <span class="dt-radio on"></span>
+              <span class="dt-label">Tax-exclusive (net rates)</span>
+              <div class="dt-sub">Nightly rates in rate plans are net (before tax). Tax added automatically on folio and receipt.</div>
+            </div>
+            <div class="dt-card">
+              <span class="dt-radio"></span>
+              <span class="dt-label">Tax-inclusive (gross rates)</span>
+              <div class="dt-sub">Nightly rates already include all tax. No tax added on folio. Receipt shows tax breakdown from gross.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tax preview -->
+        <div class="tax-preview">
+          <div class="tp-title">Preview — IDR 3,300,000 / night (net rate, tax-exclusive)</div>
+          <div class="tp-row"><span class="tp-l">Net accommodation (3 nights)</span><span class="tp-r">9,900,000</span></div>
+          <div class="tp-row"><span class="tp-l">Service charge (10%)</span><span class="tp-r">990,000</span></div>
+          <div class="tp-row"><span class="tp-l">PPN/VAT 11% on (net + SC)</span><span class="tp-r">1,187,900</span></div>
+          <div class="tp-row"><span class="tp-l">Total (++ rate applied)</span><span class="tp-r green">IDR 12,077,900</span></div>
+        </div>
+
+        <!-- Receipt settings -->
+        <div class="field-section" style="margin-top:16px">
+          <div class="fs-title">Receipt &amp; invoice settings</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl">NPWP (tax registration number)</div>
+              <input class="f-input" placeholder="00.000.000.0-000.000" value="01.234.567.8-901.000">
+              <div class="f-note">Printed on PDF receipt header for Indonesian tax compliance.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Receipt language</div>
+              <select class="f-select">
+                <option>English</option>
+                <option>Bahasa Indonesia</option>
+                <option>English + Bahasa Indonesia</option>
+              </select>
+              <div class="f-note">Language used on PDF receipts and email templates.</div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="toggle-row">
+              <div class="tr-text">
+                <div class="tr-label">Show tax breakdown on receipt</div>
+                <div class="tr-sub">When on: receipt shows service charge and PPN as separate line items. When off: only shows total amount.</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+            <div style="margin-top:8px">
+            <div class="toggle-row">
+              <div class="tr-text">
+                <div class="tr-label">Include "++" notation on rate plans</div>
+                <div class="tr-sub">Displays "++" next to all nightly rates in reservation wizard and receipts to indicate tax and service charge are additional.</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-bar">
+        <div class="sb-hint">Tax rate changes apply to all NEW folio charges. Existing folios are not retroactively adjusted.</div>
+        <div><button class="btn-cancel">Cancel</button><button class="btn-save">Save tax settings</button></div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 3: DEPOSIT SETTINGS ══════════════════════════════════════ -->
+    <div class="s-card">
+      <div class="sc-head">
+        <div class="sch-l">
+          <div class="sch-title">💰 Deposit settings
+            <span class="sch-badge badge-mvp">MVP</span>
+          </div>
+          <div class="sch-sub">Default deposit rules for new reservations and default security deposit at check-in</div>
+        </div>
+      </div>
+      <div class="sc-body">
+
+        <div class="impact">These are <strong>defaults only</strong> — agents can override the deposit amount on any individual reservation. No deposit is enforced by the system unless "Require deposit to confirm" is enabled.</div>
+
+        <!-- Default deposit type -->
+        <div class="field-section">
+          <div class="fs-title">Default reservation deposit</div>
+          <div class="dep-type-row">
+            <div class="dt-card">
+              <span class="dt-radio"></span>
+              <span class="dt-label">No deposit</span>
+              <div class="dt-sub">No default deposit. Agent decides per reservation.</div>
+            </div>
+            <div class="dt-card on">
+              <span class="dt-radio on"></span>
+              <span class="dt-label">Fixed IDR amount</span>
+              <div class="dt-sub">Pre-fills the deposit field with a fixed IDR amount.</div>
+            </div>
+            <div class="dt-card">
+              <span class="dt-radio"></span>
+              <span class="dt-label">% of accommodation</span>
+              <div class="dt-sub">Pre-fills based on a percentage of the total room charge.</div>
+            </div>
+            <div class="dt-card">
+              <span class="dt-radio"></span>
+              <span class="dt-label">Full accommodation</span>
+              <div class="dt-sub">Pre-fills the full accommodation amount (pay in full upfront).</div>
+            </div>
+          </div>
+          <!-- Conditional: Fixed IDR -->
+          <div class="sub-fields">
+            <div class="field">
+              <div class="f-lbl">Default deposit amount (IDR) <span class="req">*</span></div>
+              <div class="input-unit" style="max-width:280px">
+                <div class="iu-unit" style="border-radius:5px 0 0 5px;border-right:none;border:1.5px solid #dfe1e6">IDR</div>
+                <input class="iu-input" style="border-radius:0 5px 5px 0;border-left:none" value="1,000,000">
+              </div>
+              <div class="f-note">Pre-filled in reservation Step 4. Agent can override per reservation.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deposit requirement toggle -->
+        <div class="field-section">
+          <div class="fs-title">Deposit policy</div>
+          <div class="toggle-row" style="margin-bottom:8px">
+            <div class="tr-text">
+              <div class="tr-label">Require deposit to confirm reservation</div>
+              <div class="tr-sub">When on: reservation cannot move from On Hold → Confirmed without at least IDR 1 deposit recorded. When off: agent can confirm with zero deposit.</div>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="tr-text">
+              <div class="tr-label">Allow deposit refund before check-in</div>
+              <div class="tr-sub">When on: agents can record a deposit refund with reason. When off: refunds require Manager approval. Currently always allowed per SRS.</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+        </div>
+
+        <!-- Security deposit at check-in -->
+        <div class="field-section">
+          <div class="fs-title">Security deposit at check-in (Check-in Step 5 Card 2)</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl">Default security deposit amount <span class="req">*</span></div>
+              <div class="input-unit">
+                <div class="iu-unit" style="border-radius:5px 0 0 5px;border-right:none;border:1.5px solid #dfe1e6">IDR</div>
+                <input class="iu-input" style="border-radius:0 5px 5px 0;border-left:none" value="1,000,000">
+              </div>
+              <div class="f-note">Pre-fills Card 2 amount in check-in Step 5. Agent can adjust per guest.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Security deposit payment method</div>
+              <select class="f-select">
+                <option>Cash (default)</option>
+                <option>Card EDC</option>
+                <option>Any method</option>
+              </select>
+              <div class="f-note">Default method pre-selected in Card 2. Agent can change.</div>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="toggle-row">
+              <div class="tr-text">
+                <div class="tr-label">Allow waiving security deposit</div>
+                <div class="tr-sub">When on: agent can toggle off the "Collect security deposit at check-in" in Step 5. When off: security deposit is mandatory.</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Void threshold -->
+        <div class="field-section" style="margin-bottom:0">
+          <div class="fs-title">Void approval threshold</div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="f-lbl" style="color:#97a0af">Void threshold (Phase 2 configurable)</div>
+              <div class="locked-field">
+                <span class="lf-val">IDR 500,000</span>
+                <span class="lf-badge">Locked · Phase 2</span>
+              </div>
+              <div class="lf-note">Voids above this amount require Manager approval. Fixed at IDR 500,000 in MVP. Configurable in Phase 2.</div>
+            </div>
+            <div class="field">
+              <div class="f-lbl">Multiple deposits per reservation</div>
+              <div class="f-derived">
+                <span class="derived-lbl">Always on</span>
+                Unlimited deposits allowed
+              </div>
+              <div class="f-note">Each deposit recorded separately. Total shown in reservation header.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-bar">
+        <div class="sb-hint">Default amounts are suggestions only. Agents can override any deposit amount per reservation.</div>
+        <div><button class="btn-cancel">Cancel</button><button class="btn-save">Save deposit settings</button></div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+</div><!-- /main -->
+</body>
+</html>
