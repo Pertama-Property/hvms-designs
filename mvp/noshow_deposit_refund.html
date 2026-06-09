@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — No-show Deposit Resolution</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+     background:#f4f5f7;color:#172b4d;font-size:13.5px;padding:24px;
+     display:flex;flex-direction:column;gap:28px;max-width:1080px}
+/* State labels */
+.state-label{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+             padding:5px 14px;border-radius:5px 5px 0 0;display:inline-flex;align-items:center;gap:6px}
+.sl-amber{background:#fff8ed;border:1px solid #ffe4a3;border-bottom:none;color:#c47d0e}
+.sl-blue{background:#e6efff;border:1px solid #b3c5e8;border-bottom:none;color:#0052cc}
+.sl-green{background:#e3fcef;border:1px solid #b7dfc0;border-bottom:none;color:#006644}
+/* Card */
+.frame{background:#fff;border-radius:0 8px 8px 8px;border:1px solid #dfe1e6;overflow:hidden}
+/* Topbar */
+.topbar{height:44px;background:#fff;border-bottom:1px solid #dfe1e6;display:flex;
+        align-items:center;padding:0 20px;justify-content:space-between;font-size:13px}
+.bc{display:flex;align-items:center;gap:5px;color:#42526e}
+.bc a{color:#0052cc;text-decoration:none;font-weight:500}
+.bc-sep{color:#c1c7d0}
+/* Reservation header */
+.res-hd{padding:16px 20px;border-bottom:1px solid #dfe1e6;display:flex;align-items:flex-start;justify-content:space-between}
+.rhd-l{}
+.rsv-id{font-size:22px;font-weight:700;font-family:monospace;display:flex;align-items:center;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;font-size:12px;font-weight:500}
+.b-ns{background:#ffebe6;color:#bf2600}
+.b-conf{background:#fff3cd;color:#7a4100}
+.b-dep-pend{background:#fff8ed;color:#c47d0e}
+.b-dep-ref{background:#e3fcef;color:#006644}
+.b-dep-forf{background:#f4f5f7;color:#42526e}
+.rsv-guest{font-size:13.5px;color:#42526e;margin-top:5px}
+.rhd-r{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.btn{padding:7px 14px;border-radius:5px;font-size:13px;font-weight:500;cursor:pointer;
+     border:1.5px solid #dfe1e6;background:#fff;color:#42526e}
+.btn-blue{background:#0052cc;color:#fff;border-color:#0052cc}
+.btn-ghost{color:#97a0af;border-color:#e2e4e9;cursor:not-allowed}
+/* Summary grid */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #dfe1e6}
+.sg{padding:12px 16px;border-right:1px solid #e2e4e9}
+.sg:last-child{border-right:none}
+.sg-l{font-size:11px;color:#97a0af;margin-bottom:3px}
+.sg-v{font-size:13px;font-weight:500;color:#172b4d}
+.sg-v-r{color:#bf2600;font-weight:500;font-size:13px}
+/* DEPOSIT RESOLUTION SECTION */
+.dep-section{margin:16px 20px;border:1.5px solid #ffe4a3;border-radius:8px;overflow:hidden}
+.ds-head{padding:12px 16px;background:#fff8ed;border-bottom:1px solid #ffe4a3;
+         display:flex;align-items:center;justify-content:space-between}
+.dsh-l{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#7a4100}
+.dsh-icon{width:24px;height:24px;border-radius:50%;background:#ff991f;color:#fff;
+          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.dsh-r{font-size:12px;color:#97a0af}
+.ds-body{padding:14px 16px;background:#fff}
+/* deposit info row */
+.dep-info{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;padding:11px 14px;
+          background:#f8f9fa;border-radius:5px}
+.di-field{flex:1}
+.di-l{font-size:11px;color:#97a0af;margin-bottom:2px}
+.di-v{font-size:13px;font-weight:500;color:#172b4d}
+.di-divider{width:1px;background:#e2e4e9;align-self:stretch}
+/* resolution options */
+.res-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ro-card{border:1.5px solid #dfe1e6;border-radius:6px;padding:12px;cursor:pointer}
+.ro-card.on-refund{border-color:#36b37e;background:#f0fdf4}
+.ro-card.on-forf{border-color:#97a0af;background:#f8f9fa}
+.ro-head{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.ro-radio{width:15px;height:15px;border-radius:50%;border:2px solid #dfe1e6;flex-shrink:0;
+          display:flex;align-items:center;justify-content:center}
+.ro-radio.sel{border-color:#36b37e;background:#36b37e}
+.ro-radio.sel::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff}
+.ro-radio.sel-gr{border-color:#97a0af;background:#97a0af}
+.ro-radio.sel-gr::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff}
+.ro-lbl{font-size:13px;font-weight:600;color:#172b4d}
+.ro-sub{font-size:12px;color:#97a0af;margin-left:21px;line-height:1.5}
+/* refund form */
+.refund-form{border:1px solid #b7dfc0;border-radius:6px;overflow:hidden;margin-bottom:10px}
+.rf-head{padding:9px 14px;background:#e3fcef;border-bottom:1px solid #b7dfc0;
+         font-size:12px;font-weight:600;color:#006644}
+.rf-body{padding:12px 14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.f-field{display:flex;flex-direction:column;gap:4px}
+.f-lbl{font-size:11.5px;color:#42526e;font-weight:500}
+.f-lbl .req{color:#ff5630}
+.f-inp{height:33px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 9px;
+       font-size:13px;font-family:inherit;background:#fff}
+.f-inp:focus{border-color:#0052cc;outline:none}
+.f-sel{height:33px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 20px 0 8px;
+       font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none}
+.f-textarea{border:1.5px solid #dfe1e6;border-radius:5px;padding:8px 9px;font-size:13px;
+            font-family:inherit;width:100%;resize:none}
+.f-textarea:focus{border-color:#0052cc;outline:none}
+.input-unit{display:flex}
+.iu-pfx{height:33px;padding:0 9px;background:#f8f9fa;border:1.5px solid #dfe1e6;
+        border-right:none;border-radius:5px 0 0 5px;display:flex;align-items:center;
+        font-size:12.5px;color:#97a0af;white-space:nowrap}
+.iu-inp{height:33px;border:1.5px solid #dfe1e6;border-radius:0 5px 5px 0;padding:0 9px;
+        font-size:13px;font-family:inherit;background:#fff;flex:1}
+.iu-inp:focus{border-color:#0052cc;outline:none}
+/* action footer */
+.ds-footer{padding:12px 16px;background:#f8f9fa;border-top:1px solid #dfe1e6;
+           display:flex;align-items:center;justify-content:space-between}
+.df-hint{font-size:12px;color:#97a0af}
+.btn-confirm-refund{padding:8px 18px;background:#36b37e;color:#fff;border:none;
+                    border-radius:5px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-confirm-forf{padding:8px 18px;background:#97a0af;color:#fff;border:none;
+                  border-radius:5px;font-size:13px;font-weight:500;cursor:pointer}
+
+/* RESOLVED STATE STYLES */
+.dep-section-green{margin:16px 20px;border:1.5px solid #b7dfc0;border-radius:8px;overflow:hidden}
+.ds-head-green{padding:12px 16px;background:#e3fcef;border-bottom:1px solid #b7dfc0;
+               display:flex;align-items:center;justify-content:space-between}
+.dsh-l-green{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#006644}
+.dep-section-gray{margin:16px 20px;border:1.5px solid #dfe1e6;border-radius:8px;overflow:hidden}
+.ds-head-gray{padding:12px 16px;background:#f4f5f7;border-bottom:1px solid #dfe1e6;
+              display:flex;align-items:center;justify-content:space-between}
+.dsh-l-gray{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#42526e}
+
+/* Resolution summary */
+.res-summary{padding:14px 16px;background:#fff}
+.rs-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;
+        border-bottom:1px solid #f4f5f7}
+.rs-row:last-child{border-bottom:none}
+.rs-l{color:#97a0af}
+.rs-v{font-weight:500;color:#172b4d}
+.rs-v-g{color:#006644;font-weight:500}
+.rs-v-gr{color:#42526e;font-weight:500}
+
+/* Other sections of the page */
+.page-body{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.sec-card{border:1px solid #dfe1e6;border-radius:6px;overflow:hidden}
+.sc-h{padding:10px 14px;background:#f8f9fa;border-bottom:1px solid #dfe1e6;font-size:12px;font-weight:600;color:#42526e}
+.sc-b{padding:12px 14px}
+.field-row{display:flex;gap:24px;font-size:12.5px;flex-wrap:wrap}
+.fr-f{display:flex;flex-direction:column;gap:2px}
+.fr-l{font-size:11px;color:#97a0af}
+.fr-v{font-weight:500;color:#172b4d}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STATE 1 — No-show confirmed · Deposit UNRESOLVED (Manager sees this)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-label sl-amber">⚠ State 1 — No-show confirmed · Deposit pending resolution · Manager view</div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="bc"><a href="#">Front Desk</a><span class="bc-sep">›</span><a href="#">Reservations</a><span class="bc-sep">›</span><span style="color:#172b4d;font-weight:500">RSV-2026-0041</span></div>
+      <div style="font-size:12px;color:#97a0af">Manager view · Full access</div>
+    </div>
+    <!-- Reservation header -->
+    <div class="res-hd">
+      <div class="rhd-l">
+        <div class="rsv-id">RSV-2026-0041
+          <span class="badge b-ns">● No-show</span>
+          <span class="badge b-dep-pend">⚠ Deposit IDR 1,000,000 — unresolved</span>
+        </div>
+        <div class="rsv-guest">Guest: <strong>Hendrick Willems</strong> · GST-0042 · +62 812 3456 7890 · Netherlands</div>
+      </div>
+      <div class="rhd-r">
+        <button class="btn btn-ghost" style="cursor:not-allowed">+ Add charge</button>
+        <button class="btn btn-blue" style="background:#0052cc">↩ Reverse no-show</button>
+      </div>
+    </div>
+    <!-- Summary strip -->
+    <div class="sum-grid">
+      <div class="sg"><div class="sg-l">Room</div><div class="sg-v">V-03 · 2BR Pool Villa</div></div>
+      <div class="sg"><div class="sg-l">Check-in</div><div class="sg-v">08 Jun 2026 · 14:00</div></div>
+      <div class="sg"><div class="sg-l">Check-out</div><div class="sg-v">11 Jun 2026 · 12:00</div></div>
+      <div class="sg"><div class="sg-l">No-show marked</div><div class="sg-v-r">08 Jun 2026 · 18:14 · Rina Kusuma</div></div>
+    </div>
+
+    <!-- ▼ DEPOSIT RESOLUTION SECTION — unresolved state -->
+    <div class="dep-section">
+      <div class="ds-head">
+        <div class="dsh-l">
+          <div class="dsh-icon">!</div>
+          Deposit requires resolution — Manager action needed
+        </div>
+        <div class="dsh-r">No folio created · resolve deposit manually</div>
+      </div>
+      <div class="ds-body">
+        <!-- Deposit info -->
+        <div class="dep-info">
+          <div class="di-field"><div class="di-l">Deposit collected</div><div class="di-v">IDR 1,000,000</div></div>
+          <div class="di-divider"></div>
+          <div class="di-field"><div class="di-l">Method</div><div class="di-v">Cash</div></div>
+          <div class="di-divider"></div>
+          <div class="di-field"><div class="di-l">Reference</div><div class="di-v">DEP-0041</div></div>
+          <div class="di-divider"></div>
+          <div class="di-field"><div class="di-l">Collected on</div><div class="di-v">05 Jun 2026</div></div>
+          <div class="di-divider"></div>
+          <div class="di-field"><div class="di-l">Collected by</div><div class="di-v">Rina Kusuma</div></div>
+        </div>
+
+        <!-- Resolution type selection -->
+        <div style="font-size:12px;font-weight:600;color:#42526e;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Select resolution action</div>
+        <div class="res-opts">
+          <div class="ro-card on-refund">
+            <div class="ro-head"><div class="ro-radio sel"></div><div class="ro-lbl" style="color:#006644">Refund deposit to guest</div></div>
+            <div class="ro-sub">Guest did not use the room. Return the full or partial deposit amount. Agent records how the money was returned.</div>
+          </div>
+          <div class="ro-card">
+            <div class="ro-head"><div class="ro-radio"></div><div class="ro-lbl">Forfeit deposit (property keeps)</div></div>
+            <div class="ro-sub">Property policy requires forfeiture. Deposit stays with property. Reason recorded for audit trail.</div>
+          </div>
+        </div>
+
+        <!-- Refund form (shown when "Refund" selected) -->
+        <div class="refund-form">
+          <div class="rf-head">↩ Refund deposit to guest</div>
+          <div class="rf-body">
+            <div class="form-row">
+              <div class="f-field">
+                <div class="f-lbl">Refund amount (IDR) <span class="req">*</span></div>
+                <div class="input-unit">
+                  <div class="iu-pfx">IDR</div>
+                  <input class="iu-inp" value="1,000,000">
+                </div>
+              </div>
+              <div class="f-field">
+                <div class="f-lbl">Refund method <span class="req">*</span></div>
+                <select class="f-sel" style="width:100%">
+                  <option>Cash — returned from till</option>
+                  <option>Bank transfer</option>
+                  <option>Card reversal</option>
+                  <option>QRIS reversal</option>
+                </select>
+              </div>
+              <div class="f-field">
+                <div class="f-lbl">Refund date <span class="req">*</span></div>
+                <input class="f-inp" type="date" value="2026-06-08">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="f-field">
+                <div class="f-lbl">Reference / receipt number</div>
+                <input class="f-inp" placeholder="e.g. cash receipt no., bank ref">
+              </div>
+              <div class="f-field">
+                <div class="f-lbl">Reason for refund <span class="req">*</span></div>
+                <select class="f-sel" style="width:100%">
+                  <option>No-show — deposit refunded per property policy</option>
+                  <option>No-show — guest contacted and requested refund</option>
+                  <option>Flight delay — guest unable to arrive</option>
+                  <option>Goodwill refund</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="f-field">
+              <div class="f-lbl">Internal notes (optional)</div>
+              <textarea class="f-textarea" rows="2" placeholder="e.g. Guest called at 20:00, delayed flight, refund processed by Manager"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="ds-footer">
+        <div class="df-hint">Refund amount cannot exceed IDR 1,000,000. Audit trail will record Manager name, timestamp, and reason.</div>
+        <button class="btn-confirm-refund">Confirm refund — IDR 1,000,000</button>
+      </div>
+    </div>
+
+    <!-- Other info -->
+    <div class="page-body" style="padding-top:0">
+      <div class="sec-card">
+        <div class="sc-h">No-show audit trail</div>
+        <div class="sc-b">
+          <div style="font-size:12.5px;color:#42526e;line-height:1.7">
+            <span style="color:#172b4d;font-weight:500">08 Jun 2026 · 18:14</span> — Rina Kusuma marked reservation as No-show ·
+            Reason: "Guest did not arrive — no contact made" · Room V-03 released to Available
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STATE 2 — Deposit REFUNDED (resolved)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-label sl-green">✓ State 2 — Deposit REFUNDED · Resolved</div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="bc"><a href="#">Front Desk</a><span class="bc-sep">›</span><a href="#">Reservations</a><span class="bc-sep">›</span><span style="color:#172b4d;font-weight:500">RSV-2026-0041</span></div>
+    </div>
+    <div class="res-hd">
+      <div class="rhd-l">
+        <div class="rsv-id">RSV-2026-0041
+          <span class="badge b-ns">● No-show</span>
+          <span class="badge b-dep-ref">✓ Deposit refunded</span>
+        </div>
+        <div class="rsv-guest">Guest: <strong>Hendrick Willems</strong> · GST-0042</div>
+      </div>
+      <div class="rhd-r">
+        <button class="btn btn-blue">↩ Reverse no-show</button>
+      </div>
+    </div>
+    <div class="sum-grid">
+      <div class="sg"><div class="sg-l">Room</div><div class="sg-v">V-03 · 2BR Pool Villa</div></div>
+      <div class="sg"><div class="sg-l">Check-in</div><div class="sg-v">08 Jun 2026 · 14:00</div></div>
+      <div class="sg"><div class="sg-l">Check-out</div><div class="sg-v">11 Jun 2026 · 12:00</div></div>
+      <div class="sg"><div class="sg-l">No-show marked</div><div class="sg-v-r">08 Jun 2026 · 18:14 · Rina Kusuma</div></div>
+    </div>
+
+    <!-- ▼ DEPOSIT SECTION — refunded state (green, read-only) -->
+    <div class="dep-section-green">
+      <div class="ds-head-green">
+        <div class="dsh-l-green">
+          <span style="width:22px;height:22px;border-radius:50%;background:#36b37e;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">✓</span>
+          Deposit resolved — refunded to guest
+        </div>
+        <div class="dsh-r" style="color:#36b37e">08 Jun 2026 · 20:30 · Manager</div>
+      </div>
+      <div class="res-summary">
+        <div class="rs-row"><span class="rs-l">Original deposit</span><span class="rs-v">IDR 1,000,000 · Cash · Ref DEP-0041 · 05 Jun 2026</span></div>
+        <div class="rs-row"><span class="rs-l">Refund amount</span><span class="rs-v-g">IDR 1,000,000 — full refund</span></div>
+        <div class="rs-row"><span class="rs-l">Refund method</span><span class="rs-v">Cash — returned from till</span></div>
+        <div class="rs-row"><span class="rs-l">Refund date</span><span class="rs-v">08 Jun 2026</span></div>
+        <div class="rs-row"><span class="rs-l">Reason</span><span class="rs-v">No-show — deposit refunded per property policy</span></div>
+        <div class="rs-row"><span class="rs-l">Resolved by</span><span class="rs-v">Manager · 08 Jun 2026 · 20:30</span></div>
+        <div class="rs-row" style="border-bottom:none"><span class="rs-l">Notes</span><span class="rs-v" style="color:#97a0af">Guest called at 20:00, delayed flight, refund processed by Manager</span></div>
+      </div>
+    </div>
+
+    <div class="page-body" style="padding-top:0">
+      <div class="sec-card">
+        <div class="sc-h">Audit trail</div>
+        <div class="sc-b" style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12.5px;color:#42526e;line-height:1.7"><span style="color:#172b4d;font-weight:500">08 Jun · 18:14</span> — Rina Kusuma marked No-show · Reason: Guest did not arrive</div>
+          <div style="font-size:12.5px;color:#006644;line-height:1.7"><span style="color:#172b4d;font-weight:500">08 Jun · 20:30</span> — Manager processed deposit refund · IDR 1,000,000 · Cash · "No-show — property policy"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STATE 3 — Deposit FORFEITED (property keeps)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-label sl-blue">⬤ State 3 — Deposit FORFEITED · Property keeps</div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="bc"><a href="#">Front Desk</a><span class="bc-sep">›</span><a href="#">Reservations</a><span class="bc-sep">›</span><span style="color:#172b4d;font-weight:500">RSV-2026-0041</span></div>
+    </div>
+    <div class="res-hd">
+      <div class="rhd-l">
+        <div class="rsv-id">RSV-2026-0041
+          <span class="badge b-ns">● No-show</span>
+          <span class="badge b-dep-forf">Deposit forfeited</span>
+        </div>
+        <div class="rsv-guest">Guest: <strong>Tanaka Group</strong> · GST-0055</div>
+      </div>
+      <div class="rhd-r">
+        <button class="btn btn-ghost" style="cursor:not-allowed">Reversal window closed</button>
+      </div>
+    </div>
+    <div class="sum-grid">
+      <div class="sg"><div class="sg-l">Room</div><div class="sg-v">V-07 · 3BR Villa</div></div>
+      <div class="sg"><div class="sg-l">Check-in</div><div class="sg-v">01 Jun 2026 · 14:00</div></div>
+      <div class="sg"><div class="sg-l">Check-out (past)</div><div class="sg-v">04 Jun 2026 · 12:00</div></div>
+      <div class="sg"><div class="sg-l">No-show marked</div><div class="sg-v-r">01 Jun 2026 · 16:22 · Rina Kusuma</div></div>
+    </div>
+
+    <!-- ▼ DEPOSIT SECTION — forfeited state -->
+    <div class="dep-section-gray">
+      <div class="ds-head-gray">
+        <div class="dsh-l-gray">
+          <span style="width:22px;height:22px;border-radius:50%;background:#42526e;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">✓</span>
+          Deposit resolved — forfeited (property)
+        </div>
+        <div class="dsh-r">01 Jun 2026 · 17:00 · Manager</div>
+      </div>
+      <div class="res-summary">
+        <div class="rs-row"><span class="rs-l">Original deposit</span><span class="rs-v">IDR 5,000,000 · Bank transfer · Ref BT-2026-0055 · 28 May 2026</span></div>
+        <div class="rs-row"><span class="rs-l">Forfeited amount</span><span class="rs-v-gr">IDR 5,000,000 — kept by property</span></div>
+        <div class="rs-row"><span class="rs-l">Reason</span><span class="rs-v">Outside cancellation window — no-show policy applies</span></div>
+        <div class="rs-row"><span class="rs-l">Resolved by</span><span class="rs-v">Manager · 01 Jun 2026 · 17:00</span></div>
+        <div class="rs-row" style="border-bottom:none"><span class="rs-l">Reversal window</span><span class="rs-v" style="color:#97a0af">Closed — CO time 04 Jun 12:00 has passed</span></div>
+      </div>
+    </div>
+
+    <div class="page-body" style="padding-top:0">
+      <div class="sec-card">
+        <div class="sc-h">Audit trail</div>
+        <div class="sc-b" style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12.5px;color:#42526e;line-height:1.7"><span style="color:#172b4d;font-weight:500">01 Jun · 16:22</span> — Rina Kusuma marked No-show · Reason: Guest did not arrive</div>
+          <div style="font-size:12.5px;color:#42526e;line-height:1.7"><span style="color:#172b4d;font-weight:500">01 Jun · 17:00</span> — Manager recorded deposit forfeiture · IDR 5,000,000 · "Outside cancellation window"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
