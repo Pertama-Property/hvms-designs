@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Check-Out · All Scenarios · Frappe v16</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+     background:#f0f4f7;color:#1c1c1c;font-size:13px;display:flex;flex-direction:column;
+     gap:32px;padding:24px;max-width:1120px}
+
+/* ── State label ───────────────────────────────────────── */
+.state-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+           padding:4px 12px;border-radius:4px 4px 0 0;display:inline-flex;align-items:center;gap:5px}
+.sl-1{background:#e8f4fc;border:1px solid #b3d1e8;border-bottom:none;color:#1a73e8}
+.sl-2{background:#e6f4ea;border:1px solid #b2dfbd;border-bottom:none;color:#1e7e34}
+.sl-3{background:#fce8e6;border:1px solid #f5c6c2;border-bottom:none;color:#c62828}
+
+/* ── Page shell ────────────────────────────────────────── */
+.shell{display:flex;border-radius:0 4px 4px 4px;overflow:hidden;
+       box-shadow:0 1px 4px rgba(0,0,0,.12);background:#f8f9fa}
+
+/* ── Frappe sidebar ────────────────────────────────────── */
+.fsb{width:178px;flex-shrink:0;background:#fff;border-right:1px solid #e2e6ea;
+     display:flex;flex-direction:column;padding:0}
+.fsb-top{padding:10px 12px;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;gap:8px}
+.fsb-icon{width:28px;height:28px;background:#6c63ff;border-radius:6px;display:flex;align-items:center;
+          justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.fsb-app{display:flex;flex-direction:column}
+.fsb-app-name{font-size:13px;font-weight:600;color:#1c1c1c;line-height:1.2}
+.fsb-app-sub{font-size:11px;color:#8d95a0;line-height:1.2}
+.fsb-nav{padding:6px 0;flex:1}
+.fsb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12.5px;
+          color:#4a5568;cursor:pointer}
+.fsb-item:hover{background:#f0f4f7}
+.fsb-item.on{background:#eaf0fb;color:#1a73e8;font-weight:500}
+.fsb-item .ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+               font-size:13px;opacity:.6;flex-shrink:0}
+.fsb-item.on .ico{opacity:1}
+.fsb-sec{font-size:10px;font-weight:600;color:#8d95a0;padding:8px 14px 3px;
+         text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:space-between}
+.fsb-user{padding:10px 12px;border-top:1px solid #e2e6ea;display:flex;align-items:center;gap:8px;margin-top:auto}
+.fsb-avatar{width:28px;height:28px;border-radius:50%;background:#6c63ff;color:#fff;
+            display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.fsb-uname{font-size:12px;font-weight:500;color:#1c1c1c;line-height:1.2}
+.fsb-uemail{font-size:10.5px;color:#8d95a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+
+/* ── Main area ─────────────────────────────────────────── */
+.fmain{flex:1;display:flex;flex-direction:column;background:#f8f9fa;min-width:0}
+.fbc{height:34px;background:#fff;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;
+     padding:0 16px;gap:6px;font-size:12px;color:#6c757d}
+.fbc span{color:#1c1c1c}
+
+/* Content card */
+.fcard{background:#fff;margin:16px;border-radius:6px;border:1px solid #e2e6ea;overflow:hidden}
+.fcard-hd{padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #f2f3f4}
+.fcd-l{}
+.fcd-title{font-size:20px;font-weight:600;color:#1c1c1c;margin-bottom:3px}
+.fcd-sub{font-size:12.5px;color:#6c757d}
+.fcd-r{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#6c757d;white-space:nowrap}
+.fcd-rsv{font-weight:600;color:#1c1c1c}
+.ci-badge{background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:11.5px;font-weight:500}
+
+/* Stepper */
+.fstepper{display:flex;align-items:center;justify-content:center;padding:18px 24px;gap:0;border-bottom:1px solid #f2f3f4}
+.fst{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:100px}
+.fst-connector{flex:1;height:2px;background:#28a745;margin-bottom:18px;max-width:60px}
+.fst-connector.inactive{background:#dee2e6}
+.fst-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+         font-size:14px;font-weight:700}
+.fst-dot.done{background:#28a745;color:#fff}
+.fst-dot.active{background:#1a73e8;color:#fff;font-size:13px}
+.fst-dot.inactive{background:#dee2e6;color:#6c757d;font-size:13px}
+.fst-lbl{font-size:12px;color:#6c757d;text-align:center;line-height:1.3}
+.fst.active .fst-lbl{font-weight:600;color:#1c1c1c}
+
+/* Step accordion */
+.fstep{border-bottom:1px solid #e2e6ea}
+.fstep:last-child{border-bottom:none}
+.fstep-hd{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.fstep-hd.done{background:#f0fdf4}
+.fstep-hd.active{background:#f0fdf4}
+.fstep-hd.locked{background:#f8f9fa}
+.fsh-l{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;
+        text-transform:uppercase;letter-spacing:.05em;color:#495057}
+.fstep-hd.done .fsh-l{color:#28a745}
+.fstep-hd.active .fsh-l{color:#28a745}
+.fstep-hd.locked .fsh-l{color:#adb5bd}
+.fsh-check{color:#28a745;font-size:16px}
+.fsh-chevron{font-size:14px;color:#adb5bd}
+/* Step body */
+.fstep-body{padding:16px 20px}
+/* Guest info row */
+.fg-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:14px}
+.fg-cell{display:flex;flex-direction:column;gap:3px;padding:0 8px}
+.fg-cell:first-child{padding-left:0}
+.fgc-l{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6c757d}
+.fgc-v{font-size:13px;font-weight:600;color:#1c1c1c}
+/* Folio table */
+table.ftbl{width:100%;border-collapse:collapse;margin-bottom:8px}
+.ftbl th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;
+         letter-spacing:.05em;color:#6c757d;border-bottom:1px solid #dee2e6}
+.ftbl td{padding:9px 10px;border-bottom:1px solid #f2f3f4;font-size:13px;vertical-align:middle}
+.ftbl tr:last-child td{border-bottom:none}
+.ftbl td.date{color:#6c757d;font-size:12.5px;white-space:nowrap}
+.ftbl td.amt{text-align:right;font-weight:500;font-family:monospace;font-size:13px}
+.amt-credit{color:#28a745}
+.amt-debit{color:#1c1c1c}
+/* Type badges */
+.tbadge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:500}
+.tb-dep{background:#d4edda;color:#155724}
+.tb-pay{background:#cce5ff;color:#004085}
+.tb-void{background:#f8d7da;color:#721c24}
+.tb-room{background:#e2e3e5;color:#383d41}
+/* Balance row */
+.fbal-row{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:10px 0 4px;
+          border-top:1px solid #dee2e6}
+.fbal-lbl{font-size:12.5px;color:#6c757d}
+.fbal-amt{font-size:15px;font-weight:700;color:#1c1c1c;font-family:monospace}
+.fbal-amt.due{color:#1c1c1c}
+.fbal-amt.zero{color:#28a745}
+/* Add manual charge btn */
+.add-charge-btn{display:flex;justify-content:flex-end;padding-top:8px}
+.btn-add-charge{padding:5px 12px;border:1px solid #ced4da;border-radius:4px;font-size:12.5px;
+                color:#495057;background:#fff;cursor:pointer}
+
+/* STEP 2 — Collect payment form */
+.pay-form-grid{display:grid;grid-template-columns:1.5fr 1.5fr 1fr;gap:12px;margin-bottom:14px}
+.pf-field{display:flex;flex-direction:column;gap:5px}
+.pf-lbl{font-size:12px;font-weight:500;color:#495057}
+.pf-lbl .req{color:#dc3545}
+.pf-input{height:34px;border:1px solid #ced4da;border-radius:4px;padding:0 10px;
+           font-size:13px;font-family:inherit;background:#fff;color:#1c1c1c}
+.pf-input:focus{border-color:#80bdff;outline:none}
+.pf-input.change-pos{background:#d4edda;border-color:#28a745;color:#155724;font-weight:600}
+.pf-input.change-short{background:#f8d7da;border-color:#dc3545;color:#721c24;font-weight:600}
+.pf-select{height:34px;border:1px solid #ced4da;border-radius:4px;padding:0 28px 0 10px;
+           font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none}
+/* Change banner */
+.change-bar{border-radius:4px;padding:9px 14px;display:flex;align-items:center;
+            justify-content:space-between;margin-bottom:14px}
+.cb-pos{background:#d4edda;border:1px solid #b2dfbd}
+.cb-neg{background:#f8d7da;border:1px solid #f5c6c2}
+.cbt{font-size:12px}.cbt-pos{color:#155724}.cbt-neg{color:#721c24}
+.cba{font-size:20px;font-weight:700;font-family:monospace}.cba-pos{color:#155724}.cba-neg{color:#dc3545}
+/* Payment summary */
+.psummary{background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:12px 14px;margin-bottom:14px}
+.psum-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+            color:#6c757d;margin-bottom:8px}
+.psum-row{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;
+          border-bottom:1px solid #e9ecef}
+.psum-row:last-child{border-bottom:none}
+.ps-l{color:#495057}.ps-r{font-family:monospace;font-weight:500}
+.ps-g{color:#28a745}.ps-a{color:#e67e00}
+.psum-div{border-top:1.5px solid #dee2e6;margin:6px 0}
+.psum-total{display:flex;justify-content:space-between;font-size:14px;font-weight:600;padding-top:5px}
+/* Confirm btn */
+.btn-confirm-pay{width:100%;padding:10px;background:#28a745;color:#fff;border:none;
+                 border-radius:4px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-confirm-return{width:100%;padding:10px;background:#28a745;color:#fff;border:none;
+                    border-radius:4px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit}
+/* Deposit return */
+.dep-return-card{background:#d4edda;border:1.5px solid #28a745;border-radius:6px;
+                 padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.drc-l{display:flex;align-items:center;gap:10px}
+.drc-icon{width:30px;height:30px;border-radius:50%;background:#28a745;color:#fff;
+          display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.drc-title{font-size:13px;font-weight:600;color:#155724}
+.drc-sub{font-size:12px;color:#1e7e34;margin-top:1px}
+.drc-amt{font-size:22px;font-weight:700;color:#155724;font-family:monospace}
+
+/* STEP 3 — Receipt */
+.pdf-card{border:1px solid #dee2e6;border-radius:4px;padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.pdf-info{}
+.pdf-title{font-size:13.5px;font-weight:600;color:#1c1c1c;margin-bottom:3px}
+.pdf-meta{font-size:12px;color:#6c757d;line-height:1.6}
+.btn-dl{padding:6px 14px;border:1px solid #ced4da;border-radius:4px;font-size:12.5px;color:#495057;background:#fff;cursor:pointer}
+.email-sec{margin-bottom:14px}
+.email-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.email-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#495057}
+.email-title .opt{font-weight:400;color:#adb5bd;margin-left:4px}
+.smtp-badge{background:#d4edda;color:#155724;font-size:11px;font-weight:500;padding:2px 8px;border-radius:12px;display:flex;align-items:center;gap:3px}
+.email-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.ef-field{display:flex;flex-direction:column;gap:4px}
+.ef-lbl{font-size:11.5px;color:#6c757d}
+.ef-inp{height:34px;border:1px solid #ced4da;border-radius:4px;padding:0 10px;font-size:13px;font-family:inherit}
+.btn-send-email{padding:7px 16px;background:#1c1c1c;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.email-note{font-size:12px;color:#6c757d;margin-top:8px}
+
+/* STEP 4 — Confirm */
+.s4-info{background:#d4edda;border-radius:4px;padding:12px 14px;font-size:13px;color:#155724;line-height:1.6;margin-bottom:14px}
+.s4-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.s4-cell{display:flex;flex-direction:column;gap:3px;padding:0 8px}
+.s4-cell:first-child{padding-left:0}
+.s4c-l{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6c757d}
+.s4c-v{font-size:13px;font-weight:600;color:#1c1c1c}
+.s4c-v.green{color:#28a745}
+
+/* VOID BLOCK */
+.void-block{border:1px solid #f5c6c2;border-radius:4px;overflow:hidden;margin-bottom:14px}
+.vb-hd{background:#dc3545;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.vb-hd-icon{width:22px;height:22px;border-radius:50%;background:#fff;color:#dc3545;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.vb-hd-title{font-size:13px;font-weight:600;color:#fff}
+.vb-body{padding:12px 14px;background:#fff8f8}
+.vb-desc{font-size:13px;color:#721c24;line-height:1.6;margin-bottom:12px}
+.void-item-card{border:1px solid #f5c6c2;border-radius:4px;padding:10px 14px;background:#fff;margin-bottom:10px}
+.vic-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+.vic-desc{font-size:13px;font-weight:500;color:#1c1c1c}
+.vic-amt{font-size:14px;font-weight:700;font-family:monospace;color:#dc3545}
+.vic-meta{font-size:12px;color:#6c757d}
+.vic-tag{font-size:10.5px;background:#f8d7da;color:#721c24;padding:1px 7px;border-radius:12px;font-weight:500;margin-left:6px}
+.mgr-row{background:#f8f9fa;border:1px solid #e9ecef;border-radius:4px;padding:9px 14px;
+         display:flex;align-items:center;justify-content:space-between}
+.mgr-l{font-size:12.5px;color:#495057;display:flex;align-items:center;gap:7px}
+.mgr-badge{background:#cce5ff;color:#004085;font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:12px}
+.mgr-btns{display:flex;gap:8px}
+.btn-approve{padding:6px 14px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer}
+.btn-reject{padding:6px 14px;background:#fff;border:1px solid #dc3545;color:#dc3545;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer}
+.vb-note{padding:10px 14px;border-top:1px solid #f5c6c2;background:#fff3f3;font-size:12px;color:#dc3545}
+.step-locked-note{background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:10px 14px;
+                  font-size:12.5px;color:#adb5bd;font-style:italic;margin-bottom:14px}
+
+/* Bottom bar */
+.fbtm{padding:12px 16px;background:#fff;border-top:1px solid #e2e6ea;display:flex;
+      align-items:center;justify-content:space-between}
+.btn-prev{padding:7px 14px;border:1px solid #ced4da;border-radius:4px;font-size:12.5px;color:#495057;background:#fff;cursor:pointer}
+.fbtm-center{font-size:12.5px;color:#6c757d}
+.fbtm-right{display:flex;gap:8px}
+.btn-draft{padding:7px 14px;border:1px solid #ced4da;border-radius:4px;font-size:12.5px;color:#495057;background:#fff;cursor:pointer}
+.btn-co{padding:7px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer}
+.btn-co.disabled{background:#ced4da;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- ═══ SCENARIO 1: Balance > 0 — Collect outstanding ════════════════ -->
+<div>
+  <div class="state-lbl sl-1">Scenario 1 — Balance IDR 900,000 · Adds on outstanding · Step 2 active</div>
+  <div class="shell">
+    <!-- Sidebar -->
+    <div class="fsb">
+      <div class="fsb-top">
+        <div class="fsb-icon">F</div>
+        <div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div>
+      </div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Core Operations <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item"><span class="ico">⊡</span>Room Availability Check</div>
+        <div class="fsb-item"><span class="ico">☰</span>Reservations</div>
+        <div class="fsb-item"><span class="ico">←</span>Check In</div>
+        <div class="fsb-item on"><span class="ico">→</span>Check Out</div>
+        <div class="fsb-item"><span class="ico">↗</span>Departures</div>
+        <div class="fsb-sec">Folio &amp; Billing <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item"><span class="ico">📋</span>Guest Folio</div>
+        <div class="fsb-item"><span class="ico">💳</span>Deposit</div>
+      </div>
+      <div class="fsb-user">
+        <div class="fsb-avatar">R</div>
+        <div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div>
+      </div>
+    </div>
+    <!-- Main -->
+    <div class="fmain">
+      <div class="fbc">🏠 / <span>Guest Check-out</span></div>
+      <div class="fcard">
+        <!-- Card header -->
+        <div class="fcard-hd">
+          <div class="fcd-l">
+            <div class="fcd-title">Check-Out</div>
+            <div class="fcd-sub">Settle folio, collect payment, and confirm departure</div>
+          </div>
+          <div class="fcd-r">Reservation &nbsp;<span class="fcd-rsv">RSV-2026-0041</span>&nbsp;<span class="ci-badge">Checked In</span></div>
+        </div>
+        <!-- Stepper -->
+        <div class="fstepper">
+          <div class="fst"><div class="fst-dot done">✓</div><div class="fst-lbl">Folio review</div></div>
+          <div class="fst-connector"></div>
+          <div class="fst active"><div class="fst-dot active">2</div><div class="fst-lbl">Collect payment</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">3</div><div class="fst-lbl">Receipt</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">4</div><div class="fst-lbl">Confirm check-out</div></div>
+        </div>
+        <!-- Step 1 collapsed -->
+        <div class="fstep">
+          <div class="fstep-hd done">
+            <div class="fsh-l">Step 1 — Folio review <span class="fsh-check">✓</span></div>
+            <div class="fsh-chevron">▾</div>
+          </div>
+          <div class="fstep-body">
+            <div class="fg-row">
+              <div class="fg-cell"><div class="fgc-l">Guest</div><div class="fgc-v">Hendrick Willems</div></div>
+              <div class="fg-cell"><div class="fgc-l">Room</div><div class="fgc-v">V-03 · 2BR Pool Villa</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-in</div><div class="fgc-v">08 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-out</div><div class="fgc-v">11 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Nights stayed</div><div class="fgc-v">3</div></div>
+            </div>
+            <table class="ftbl">
+              <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+              <tbody>
+                <tr><td class="date">08 Jun 2026</td><td>Accommodation — Standard Rate (3 nights)</td><td></td><td class="amt amt-debit">IDR 10,500,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Airport transfer — Ngurah Rai → V-03</td><td></td><td class="amt amt-debit">IDR 750,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Welcome fruit basket</td><td></td><td class="amt amt-debit">IDR 150,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Deposit Offset</td><td><span class="tbadge tb-dep">Deposit</span></td><td class="amt amt-credit">IDR 1,000,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Room charge (Cash)</td><td><span class="tbadge tb-pay">Payment</span></td><td class="amt amt-credit">IDR 10,500,000</td></tr>
+              </tbody>
+            </table>
+            <div class="fbal-row">
+              <span class="fbal-lbl">Balance due at check-out</span>
+              <span class="fbal-amt due">IDR 900,000</span>
+            </div>
+            <div class="add-charge-btn"><button class="btn-add-charge">Add manual charge</button></div>
+          </div>
+        </div>
+        <!-- Step 2 active -->
+        <div class="fstep">
+          <div class="fstep-hd active">
+            <div class="fsh-l">Step 2 — Collect payment</div>
+            <div class="fsh-chevron">▴</div>
+          </div>
+          <div class="fstep-body">
+            <div class="pay-form-grid">
+              <div class="pf-field"><div class="pf-lbl">Payment method <span class="req">*</span></div>
+                <select class="pf-select"><option>Cash</option></select></div>
+              <div class="pf-field"><div class="pf-lbl">Amount tendered (IDR) <span class="req">*</span></div>
+                <input class="pf-input" value="1,000,000"></div>
+              <div class="pf-field"><div class="pf-lbl">Change to return</div>
+                <input class="pf-input change-pos" value="IDR 100,000" readonly></div>
+            </div>
+            <div class="change-bar cb-pos">
+              <div><div class="cbt cbt-pos">Change to give back to guest</div>
+                <div style="font-size:11.5px;color:#1e7e34">IDR 1,000,000 tendered − IDR 900,000 balance due</div></div>
+              <div class="cba cba-pos">IDR 100,000</div>
+            </div>
+            <div class="psummary">
+              <div class="psum-title">Settlement summary</div>
+              <div class="psum-row"><span class="ps-l">Accommodation + Adds on</span><span class="ps-r">11,400,000</span></div>
+              <div class="psum-row"><span class="ps-l">Deposit Offset (check-in)</span><span class="ps-r ps-g">−1,000,000</span></div>
+              <div class="psum-row"><span class="ps-l">Room charge — Cash (check-in)</span><span class="ps-r ps-g">−10,500,000</span></div>
+              <div class="psum-div"></div>
+              <div class="psum-row"><span class="ps-l" style="color:#1c1c1c;font-weight:500">Collecting now (adds on)</span><span class="ps-r ps-a">IDR 900,000</span></div>
+              <div class="psum-total"><span>Balance after payment</span><span style="color:#28a745">IDR 0</span></div>
+            </div>
+            <button class="btn-confirm-pay">Confirm payment — IDR 900,000</button>
+          </div>
+        </div>
+        <!-- Steps 3+4 locked -->
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 3 — Receipt</div><div class="fsh-chevron">▾</div></div></div>
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 4 — Confirm check-out</div><div class="fsh-chevron">▾</div></div></div>
+      </div>
+      <div class="fbtm">
+        <button class="btn-prev">Previous</button>
+        <div class="fbtm-center">Step 2 of 4</div>
+        <div class="fbtm-right"><button class="btn-draft">Save as draft</button><button class="btn-co disabled" disabled>Confirm check-out</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SCENARIO 2: Deposit surplus — return to guest ════════════════ -->
+<div>
+  <div class="state-lbl sl-2">Scenario 2 — Deposit surplus · Return IDR 250,000 · Step 2 active</div>
+  <div class="shell">
+    <div class="fsb">
+      <div class="fsb-top"><div class="fsb-icon">F</div><div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div></div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Core Operations <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item on"><span class="ico">→</span>Check Out</div>
+        <div class="fsb-sec">Folio &amp; Billing <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item"><span class="ico">📋</span>Guest Folio</div>
+      </div>
+      <div class="fsb-user"><div class="fsb-avatar">R</div><div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="fmain">
+      <div class="fbc">🏠 / <span>Guest Check-out</span></div>
+      <div class="fcard">
+        <div class="fcard-hd">
+          <div class="fcd-l"><div class="fcd-title">Check-Out</div><div class="fcd-sub">Settle folio, collect payment, and confirm departure</div></div>
+          <div class="fcd-r">Reservation &nbsp;<span class="fcd-rsv">RSV-2026-0039</span>&nbsp;<span class="ci-badge">Checked In</span></div>
+        </div>
+        <div class="fstepper">
+          <div class="fst"><div class="fst-dot done">✓</div><div class="fst-lbl">Folio review</div></div>
+          <div class="fst-connector"></div>
+          <div class="fst active"><div class="fst-dot active">2</div><div class="fst-lbl">Collect payment</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">3</div><div class="fst-lbl">Receipt</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">4</div><div class="fst-lbl">Confirm check-out</div></div>
+        </div>
+        <!-- Step 1 collapsed -->
+        <div class="fstep">
+          <div class="fstep-hd done">
+            <div class="fsh-l">Step 1 — Folio review <span class="fsh-check">✓</span></div>
+            <div class="fsh-chevron">▾</div>
+          </div>
+          <div class="fstep-body">
+            <div class="fg-row">
+              <div class="fg-cell"><div class="fgc-l">Guest</div><div class="fgc-v">Priya Sharma</div></div>
+              <div class="fg-cell"><div class="fgc-l">Room</div><div class="fgc-v">V-10 · 3BR Villa</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-in</div><div class="fgc-v">08 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-out</div><div class="fgc-v">10 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Nights stayed</div><div class="fgc-v">2</div></div>
+            </div>
+            <table class="ftbl">
+              <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+              <tbody>
+                <tr><td class="date">08 Jun 2026</td><td>Room Charge (2 nights)</td><td></td><td class="amt amt-debit">IDR 7,000,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Deposit Offset</td><td><span class="tbadge tb-dep">Deposit</span></td><td class="amt amt-credit">IDR 1,000,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Room charge (Cash)</td><td><span class="tbadge tb-pay">Payment</span></td><td class="amt amt-credit">IDR 7,000,000</td></tr>
+              </tbody>
+            </table>
+            <div class="fbal-row">
+              <span class="fbal-lbl">Balance due at check-out</span>
+              <span class="fbal-amt zero">IDR −250,000</span>
+            </div>
+            <div class="add-charge-btn"><button class="btn-add-charge">Add manual charge</button></div>
+          </div>
+        </div>
+        <!-- Step 2 active — deposit return -->
+        <div class="fstep">
+          <div class="fstep-hd active">
+            <div class="fsh-l">Step 2 — Settlement</div>
+            <div class="fsh-chevron">▴</div>
+          </div>
+          <div class="fstep-body">
+            <div class="dep-return-card">
+              <div class="drc-l">
+                <div class="drc-icon">↩</div>
+                <div>
+                  <div class="drc-title">Return cash to guest</div>
+                  <div class="drc-sub">Deposit credit exceeds total charges — return the difference from till</div>
+                </div>
+              </div>
+              <div class="drc-amt">IDR 250,000</div>
+            </div>
+            <div class="psummary">
+              <div class="psum-title">Settlement summary</div>
+              <div class="psum-row"><span class="ps-l">Room Charge (2 nights)</span><span class="ps-r">7,000,000</span></div>
+              <div class="psum-row"><span class="ps-l">Deposit Offset</span><span class="ps-r ps-g">−1,000,000</span></div>
+              <div class="psum-row"><span class="ps-l">Room charge — Cash (check-in)</span><span class="ps-r ps-g">−7,000,000</span></div>
+              <div class="psum-div"></div>
+              <div class="psum-row"><span class="ps-l" style="color:#155724;font-weight:500">Return to guest (deposit surplus)</span><span class="ps-r ps-g">IDR 250,000</span></div>
+              <div class="psum-total"><span>Balance after return</span><span style="color:#28a745">IDR 0</span></div>
+            </div>
+            <div style="font-size:12px;color:#6c757d;margin-bottom:10px">No cash collected from guest. Agent returns IDR 250,000 from the till.</div>
+            <button class="btn-confirm-return">Confirm — return IDR 250,000 to guest</button>
+          </div>
+        </div>
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 3 — Receipt</div><div class="fsh-chevron">▾</div></div></div>
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 4 — Confirm check-out</div><div class="fsh-chevron">▾</div></div></div>
+      </div>
+      <div class="fbtm">
+        <button class="btn-prev">Previous</button>
+        <div class="fbtm-center">Step 2 of 4</div>
+        <div class="fbtm-right"><button class="btn-draft">Save as draft</button><button class="btn-co disabled" disabled>Confirm check-out</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SCENARIO 3: Pending void BLOCKS checkout ════════════════════ -->
+<div>
+  <div class="state-lbl sl-3">Scenario 3 — Pending void detected · Checkout blocked · Manager must resolve in Step 1</div>
+  <div class="shell">
+    <div class="fsb">
+      <div class="fsb-top"><div class="fsb-icon">F</div><div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div></div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Core Operations <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item on"><span class="ico">→</span>Check Out</div>
+        <div class="fsb-sec">Folio &amp; Billing <span style="opacity:.4">▾</span></div>
+        <div class="fsb-item"><span class="ico">📋</span>Guest Folio</div>
+      </div>
+      <div class="fsb-user"><div class="fsb-avatar">R</div><div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="fmain">
+      <div class="fbc">🏠 / <span>Guest Check-out</span></div>
+      <div class="fcard">
+        <div class="fcard-hd">
+          <div class="fcd-l"><div class="fcd-title">Check-Out</div><div class="fcd-sub">Settle folio, collect payment, and confirm departure</div></div>
+          <div class="fcd-r">Reservation &nbsp;<span class="fcd-rsv">RSV-2026-0041</span>&nbsp;<span class="ci-badge">Checked In</span></div>
+        </div>
+        <div class="fstepper">
+          <div class="fst active"><div class="fst-dot active">1</div><div class="fst-lbl">Folio review</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">2</div><div class="fst-lbl">Collect payment</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">3</div><div class="fst-lbl">Receipt</div></div>
+          <div class="fst-connector inactive"></div>
+          <div class="fst"><div class="fst-dot inactive">4</div><div class="fst-lbl">Confirm check-out</div></div>
+        </div>
+        <!-- Step 1 expanded — blocked -->
+        <div class="fstep">
+          <div class="fstep-hd active">
+            <div class="fsh-l" style="color:#dc3545">Step 1 — Folio review &nbsp;<span style="font-size:13px">⛔</span></div>
+            <div class="fsh-chevron">▴</div>
+          </div>
+          <div class="fstep-body">
+            <div class="fg-row" style="margin-bottom:14px">
+              <div class="fg-cell"><div class="fgc-l">Guest</div><div class="fgc-v">Hendrick Willems</div></div>
+              <div class="fg-cell"><div class="fgc-l">Room</div><div class="fgc-v">V-03 · 2BR Pool Villa</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-in</div><div class="fgc-v">08 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Check-out</div><div class="fgc-v">11 Jun 2026</div></div>
+              <div class="fg-cell"><div class="fgc-l">Nights stayed</div><div class="fgc-v">3</div></div>
+            </div>
+            <table class="ftbl" style="margin-bottom:10px">
+              <thead><tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+              <tbody>
+                <tr><td class="date">08 Jun 2026</td><td>Accommodation — Standard Rate (3 nights)</td><td></td><td class="amt amt-debit">IDR 10,500,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Airport transfer — Ngurah Rai → V-03</td><td></td><td class="amt amt-debit">IDR 750,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Spa treatment — 25 May 2026 &nbsp;<span class="tbadge" style="background:#f8d7da;color:#721c24;font-size:10.5px">Void pending ⏱</span></td><td></td><td class="amt amt-debit" style="color:#e67e00">IDR 750,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Deposit Offset</td><td><span class="tbadge tb-dep">Deposit</span></td><td class="amt amt-credit">IDR 1,000,000</td></tr>
+                <tr><td class="date">08 Jun 2026</td><td>Payment — Room charge (Cash)</td><td><span class="tbadge tb-pay">Payment</span></td><td class="amt amt-credit">IDR 10,500,000</td></tr>
+              </tbody>
+            </table>
+            <!-- HARD BLOCK -->
+            <div class="void-block">
+              <div class="vb-hd">
+                <div class="vb-hd-icon">⛔</div>
+                <div class="vb-hd-title">Checkout blocked — 1 void pending Manager approval</div>
+              </div>
+              <div class="vb-body">
+                <div class="vb-desc">A charge on this folio has a void request awaiting Manager approval. <strong>Checkout cannot proceed until all pending voids are resolved.</strong> The Manager must approve or reject the void below before payment can be collected.</div>
+                <div class="void-item-card">
+                  <div class="vic-hd">
+                    <div>
+                      <div class="vic-desc">Spa treatment — 25 May 2026 <span class="vic-tag">Void pending ⏱</span></div>
+                      <div class="vic-meta">Submitted by Rina Kusuma · 27 May 10:30 · Reason: "Guest disputed charge"</div>
+                    </div>
+                    <div class="vic-amt">IDR 750,000</div>
+                  </div>
+                </div>
+                <div class="mgr-row">
+                  <div class="mgr-l"><span class="mgr-badge">Manager only</span> Approve or reject to unblock checkout</div>
+                  <div class="mgr-btns">
+                    <button class="btn-reject">Reject void</button>
+                    <button class="btn-approve">✓ Approve void</button>
+                  </div>
+                </div>
+              </div>
+              <div class="vb-note">⛔ After resolving: if approved, balance reduces by IDR 750,000 and checkout proceeds. If rejected, charge remains on folio and checkout proceeds.</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 2 locked -->
+        <div class="fstep">
+          <div class="fstep-hd locked">
+            <div class="fsh-l">Step 2 — Collect payment</div>
+            <div class="fsh-chevron">▾</div>
+          </div>
+          <div class="fstep-body">
+            <div class="step-locked-note">Locked until pending void in Step 1 is resolved by Manager</div>
+          </div>
+        </div>
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 3 — Receipt</div><div class="fsh-chevron">▾</div></div></div>
+        <div class="fstep"><div class="fstep-hd locked"><div class="fsh-l">Step 4 — Confirm check-out</div><div class="fsh-chevron">▾</div></div></div>
+      </div>
+      <div class="fbtm">
+        <button class="btn-prev">Previous</button>
+        <div class="fbtm-center" style="color:#dc3545;font-weight:500">⛔ Resolve pending void to continue</div>
+        <div class="fbtm-right"><button class="btn-draft">Save as draft</button><button class="btn-co disabled" disabled>Cannot proceed — void pending</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
