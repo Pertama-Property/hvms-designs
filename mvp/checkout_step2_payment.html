@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Checkout Step 2 · All non-zero balance scenarios</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+     background:#f4f5f7;color:#172b4d;font-size:13.5px;padding:24px;
+     display:flex;flex-direction:column;gap:28px;max-width:1080px}
+/* State labels */
+.state-lbl{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+           padding:5px 14px;border-radius:5px 5px 0 0;display:inline-flex;align-items:center;gap:6px}
+.sl-blue  {background:#e6efff;border:1px solid #b3c5e8;border-bottom:none;color:#0052cc}
+.sl-green {background:#e3fcef;border:1px solid #b7dfc0;border-bottom:none;color:#006644}
+.sl-amber {background:#fff8ed;border:1px solid #ffe4a3;border-bottom:none;color:#c47d0e}
+.sl-red   {background:#ffebe6;border:1px solid #ffbdad;border-bottom:none;color:#bf2600}
+/* Frame */
+.frame{background:#fff;border-radius:0 8px 8px 8px;border:1px solid #dfe1e6;overflow:hidden}
+/* Step header */
+.step-hd{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;
+         border-bottom:1px solid #dfe1e6}
+.sth-l{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#0052cc}
+.sth-r{font-size:12px;font-weight:500}
+.sth-r-blue{color:#0052cc}.sth-r-amber{color:#c47d0e}
+/* Pending void banner */
+.void-warn{background:#fff8ed;border:1px solid #ffe4a3;border-radius:5px;padding:10px 14px;
+           display:flex;align-items:flex-start;gap:10px;margin:14px 18px 0}
+.vw-icon{width:22px;height:22px;border-radius:50%;background:#ff991f;color:#fff;display:flex;
+         align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+.vw-text{font-size:12.5px;color:#7a4100;line-height:1.5}
+/* Deposit return card */
+.dep-return{background:#e3fcef;border:1.5px solid #36b37e;border-radius:6px;
+            padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+            margin:14px 18px 0}
+.dr-l{display:flex;align-items:center;gap:10px}
+.dr-icon{width:28px;height:28px;border-radius:50%;background:#36b37e;color:#fff;display:flex;
+         align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dr-text{font-size:13px;color:#006644;font-weight:500}
+.dr-sub{font-size:12px;color:#57a77e;margin-top:1px}
+.dr-amt{font-size:22px;font-weight:700;color:#006644;font-family:monospace}
+/* Payment form */
+.pay-form{padding:14px 18px}
+.pf-row{display:grid;grid-template-columns:1.2fr 1.2fr 1fr;gap:10px;margin-bottom:12px}
+.pf-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pf-field{display:flex;flex-direction:column;gap:4px}
+.pf-lbl{font-size:11.5px;color:#42526e;font-weight:500}
+.pf-lbl .req{color:#ff5630}
+.pf-inp{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 10px;
+        font-size:13px;font-family:inherit;background:#fff}
+.pf-inp.change{background:#e3fcef;border-color:#abf5d1;color:#006644;font-weight:600}
+.pf-inp.short{background:#ffebe6;border-color:#ffbdad;color:#bf2600;font-weight:600}
+.pf-sel{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 22px 0 8px;
+        font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none}
+.pf-hint{font-size:11.5px;color:#97a0af;margin-top:3px}
+/* Change/short return banner */
+.change-banner{border-radius:5px;padding:9px 14px;display:flex;align-items:center;
+               justify-content:space-between;margin-bottom:12px}
+.cb-green{background:#e3fcef}
+.cb-red  {background:#ffebe6}
+.cb-text{font-size:12px}
+.cb-g{color:#42526e}.cb-r{color:#7a4100}
+.cb-amt-g{font-size:20px;font-weight:700;color:#006644;font-family:monospace}
+.cb-amt-r{font-size:20px;font-weight:700;color:#bf2600;font-family:monospace}
+/* Folio summary strip — EXPANDED */
+.folio-strip{background:#f8f9fa;border-radius:5px;padding:12px 14px;margin-bottom:12px}
+.fs-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+          color:#97a0af;margin-bottom:8px}
+.fs-row{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;
+        border-bottom:1px solid #e2e4e9}
+.fs-row:last-child{border-bottom:none}
+.fs-l{color:#42526e}
+.fs-r{font-family:monospace;font-weight:500}
+.fsr-g{color:#006644}.fsr-a{color:#c47d0e}
+.fsr-m{color:#97a0af;font-style:italic}
+.fsr-pend{color:#c47d0e}
+.fs-divider{border-top:1.5px solid #dfe1e6;margin:6px 0}
+.fs-total{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;padding-top:5px}
+/* Payment method note */
+.pm-note{font-size:11.5px;color:#97a0af;font-style:italic;margin-bottom:10px}
+/* Phase 1 badge */
+.p1-badge{font-size:10px;background:#e6efff;color:#0052cc;padding:1px 6px;border-radius:3px;
+          font-weight:500;margin-left:5px}
+/* Confirm button */
+.conf-btn{width:100%;padding:11px;border:none;border-radius:5px;
+          font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.cb-normal{background:#36b37e;color:#fff}
+.cb-return{background:#36b37e;color:#fff}
+.cb-short{background:#c1c7d0;color:#fff;cursor:not-allowed}
+.cb-void {background:#36b37e;color:#fff}
+/* Short payment note */
+.short-note{font-size:12px;color:#bf2600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+
+<!-- ═══ SCENARIO 1: Balance > 0 — Adds on outstanding ═════════════════ -->
+<div>
+  <div class="state-lbl sl-blue">Scenario 1 — Balance IDR 900,000 due · Adds on outstanding (most common)</div>
+  <div class="frame">
+    <div class="step-hd">
+      <div class="sth-l">Step 2 — Collect payment</div>
+      <div class="sth-r sth-r-blue">Balance due IDR 900,000</div>
+    </div>
+    <div class="pay-form">
+      <div class="pf-row">
+        <div class="pf-field"><div class="pf-lbl">Payment method <span class="req">*</span></div>
+          <select class="pf-sel"><option>Cash</option><option>Card EDC (Phase 1)</option><option>QRIS (Phase 1)</option></select></div>
+        <div class="pf-field"><div class="pf-lbl">Amount tendered (IDR) <span class="req">*</span></div>
+          <input class="pf-inp" value="1,000,000"></div>
+        <div class="pf-field"><div class="pf-lbl">Change to return</div>
+          <input class="pf-inp change" value="IDR 100,000" readonly></div>
+      </div>
+      <div class="change-banner cb-green">
+        <div><div class="cb-text cb-g">Change to return to guest</div>
+          <div style="font-size:11.5px;color:#57a77e">IDR 1,000,000 tendered − IDR 900,000 balance</div></div>
+        <div class="cb-amt-g">IDR 100,000</div>
+      </div>
+      <!-- Expanded folio summary -->
+      <div class="folio-strip">
+        <div class="fs-title">Payment summary</div>
+        <div class="fs-row"><span class="fs-l">Accommodation — 3n × IDR 3,500,000</span><span class="fs-r">10,500,000</span></div>
+        <div class="fs-row"><span class="fs-l">Airport transfer</span><span class="fs-r">750,000</span></div>
+        <div class="fs-row"><span class="fs-l">Welcome basket</span><span class="fs-r">150,000</span></div>
+        <div class="fs-row"><span class="fs-l">Reservation deposit (auto-credit at CI)</span><span class="fs-r fsr-g">—</span></div>
+        <div class="fs-row"><span class="fs-l">Room charge — Cash (check-in)</span><span class="fs-r fsr-g">−10,500,000</span></div>
+        <div class="fs-row"><span class="fs-l">Security deposit — Cash (check-in)</span><span class="fs-r fsr-g">−1,000,000</span></div>
+        <div class="fs-divider"></div>
+        <div class="fs-row"><span class="fs-l" style="color:#172b4d;font-weight:500">Collecting now (adds on)</span><span class="fs-r fsr-a">IDR 900,000</span></div>
+        <div class="fs-total"><span>Balance after payment</span><span style="color:#36b37e">IDR 0</span></div>
+      </div>
+      <button class="conf-btn cb-normal">Confirm payment — IDR 900,000</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO 2: Balance < 0 — Deposit surplus ═════════════════════ -->
+<div>
+  <div class="state-lbl sl-green">Scenario 2 — Deposit surplus · Return IDR 250,000 to guest</div>
+  <div class="frame">
+    <div class="step-hd">
+      <div class="sth-l">Step 2 — Settlement</div>
+      <div class="sth-r" style="color:#36b37e">Return IDR 250,000 to guest</div>
+    </div>
+    <div class="dep-return">
+      <div class="dr-l">
+        <div class="dr-icon">↩</div>
+        <div><div class="dr-text">Return cash to guest</div>
+          <div class="dr-sub">Deposit credit exceeds total charges — return the difference from till</div></div>
+      </div>
+      <div class="dr-amt">IDR 250,000</div>
+    </div>
+    <div class="pay-form" style="padding-top:14px">
+      <div class="folio-strip">
+        <div class="fs-title">Payment summary</div>
+        <div class="fs-row"><span class="fs-l">Accommodation — 2n × IDR 3,500,000</span><span class="fs-r">7,000,000</span></div>
+        <div class="fs-row"><span class="fs-l">Room charge — Cash (CI)</span><span class="fs-r fsr-g">−7,000,000</span></div>
+        <div class="fs-row"><span class="fs-l">Security deposit — Cash (CI)</span><span class="fs-r fsr-g">−1,000,000</span></div>
+        <div class="fs-divider"></div>
+        <div class="fs-row"><span class="fs-l" style="color:#36b37e;font-weight:500">Return to guest (deposit surplus)</span><span class="fs-r fsr-g">IDR 250,000</span></div>
+        <div class="fs-total"><span>Balance after return</span><span style="color:#36b37e">IDR 0</span></div>
+      </div>
+      <div class="pf-hint" style="margin-bottom:10px">No cash collected from guest. Agent returns IDR 250,000 from the till.</div>
+      <button class="conf-btn cb-return">Confirm — return IDR 250,000 to guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO 3: Pending void at checkout ══════════════════════════ -->
+<div>
+  <div class="state-lbl sl-amber">Scenario 3 — Pending void · Balance includes void amount</div>
+  <div class="frame">
+    <div class="step-hd">
+      <div class="sth-l">Step 2 — Collect payment</div>
+      <div class="sth-r sth-r-amber">⏱ Balance IDR 1,650,000 (includes pending void)</div>
+    </div>
+    <!-- Pending void warning -->
+    <div class="void-warn">
+      <div class="vw-icon">!</div>
+      <div class="vw-text">
+        <strong>1 void pending Manager approval</strong> — Spa treatment IDR 750,000 awaits approval. The balance below includes this charge. If the void is approved after checkout, a refund of IDR 750,000 must be processed manually by Manager.<br>
+        Agent can proceed — folio remains open for this void action only after checkout.
+      </div>
+    </div>
+    <div class="pay-form" style="padding-top:14px">
+      <div class="pf-row">
+        <div class="pf-field"><div class="pf-lbl">Payment method <span class="req">*</span></div>
+          <select class="pf-sel"><option>Cash</option></select></div>
+        <div class="pf-field"><div class="pf-lbl">Amount tendered (IDR) <span class="req">*</span></div>
+          <input class="pf-inp" value="1,650,000"></div>
+        <div class="pf-field"><div class="pf-lbl">Change to return</div>
+          <input class="pf-inp change" value="IDR 0" readonly></div>
+      </div>
+      <div class="folio-strip">
+        <div class="fs-title">Payment summary</div>
+        <div class="fs-row"><span class="fs-l">Accommodation — 3 nights</span><span class="fs-r">10,500,000</span></div>
+        <div class="fs-row"><span class="fs-l">Adds on (airport + basket)</span><span class="fs-r">900,000</span></div>
+        <div class="fs-row" style="background:#fff8ed"><span class="fs-l" style="color:#c47d0e">Spa treatment — 25 May <span style="font-size:10.5px;background:#fff3cd;color:#7a4100;padding:1px 5px;border-radius:3px">void pending ⏱</span></span><span class="fs-r fsr-pend">750,000</span></div>
+        <div class="fs-row"><span class="fs-l">Room charge (CI)</span><span class="fs-r fsr-g">−10,500,000</span></div>
+        <div class="fs-row"><span class="fs-l">Security deposit (CI)</span><span class="fs-r fsr-g">−1,000,000</span></div>
+        <div class="fs-divider"></div>
+        <div class="fs-row"><span class="fs-l" style="color:#c47d0e;font-weight:500">Collecting now (void included)</span><span class="fs-r fsr-pend">IDR 1,650,000</span></div>
+        <div class="fs-row" style="font-size:11.5px"><span class="fs-l" style="color:#97a0af">If void approved after checkout → balance adjusts to IDR 900,000 → Manager processes refund</span><span class="fs-r fsr-m">post-CO action</span></div>
+        <div class="fs-total"><span>Balance after payment (void included)</span><span style="color:#36b37e">IDR 0</span></div>
+      </div>
+      <button class="conf-btn cb-void">Confirm payment — IDR 1,650,000</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO 4: Short payment — blocked ═══════════════════════════ -->
+<div>
+  <div class="state-lbl sl-red">Scenario 4 — Short payment · Cannot confirm · Balance not covered</div>
+  <div class="frame">
+    <div class="step-hd">
+      <div class="sth-l">Step 2 — Collect payment</div>
+      <div class="sth-r" style="color:#bf2600">Short by IDR 400,000</div>
+    </div>
+    <div class="pay-form">
+      <div class="pf-row">
+        <div class="pf-field"><div class="pf-lbl">Payment method <span class="req">*</span></div>
+          <select class="pf-sel"><option>Cash</option></select></div>
+        <div class="pf-field"><div class="pf-lbl">Amount tendered (IDR) <span class="req">*</span></div>
+          <input class="pf-inp" value="500,000"></div>
+        <div class="pf-field"><div class="pf-lbl">Short by</div>
+          <input class="pf-inp short" value="IDR 400,000" readonly></div>
+      </div>
+      <div class="change-banner cb-red">
+        <div><div class="cb-text cb-r">Short payment — cannot confirm</div>
+          <div style="font-size:11.5px;color:#bf2600">IDR 500,000 tendered − IDR 900,000 balance due = IDR 400,000 short</div></div>
+        <div class="cb-amt-r">−IDR 400,000</div>
+      </div>
+      <div class="short-note">⛔ Full balance must be collected before checkout can be confirmed. Please collect IDR 400,000 more, or contact Manager to waive the balance.</div>
+      <div class="folio-strip">
+        <div class="fs-title">Payment summary</div>
+        <div class="fs-row"><span class="fs-l">Collecting now</span><span class="fs-r fsr-a">IDR 900,000</span></div>
+        <div class="fs-row"><span class="fs-l">Tendered</span><span class="fs-r">500,000</span></div>
+        <div class="fs-total"><span style="color:#bf2600">Still outstanding</span><span style="color:#bf2600;font-family:monospace">IDR 400,000</span></div>
+      </div>
+      <button class="conf-btn cb-short" disabled>Confirm payment — short by IDR 400,000</button>
+      <div style="font-size:11.5px;color:#97a0af;text-align:center;margin-top:8px">Manager override: contact Manager to waive outstanding balance with reason</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
