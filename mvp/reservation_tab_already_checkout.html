@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Reservation List · Already Checked Out tab</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+     background:#f4f5f7;color:#172b4d;font-size:13.5px;display:flex;min-height:100vh}
+.sb{width:188px;flex-shrink:0;background:#fff;border-right:1px solid #dfe1e6;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column}
+.sb-logo{padding:12px 14px;border-bottom:1px solid #dfe1e6;display:flex;align-items:center;gap:8px}
+.sb-h{width:28px;height:28px;background:#0052cc;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.sb-name{font-size:13.5px;font-weight:700}
+.sb-nav{padding:8px 0}
+.sb-sec{font-size:10px;font-weight:600;color:#97a0af;padding:8px 14px 3px;text-transform:uppercase;letter-spacing:.6px}
+.sb-item{padding:7px 14px;font-size:13px;color:#42526e;border-left:3px solid transparent}
+.sb-item.on{background:#e6efff;color:#0052cc;font-weight:500;border-left-color:#0052cc}
+.main{margin-left:188px;flex:1;display:flex;flex-direction:column}
+.topbar{height:44px;background:#fff;border-bottom:1px solid #dfe1e6;display:flex;align-items:center;padding:0 20px;justify-content:space-between}
+.bc{display:flex;align-items:center;gap:5px;font-size:13px;color:#42526e}
+.bc a{color:#0052cc;text-decoration:none;font-weight:500}
+.page{padding:18px 20px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ph-title{font-size:21px;font-weight:600}
+.btn-new{padding:8px 16px;background:#0052cc;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:500;cursor:pointer}
+.tab-bar{display:flex;align-items:flex-end;border-bottom:2px solid #dfe1e6;margin-bottom:16px;gap:0;overflow-x:auto}
+.tab{padding:9px 16px;font-size:13px;font-weight:500;color:#42526e;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;margin-bottom:-2px}
+.tab-count{font-size:11px;background:#dfe1e6;color:#42526e;border-radius:9px;padding:1px 7px;font-weight:600}
+.tab.on{color:#0052cc;border-bottom-color:#0052cc;background:#fff}
+.tab.on .tab-count{background:#0052cc;color:#fff}
+.tab.tab-overdue .tab-count{background:#ff5630;color:#fff}
+.tab.tab-overdue{color:#ff5630}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.f-search{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 10px 0 30px;font-size:13px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%238993a4' stroke-width='2'%3E%3Ccircle cx='6' cy='6' r='4'/%3E%3Cline x1='10' y1='10' x2='13' y2='13'/%3E%3C/svg%3E") no-repeat 9px center;width:220px}
+.f-sel{height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 22px 0 8px;font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none;color:#42526e}
+.f-date-range{display:flex;align-items:center;gap:6px;height:34px;border:1.5px solid #dfe1e6;border-radius:5px;padding:0 10px;font-size:12.5px;color:#42526e;background:#fff;white-space:nowrap}
+.f-hint{font-size:12px;color:#97a0af;margin-left:4px}
+.res-table{background:#fff;border:1px solid #dfe1e6;border-radius:7px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 12px;text-align:left;font-size:11.5px;font-weight:600;color:#97a0af;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #dfe1e6;background:#f8f9fa}
+td{padding:10px 12px;border-bottom:1px solid #f4f5f7;font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f9fa}
+.td-rsv a{color:#0052cc;text-decoration:none;font-weight:500;font-family:monospace;font-size:12.5px}
+.td-guest{font-weight:500;color:#172b4d}
+.td-meta{font-size:11.5px;color:#97a0af}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11.5px;font-weight:500}
+.b-co{background:#f4f5f7;color:#42526e}
+.src{font-size:11px;padding:2px 7px;border-radius:3px;font-weight:500;background:#e6efff;color:#0052cc}
+.act-btn{padding:4px 10px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid}
+.ab-view{background:#fff;color:#42526e;border-color:#dfe1e6}
+.ab-folio{background:#fff;color:#0052cc;border-color:#0052cc}
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid #dfe1e6;border-radius:7px;margin-bottom:14px;overflow:hidden}
+.ss{padding:12px 16px;border-right:1px solid #e2e4e9}
+.ss:last-child{border-right:none}
+.ss-l{font-size:11px;color:#97a0af;margin-bottom:3px}
+.ss-v{font-size:18px;font-weight:500;color:#172b4d;font-family:monospace}
+.table-footer{padding:10px 14px;border-top:1px solid #dfe1e6;background:#f8f9fa;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#97a0af}
+.bal-zero{color:#36b37e;font-weight:500;font-family:monospace}
+.bal-due{color:#c47d0e;font-weight:500;font-family:monospace}
+.co-actual{font-size:12px;color:#42526e;font-family:monospace}
+.nights-chip{font-size:11px;background:#f4f5f7;color:#42526e;padding:2px 6px;border-radius:3px}
+.pag{display:flex;gap:4px;align-items:center}
+.pag-btn{padding:4px 10px;border:1px solid #dfe1e6;border-radius:4px;font-size:12.5px;color:#42526e;background:#fff;cursor:pointer}
+.pag-btn.on{background:#0052cc;color:#fff;border-color:#0052cc}
+</style>
+</head>
+<body>
+<div class="sb">
+  <div class="sb-logo"><div class="sb-h">H</div><div class="sb-name">HVMS</div></div>
+  <div class="sb-nav">
+    <div class="sb-sec">Front Desk</div>
+    <div class="sb-item">Check-in</div>
+    <div class="sb-item on">Reservations</div>
+    <div class="sb-item">Check-out</div>
+    <div class="sb-item">Guest folio</div>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="bc"><a href="#">Front Desk</a><span style="color:#c1c7d0;margin:0 4px">›</span><span style="font-weight:500;color:#172b4d">Reservations</span></div>
+    <div style="font-size:12px;color:#97a0af">10 Jun 2026 · 11:24 WIB</div>
+  </div>
+  <div class="page">
+    <div class="ph"><div class="ph-title">Reservations</div><button class="btn-new">+ New reservation</button></div>
+
+    <div class="tab-bar">
+      <div class="tab">Confirmed <span class="tab-count">24</span></div>
+      <div class="tab">Checked In <span class="tab-count">18</span></div>
+      <div class="tab">On Hold <span class="tab-count">5</span></div>
+      <div class="tab tab-overdue">Not yet checked out <span class="tab-count">3</span></div>
+      <div class="tab on">Already checked out <span class="tab-count">142</span></div>
+      <div class="tab">No-show <span class="tab-count">2</span></div>
+      <div class="tab">Cancelled <span class="tab-count">7</span></div>
+    </div>
+
+    <!-- Stat strip -->
+    <div class="stat-strip">
+      <div class="ss"><div class="ss-l">Total checked out (this period)</div><div class="ss-v">142</div></div>
+      <div class="ss"><div class="ss-l">Today's checkouts</div><div class="ss-v">5</div></div>
+      <div class="ss"><div class="ss-l">Total nights stayed</div><div class="ss-v">386</div></div>
+      <div class="ss"><div class="ss-l">Folios with outstanding balance</div><div class="ss-v" style="color:#c47d0e">0</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <input class="f-search" placeholder="Search guest, RSV, folio…">
+      <select class="f-sel"><option>All room types</option></select>
+      <select class="f-sel"><option>All sources</option></select>
+      <div class="f-date-range">📅 01 Jun 2026 → 10 Jun 2026</div>
+      <select class="f-sel"><option>Sort: Checkout date ↓ (newest first)</option><option>Checkout date ↑ (oldest first)</option><option>Guest name A–Z</option></select>
+      <span class="f-hint">Default: last 30 days</span>
+    </div>
+
+    <!-- Table -->
+    <div class="res-table">
+      <table>
+        <thead>
+          <tr>
+            <th>RSV</th>
+            <th>Guest</th>
+            <th>Room</th>
+            <th>Check-in</th>
+            <th>Checked out (actual)</th>
+            <th>Nights</th>
+            <th>Folio balance</th>
+            <th>Source</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-rsv"><a href="#">RSV-2026-0040</a></td>
+            <td><div class="td-guest">Priya Sharma</div><div class="td-meta">GST-0055 · India · Repeat guest</div></td>
+            <td><div>V-10</div><div class="td-meta">3BR Villa</div></td>
+            <td><div>05 Jun · 14:00</div><div class="td-meta">Checked in 14:15</div></td>
+            <td><div class="co-actual">10 Jun · 11:58</div><div class="td-meta">Rina Kusuma</div></td>
+            <td><span class="nights-chip">5 nights</span></td>
+            <td><span class="bal-zero">IDR 0</span></td>
+            <td><span class="src">Direct</span></td>
+            <td style="display:flex;gap:6px"><button class="act-btn ab-view">View</button><button class="act-btn ab-folio">Folio</button></td>
+          </tr>
+          <tr>
+            <td class="td-rsv"><a href="#">RSV-2026-0037</a></td>
+            <td><div class="td-guest">James & Sarah Mitchell</div><div class="td-meta">GST-0048 · Australia</div></td>
+            <td><div>V-07</div><div class="td-meta">3BR Villa</div></td>
+            <td><div>03 Jun · 14:00</div><div class="td-meta">Checked in 16:30</div></td>
+            <td><div class="co-actual">09 Jun · 12:05</div><div class="td-meta">Rina Kusuma</div></td>
+            <td><span class="nights-chip">6 nights</span></td>
+            <td><span class="bal-zero">IDR 0</span></td>
+            <td><span class="src">Booking.com</span></td>
+            <td style="display:flex;gap:6px"><button class="act-btn ab-view">View</button><button class="act-btn ab-folio">Folio</button></td>
+          </tr>
+          <tr>
+            <td class="td-rsv"><a href="#">RSV-2026-0035</a></td>
+            <td><div class="td-guest">Hendrick Willems</div><div class="td-meta">GST-0042 · Netherlands · VIP</div></td>
+            <td><div>V-03</div><div class="td-meta">2BR Pool Villa</div></td>
+            <td><div>01 Jun · 14:00</div><div class="td-meta">Checked in 14:22</div></td>
+            <td><div class="co-actual">07 Jun · 11:45</div><div class="td-meta">Rina Kusuma</div></td>
+            <td><span class="nights-chip">6 nights</span></td>
+            <td><span class="bal-zero">IDR 0</span></td>
+            <td><span class="src">Agoda</span></td>
+            <td style="display:flex;gap:6px"><button class="act-btn ab-view">View</button><button class="act-btn ab-folio">Folio</button></td>
+          </tr>
+          <tr>
+            <td class="td-rsv"><a href="#">RSV-2026-0033</a></td>
+            <td><div class="td-guest">Wang Family</div><div class="td-meta">GST-0061 · China</div></td>
+            <td><div>V-01, V-04</div><div class="td-meta">2× 2BR Pool Villa</div></td>
+            <td><div>29 May · 14:00</div><div class="td-meta">Checked in 15:10</div></td>
+            <td><div class="co-actual">05 Jun · 12:00</div><div class="td-meta">Rina Kusuma</div></td>
+            <td><span class="nights-chip">7 nights</span></td>
+            <td><span class="bal-zero">IDR 0</span></td>
+            <td><span class="src">Travel agent</span></td>
+            <td style="display:flex;gap:6px"><button class="act-btn ab-view">View</button><button class="act-btn ab-folio">Folio</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span>Showing 4 of 142 checked-out reservations · Period: 01 Jun–10 Jun 2026</span>
+        <div class="pag">
+          <button class="pag-btn on">1</button>
+          <button class="pag-btn">2</button>
+          <button class="pag-btn">3</button>
+          <span style="color:#97a0af;padding:0 6px">…</span>
+          <button class="pag-btn">15</button>
+          <button class="pag-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
