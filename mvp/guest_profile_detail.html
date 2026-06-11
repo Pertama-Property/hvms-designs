@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Guest Profile · Read-only view</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+     background:#f0f4f7;color:#1c1c1c;font-size:13px;display:flex;flex-direction:column;
+     gap:32px;padding:24px;max-width:1120px}
+
+/* State labels */
+.state-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+           padding:4px 12px;border-radius:4px 4px 0 0;display:inline-flex;align-items:center;gap:5px}
+.sl-1{background:#e8f4fc;border:1px solid #b3d1e8;border-bottom:none;color:#1a73e8}
+.sl-2{background:#fff0ee;border:1px solid #f5c6c2;border-bottom:none;color:#c62828}
+.sl-3{background:#fff8ed;border:1px solid #ffd591;border-bottom:none;color:#a05c00}
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.shell{display:flex;border-radius:0 4px 4px 4px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* ── Frappe sidebar ─────────────────────────────────────────── */
+.fsb{width:178px;flex-shrink:0;background:#fff;border-right:1px solid #e2e6ea;display:flex;flex-direction:column}
+.fsb-top{padding:10px 12px;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;gap:8px}
+.fsb-icon{width:28px;height:28px;background:#6c63ff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.fsb-app{display:flex;flex-direction:column}
+.fsb-app-name{font-size:13px;font-weight:600;line-height:1.2}
+.fsb-app-sub{font-size:11px;color:#8d95a0;line-height:1.2}
+.fsb-nav{padding:6px 0;flex:1;overflow:hidden}
+.fsb-sec{font-size:10px;font-weight:600;color:#8d95a0;padding:8px 14px 3px;text-transform:uppercase;letter-spacing:.05em}
+.fsb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12.5px;color:#4a5568;cursor:pointer}
+.fsb-item.on{background:#eaf0fb;color:#1a73e8;font-weight:500}
+.fsb-item .ico{width:16px;text-align:center;font-size:13px;opacity:.6;flex-shrink:0}
+.fsb-item.on .ico{opacity:1}
+.fsb-user{padding:10px 12px;border-top:1px solid #e2e6ea;display:flex;align-items:center;gap:8px;margin-top:auto}
+.fsb-avatar{width:28px;height:28px;border-radius:50%;background:#6c63ff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.fsb-uname{font-size:12px;font-weight:500;line-height:1.2}
+.fsb-uemail{font-size:10.5px;color:#8d95a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+
+/* ── Main area ──────────────────────────────────────────────── */
+.fmain{flex:1;display:flex;flex-direction:column;background:#f8f9fa;min-width:0}
+.fbc{height:34px;background:#fff;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;padding:0 20px;gap:5px;font-size:12px;color:#6c757d}
+.fbc a{color:#1a73e8;text-decoration:none}
+.fbc span{color:#1c1c1c}
+.fbc-sep{color:#c8cbd0}
+
+/* ── Profile card ───────────────────────────────────────────── */
+.fcard{background:#fff;margin:14px;border-radius:6px;border:1px solid #e2e6ea;overflow:hidden}
+
+/* ── Profile header ─────────────────────────────────────────── */
+.ph{padding:18px 20px 0;border-bottom:1px solid #e2e6ea}
+.ph-inner{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.ph-left{display:flex;align-items:flex-start;gap:16px}
+.ph-avatar{width:58px;height:58px;border-radius:50%;background:#4285f4;color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:-1px}
+.ph-info{}
+.ph-name{font-size:22px;font-weight:700;color:#1c1c1c;line-height:1.2;margin-bottom:4px}
+.ph-meta{font-size:13px;color:#6c757d;margin-bottom:7px}
+.ph-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:11.5px;font-weight:500}
+.tag-vip{background:#fff3cd;color:#856404}
+.tag-repeat{background:#cce5ff;color:#004085}
+.tag-honey{background:#fde8f0;color:#9e2261}
+.tag-corp{background:#e2e3e5;color:#383d41}
+.tag-deact{background:#f8d7da;color:#721c24}
+.ph-right{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.btn{padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer}
+.btn-outline{border:1px solid #ced4da;background:#fff;color:#495057}
+.btn-primary{background:#28a745;color:#fff;border:none}
+.btn-deact{border:1px solid #dc3545;background:#fff;color:#dc3545}
+.btn-edit{border:1px solid #1a73e8;background:#fff;color:#1a73e8}
+
+/* Stat strip */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e2e6ea}
+.ss{padding:12px 20px;border-right:1px solid #e2e6ea;display:flex;flex-direction:column;gap:3px}
+.ss:last-child{border-right:none}
+.ss-val{font-size:20px;font-weight:600;color:#1c1c1c;font-family:monospace}
+.ss-lbl{font-size:11px;color:#6c757d}
+.ss-val.blue{color:#1a73e8}
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.ftabs{display:flex;border-bottom:1px solid #e2e6ea;padding:0 20px;gap:0;background:#fff}
+.ftab{padding:10px 14px;font-size:13px;font-weight:500;color:#6c757d;cursor:pointer;
+      border-bottom:2.5px solid transparent;white-space:nowrap;margin-bottom:-1px}
+.ftab.on{color:#1a73e8;border-bottom-color:#1a73e8}
+
+/* ── Content sections ───────────────────────────────────────── */
+.fcontent{padding:16px 20px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row1{margin-bottom:14px}
+
+/* Section card */
+.scard{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden}
+.scard-hd{padding:9px 14px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;
+           font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#495057;
+           display:flex;align-items:center;justify-content:space-between}
+.scard-body{padding:12px 14px}
+/* Field rows */
+.frow{display:flex;justify-content:space-between;gap:8px;padding:5px 0;
+      border-bottom:1px solid #f4f5f7;font-size:13px}
+.frow:last-child{border-bottom:none}
+.fl{color:#6c757d;flex-shrink:0;min-width:110px}
+.fv{font-weight:500;color:#1c1c1c;text-align:right;word-break:break-word}
+.fv-warn{color:#e67e00;font-weight:500}
+.fv-g{color:#155724;font-weight:500}
+.fv-m{color:#adb5bd;font-style:italic}
+/* Subsection */
+.subsec{margin-top:12px;padding-top:10px;border-top:1px solid #e9ecef}
+.subsec-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8d95a0;margin-bottom:8px}
+/* Preference badges */
+.pref-badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.pbadge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:500}
+.pb-green{background:#d4edda;color:#155724}
+.pb-blue{background:#cce5ff;color:#004085}
+.pb-gray{background:#e2e3e5;color:#495057}
+/* Consent check */
+.consent-yes{color:#155724;font-weight:500}
+
+/* ── Internal notes ─────────────────────────────────────────── */
+.notes-card{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden;margin-bottom:14px}
+.nc-hd{padding:9px 14px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;font-size:11px;
+       font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#495057;
+       display:flex;align-items:center;justify-content:space-between}
+.nc-edit{font-size:12px;color:#1a73e8;cursor:pointer;font-weight:500;text-transform:none;letter-spacing:0}
+.nc-body{padding:14px}
+.nc-text{font-size:13px;color:#1c1c1c;line-height:1.7;margin-bottom:8px}
+.nc-meta{font-size:11.5px;color:#8d95a0}
+
+/* ── Stay history ───────────────────────────────────────────── */
+.sh-card{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden}
+.sh-hd{padding:9px 14px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;font-size:11px;
+       font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#495057;
+       display:flex;align-items:center;justify-content:space-between}
+.sh-count{font-size:10.5px;font-weight:500;background:#1a73e8;color:#fff;padding:1px 8px;border-radius:12px;text-transform:none;letter-spacing:0}
+.stay-item{padding:12px 14px;border-bottom:1px solid #f4f5f7}
+.stay-item:last-child{border-bottom:none}
+.si-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.si-rsv{color:#1a73e8;font-weight:600;font-family:monospace;font-size:12.5px;text-decoration:none}
+.si-dates{font-size:13px;color:#1c1c1c;font-weight:500;margin-left:10px}
+.si-room{font-size:13px;color:#6c757d;margin-left:6px}
+.si-nights{font-size:12px;color:#6c757d}
+.si-badges{display:flex;gap:5px;align-items:center}
+.sbadge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:500}
+.sb-ci{background:#d4edda;color:#155724}
+.sb-co{background:#e2e3e5;color:#495057}
+.sb-conf{background:#fff3cd;color:#856404}
+.sb-ns{background:#f8d7da;color:#721c24}
+.si-bot{display:flex;gap:14px;font-size:12px;color:#6c757d;margin-top:4px;flex-wrap:wrap}
+.si-bot span{display:flex;align-items:center;gap:3px}
+.si-bot strong{color:#1c1c1c;font-weight:500}
+
+/* ── Duplicate warning ──────────────────────────────────────── */
+.dup-warn{background:#fff3cd;border:1px solid #ffc107;border-radius:5px;padding:11px 14px;
+          margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.dw-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.dw-text{font-size:13px;color:#664d03;line-height:1.6}
+.dw-text strong{font-weight:600}
+.dw-link{color:#1a73e8;text-decoration:none;font-weight:500}
+
+/* ── Inactive banner ────────────────────────────────────────── */
+.inact-banner{background:#f8d7da;border:1px solid #f5c6c2;border-radius:5px;padding:11px 14px;
+              margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#58151c}
+.inact-banner strong{font-weight:600}
+
+/* Bottom bar */
+.fbtm{padding:12px 20px;background:#fff;border-top:1px solid #e2e6ea;display:flex;
+      align-items:center;justify-content:space-between}
+.btm-l{font-size:12px;color:#8d95a0}
+.btm-r{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     STATE 1 — Active guest · Full profile · Front Desk read-only view
+     ══════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-lbl sl-1">State 1 — Active guest · Front Desk agent view · Read-only · 4 stays · VIP</div>
+  <div class="shell">
+    <!-- Sidebar -->
+    <div class="fsb">
+      <div class="fsb-top">
+        <div class="fsb-icon">F</div>
+        <div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div>
+      </div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Core Operations</div>
+        <div class="fsb-item"><span class="ico">⊡</span>Room Availability Check</div>
+        <div class="fsb-item"><span class="ico">☰</span>Reservations</div>
+        <div class="fsb-item"><span class="ico">←</span>Check In</div>
+        <div class="fsb-item"><span class="ico">→</span>Check Out</div>
+        <div class="fsb-sec">Folio &amp; Billing</div>
+        <div class="fsb-item"><span class="ico">📋</span>Guest Folio</div>
+        <div class="fsb-item"><span class="ico">💳</span>Deposit</div>
+        <div class="fsb-sec">Guests</div>
+        <div class="fsb-item on"><span class="ico">👤</span>Guest profiles</div>
+        <div class="fsb-sec">Housekeeping</div>
+        <div class="fsb-item"><span class="ico">🏠</span>Room status</div>
+      </div>
+      <div class="fsb-user">
+        <div class="fsb-avatar">R</div>
+        <div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="fmain">
+      <div class="fbc">
+        🏠 <span class="fbc-sep">/</span>
+        <a href="#">Guest profiles</a>
+        <span class="fbc-sep">/</span>
+        <span>Hendrick Willems</span>
+      </div>
+
+      <div class="fcard">
+        <!-- Profile header -->
+        <div class="ph">
+          <div class="ph-inner">
+            <div class="ph-left">
+              <div class="ph-avatar">HW</div>
+              <div class="ph-info">
+                <div class="ph-name">Hendrick Willems <span style="font-size:13px;font-weight:400;color:#6c757d;margin-left:4px">GST-0042</span></div>
+                <div class="ph-meta">Guest since 12 Jan 2025 &nbsp;·&nbsp; 4 stays &nbsp;·&nbsp; 14 nights &nbsp;·&nbsp; Netherlands</div>
+                <div class="ph-tags">
+                  <span class="tag tag-vip">⭐ VIP</span>
+                  <span class="tag tag-repeat">↩ Repeat guest</span>
+                </div>
+              </div>
+            </div>
+            <div class="ph-right">
+              <button class="btn btn-outline">Back</button>
+              <button class="btn btn-edit">Edit profile</button>
+              <button class="btn btn-primary">+ New reservation</button>
+              <button class="btn btn-deact">Deactivate</button>
+            </div>
+          </div>
+          <!-- Stat strip -->
+          <div class="stat-strip">
+            <div class="ss"><div class="ss-val blue">4</div><div class="ss-lbl">Total stays</div></div>
+            <div class="ss"><div class="ss-val blue">14</div><div class="ss-lbl">Total nights</div></div>
+            <div class="ss"><div class="ss-val" style="font-size:15px;padding-top:2px">24 May 2026</div><div class="ss-lbl">Last stay</div></div>
+            <div class="ss"><div class="ss-val" style="font-size:15px;padding-top:2px">2BR Pool Villa</div><div class="ss-lbl">Preferred room type</div></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="ftabs">
+          <div class="ftab on">Overview</div>
+          <div class="ftab">Stay history (4)</div>
+          <div class="ftab">Audit log</div>
+        </div>
+
+        <!-- Content — Overview tab -->
+        <div class="fcontent">
+
+          <!-- Row 1: Identity + Contact -->
+          <div class="row2">
+            <!-- Identity -->
+            <div class="scard">
+              <div class="scard-hd">Identity</div>
+              <div class="scard-body">
+                <div class="frow"><span class="fl">Full name</span><span class="fv">Hendrick Willems</span></div>
+                <div class="frow"><span class="fl">ID type</span><span class="fv">Passport</span></div>
+                <div class="frow"><span class="fl">ID number</span><span class="fv">A12345678</span></div>
+                <div class="frow"><span class="fl">Nationality</span><span class="fv">Netherlands (NLD)</span></div>
+                <div class="frow"><span class="fl">Date of birth</span><span class="fv">14 Mar 1982 (44 yrs)</span></div>
+                <div class="frow"><span class="fl">Gender</span><span class="fv">Male</span></div>
+                <div class="frow"><span class="fl">ID expiry</span><span class="fv fv-warn">31 Aug 2026 · Expiring soon ⚠</span></div>
+                <div class="frow"><span class="fl">Country of issue</span><span class="fv">Netherlands</span></div>
+                <div class="frow"><span class="fl">Place of birth</span><span class="fv fv-m">Not captured</span></div>
+              </div>
+            </div>
+
+            <!-- Contact + Emergency -->
+            <div>
+              <div class="scard" style="margin-bottom:10px">
+                <div class="scard-hd">Contact</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Phone</span><span class="fv">+62 812 3456 7890</span></div>
+                  <div class="frow"><span class="fl">Email</span><span class="fv">h.willems@email.com</span></div>
+                  <div class="frow"><span class="fl">Country of residence</span><span class="fv">Netherlands</span></div>
+                  <div class="frow"><span class="fl">Home address</span><span class="fv">Amsterdam, NL</span></div>
+                </div>
+              </div>
+              <div class="scard">
+                <div class="scard-hd">Emergency contact</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Name</span><span class="fv">Maria Willems</span></div>
+                  <div class="frow"><span class="fl">Relationship</span><span class="fv">Spouse</span></div>
+                  <div class="frow"><span class="fl">Phone</span><span class="fv">+31 6 1234 5678</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Preferences + Consent -->
+          <div class="row2">
+            <div class="scard">
+              <div class="scard-hd">Preferences</div>
+              <div class="scard-body">
+                <div class="frow"><span class="fl">Room</span><span class="fv">High floor, Wing B, pool view</span></div>
+                <div class="frow"><span class="fl">Pillow</span><span class="fv">Soft</span></div>
+                <div class="frow"><span class="fl">Accessibility</span><span class="fv fv-m">—</span></div>
+                <div class="frow"><span class="fl">Dietary</span>
+                  <div class="pref-badges">
+                    <span class="pbadge pb-green">No pork</span>
+                    <span class="pbadge pb-green">No shellfish</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="scard">
+              <div class="scard-hd">Data consent &amp; profile</div>
+              <div class="scard-body">
+                <div class="frow"><span class="fl">Consent given</span><span class="fv fv-g">✓ Yes</span></div>
+                <div class="frow"><span class="fl">Consent date</span><span class="fv">24 May 2026 · 14:18</span></div>
+                <div class="frow"><span class="fl">Recorded by</span><span class="fv">Rina Kusuma</span></div>
+                <div class="frow"><span class="fl">Profile created</span><span class="fv">12 Jan 2025</span></div>
+                <div class="frow"><span class="fl">Last updated</span><span class="fv">24 May 2026</span></div>
+                <div class="frow"><span class="fl">Profile status</span><span class="fv fv-g">Active</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal notes -->
+          <div class="notes-card">
+            <div class="nc-hd">
+              Internal notes — staff only
+              <span class="nc-edit">Edit</span>
+            </div>
+            <div class="nc-body">
+              <div class="nc-text">Long-stay repeat guest — usually books 3–4 nights in May/Jun. Prefers Wing B villas. Always requests airport transfer. Wife is vegetarian and allergic to shellfish. Tips generously at checkout. Arrived late last stay (after 18:00) due to flight delay.</div>
+              <div class="nc-meta">Last edited by Rina Kusuma · 24 May 2026 · 14:22</div>
+            </div>
+          </div>
+
+          <!-- Stay history (summary) -->
+          <div class="sh-card">
+            <div class="sh-hd">
+              <span>Recent stays</span>
+              <span class="sh-count">4 total — see Stay history tab</span>
+            </div>
+            <div class="stay-item">
+              <div class="si-top">
+                <div style="display:flex;align-items:center">
+                  <a href="#" class="si-rsv">RSV-2026-0041</a>
+                  <span class="si-dates" style="margin-left:10px">24 May – 27 May 2026</span>
+                  <span class="si-room">· V-03 · 2BR Pool Villa</span>
+                  <span class="si-nights" style="margin-left:8px">3 nights</span>
+                </div>
+                <div class="si-badges"><span class="sbadge sb-ci">Checked In</span></div>
+              </div>
+              <div class="si-bot">
+                <span>2A · 1C</span>
+                <span><strong>IDR 11,400,000</strong></span>
+                <span>Walk-in</span>
+                <span>Standard Rate</span>
+              </div>
+            </div>
+            <div class="stay-item">
+              <div class="si-top">
+                <div style="display:flex;align-items:center">
+                  <a href="#" class="si-rsv">RSV-2025-0028</a>
+                  <span class="si-dates" style="margin-left:10px">10 Jun – 14 Jun 2025</span>
+                  <span class="si-room">· V-04 · 2BR Pool Villa</span>
+                  <span class="si-nights" style="margin-left:8px">4 nights</span>
+                </div>
+                <div class="si-badges"><span class="sbadge sb-co">Checked Out</span></div>
+              </div>
+              <div class="si-bot">
+                <span>2A</span>
+                <span><strong>IDR 14,000,000</strong></span>
+                <span>Direct</span>
+                <span>Standard Rate</span>
+              </div>
+            </div>
+            <div class="stay-item">
+              <div class="si-top">
+                <div style="display:flex;align-items:center">
+                  <a href="#" class="si-rsv">RSV-2025-0014</a>
+                  <span class="si-dates" style="margin-left:10px">15 Jan – 19 Jan 2025</span>
+                  <span class="si-room">· V-03 · 2BR Pool Villa</span>
+                  <span class="si-nights" style="margin-left:8px">4 nights</span>
+                </div>
+                <div class="si-badges"><span class="sbadge sb-co">Checked Out</span></div>
+              </div>
+              <div class="si-bot">
+                <span>2A · 1C</span>
+                <span><strong>IDR 14,000,000</strong></span>
+                <span>Walk-in</span>
+                <span>Standard Rate</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /fcontent -->
+        <div class="fbtm">
+          <div class="btm-l">Guest ID: GST-0042 · Profile created 12 Jan 2025 · Last updated 24 May 2026</div>
+          <div class="btm-r">
+            <button class="btn btn-outline">Back to guest list</button>
+            <button class="btn btn-primary">+ New reservation</button>
+          </div>
+        </div>
+      </div><!-- /fcard -->
+    </div><!-- /fmain -->
+  </div><!-- /shell -->
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     STATE 2 — ID expiry warning + duplicate profile detected
+     ══════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-lbl sl-3">State 2 — ID expiry warning · Duplicate profile detected</div>
+  <div class="shell">
+    <div class="fsb">
+      <div class="fsb-top"><div class="fsb-icon">F</div><div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div></div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Guests</div>
+        <div class="fsb-item on"><span class="ico">👤</span>Guest profiles</div>
+      </div>
+      <div class="fsb-user"><div class="fsb-avatar">R</div><div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="fmain">
+      <div class="fbc">🏠 <span class="fbc-sep">/</span> <a href="#">Guest profiles</a> <span class="fbc-sep">/</span> <span>Hendrick Willems</span></div>
+      <div class="fcard">
+        <div class="ph">
+          <div class="ph-inner">
+            <div class="ph-left">
+              <div class="ph-avatar">HW</div>
+              <div class="ph-info">
+                <div class="ph-name">Hendrick Willems <span style="font-size:13px;font-weight:400;color:#6c757d;margin-left:4px">GST-0042</span></div>
+                <div class="ph-meta">Guest since 12 Jan 2025 &nbsp;·&nbsp; 4 stays &nbsp;·&nbsp; 14 nights &nbsp;·&nbsp; Netherlands</div>
+                <div class="ph-tags"><span class="tag tag-vip">⭐ VIP</span><span class="tag tag-repeat">↩ Repeat guest</span></div>
+              </div>
+            </div>
+            <div class="ph-right">
+              <button class="btn btn-edit">Edit profile</button>
+              <button class="btn btn-primary">+ New reservation</button>
+              <button class="btn btn-deact">Deactivate</button>
+            </div>
+          </div>
+        </div>
+        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab">Audit log</div></div>
+        <div class="fcontent">
+
+          <!-- DUPLICATE WARNING BANNER -->
+          <div class="dup-warn">
+            <div class="dw-icon">⚠️</div>
+            <div class="dw-text">
+              <strong>Possible duplicate profile detected.</strong> Guest "H. Willems" (GST-0087) has the same passport number A12345678.
+              <a href="#" class="dw-link">View GST-0087</a> to confirm whether these are the same person and merge if needed. Only Manager or Admin can merge profiles.
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="scard">
+              <div class="scard-hd">Identity</div>
+              <div class="scard-body">
+                <div class="frow"><span class="fl">Full name</span><span class="fv">Hendrick Willems</span></div>
+                <div class="frow"><span class="fl">ID type</span><span class="fv">Passport</span></div>
+                <div class="frow"><span class="fl">ID number</span><span class="fv">A12345678</span></div>
+                <div class="frow"><span class="fl">Nationality</span><span class="fv">Netherlands (NLD)</span></div>
+                <div class="frow"><span class="fl">Date of birth</span><span class="fv">14 Mar 1982 (44 yrs)</span></div>
+                <div class="frow"><span class="fl">Gender</span><span class="fv">Male</span></div>
+                <!-- ID expiry warning — expiring in < 30 days OR already expired -->
+                <div class="frow"><span class="fl">ID expiry</span><span class="fv fv-warn">31 Aug 2026 · ⚠ Expiring in 81 days</span></div>
+                <div class="frow"><span class="fl">Country of issue</span><span class="fv">Netherlands</span></div>
+                <div class="frow"><span class="fl">Place of birth</span><span class="fv fv-m">Not captured</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="scard" style="margin-bottom:10px">
+                <div class="scard-hd">Contact</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Phone</span><span class="fv">+62 812 3456 7890</span></div>
+                  <div class="frow"><span class="fl">Email</span><span class="fv">h.willems@email.com</span></div>
+                  <div class="frow"><span class="fl">Country of residence</span><span class="fv">Netherlands</span></div>
+                  <div class="frow"><span class="fl">Home address</span><span class="fv">Amsterdam, NL</span></div>
+                </div>
+              </div>
+              <div class="scard">
+                <div class="scard-hd">Emergency contact</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Name</span><span class="fv">Maria Willems</span></div>
+                  <div class="frow"><span class="fl">Relationship</span><span class="fv">Spouse</span></div>
+                  <div class="frow"><span class="fl">Phone</span><span class="fv">+31 6 1234 5678</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fbtm">
+          <div class="btm-l">⚠ ID expiry warning active · Possible duplicate detected</div>
+          <div class="btm-r"><button class="btn btn-outline">Back</button><button class="btn btn-primary">+ New reservation</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     STATE 3 — Deactivated guest profile
+     ══════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="state-lbl sl-2">State 3 — Deactivated guest · All data visible · No new reservations</div>
+  <div class="shell">
+    <div class="fsb">
+      <div class="fsb-top"><div class="fsb-icon">F</div><div class="fsb-app"><div class="fsb-app-name">Front Desk</div><div class="fsb-app-sub">HVMS App</div></div></div>
+      <div class="fsb-nav">
+        <div class="fsb-sec">Guests</div>
+        <div class="fsb-item on"><span class="ico">👤</span>Guest profiles</div>
+      </div>
+      <div class="fsb-user"><div class="fsb-avatar">R</div><div><div class="fsb-uname">Rina</div><div class="fsb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="fmain">
+      <div class="fbc">🏠 <span class="fbc-sep">/</span> <a href="#">Guest profiles</a> <span class="fbc-sep">/</span> <span>Hendrick Willems</span></div>
+      <div class="fcard">
+        <div class="ph">
+          <div class="ph-inner">
+            <div class="ph-left">
+              <div class="ph-avatar" style="background:#adb5bd">HW</div>
+              <div class="ph-info">
+                <div class="ph-name">Hendrick Willems <span style="font-size:13px;font-weight:400;color:#6c757d;margin-left:4px">GST-0042</span> <span class="tag tag-deact" style="font-size:12px;margin-left:6px">Deactivated</span></div>
+                <div class="ph-meta">Guest since 12 Jan 2025 &nbsp;·&nbsp; 4 stays &nbsp;·&nbsp; 14 nights &nbsp;·&nbsp; Netherlands</div>
+                <div class="ph-tags"><span class="tag tag-vip">⭐ VIP</span><span class="tag tag-repeat">↩ Repeat guest</span></div>
+              </div>
+            </div>
+            <div class="ph-right">
+              <button class="btn btn-edit">Edit profile</button>
+              <!-- Reactivate instead of Deactivate -->
+              <button class="btn btn-primary" style="background:#1a73e8">Reactivate</button>
+            </div>
+          </div>
+        </div>
+        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab">Audit log</div></div>
+        <div class="fcontent">
+
+          <!-- INACTIVE BANNER -->
+          <div class="inact-banner">
+            <span style="font-size:18px">🚫</span>
+            <span><strong>This profile is deactivated.</strong> New reservations cannot be created for this guest. All historical data is preserved. Reactivate the profile to resume bookings.</span>
+          </div>
+
+          <div class="row2">
+            <div class="scard">
+              <div class="scard-hd">Identity</div>
+              <div class="scard-body">
+                <div class="frow"><span class="fl">Full name</span><span class="fv">Hendrick Willems</span></div>
+                <div class="frow"><span class="fl">ID type</span><span class="fv">Passport</span></div>
+                <div class="frow"><span class="fl">ID number</span><span class="fv">A12345678</span></div>
+                <div class="frow"><span class="fl">Nationality</span><span class="fv">Netherlands (NLD)</span></div>
+                <div class="frow"><span class="fl">Date of birth</span><span class="fv">14 Mar 1982 (44 yrs)</span></div>
+                <div class="frow"><span class="fl">Gender</span><span class="fv">Male</span></div>
+                <div class="frow"><span class="fl">ID expiry</span><span class="fv">31 Aug 2026</span></div>
+                <div class="frow"><span class="fl">Country of issue</span><span class="fv">Netherlands</span></div>
+                <div class="frow"><span class="fl">Place of birth</span><span class="fv fv-m">Not captured</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="scard" style="margin-bottom:10px">
+                <div class="scard-hd">Contact</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Phone</span><span class="fv">+62 812 3456 7890</span></div>
+                  <div class="frow"><span class="fl">Email</span><span class="fv">h.willems@email.com</span></div>
+                  <div class="frow"><span class="fl">Country of residence</span><span class="fv">Netherlands</span></div>
+                  <div class="frow"><span class="fl">Home address</span><span class="fv">Amsterdam, NL</span></div>
+                </div>
+              </div>
+              <div class="scard">
+                <div class="scard-hd">Data consent &amp; profile</div>
+                <div class="scard-body">
+                  <div class="frow"><span class="fl">Profile status</span><span class="fv fv-warn">Deactivated</span></div>
+                  <div class="frow"><span class="fl">Deactivated by</span><span class="fv">Manager · 11 Jun 2026 · 09:30</span></div>
+                  <div class="frow"><span class="fl">Deactivation reason</span><span class="fv">Guest requested data removal</span></div>
+                  <div class="frow"><span class="fl">Profile created</span><span class="fv">12 Jan 2025</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fbtm">
+          <div class="btm-l">🚫 Profile deactivated · New reservations blocked · Historical data preserved</div>
+          <div class="btm-r"><button class="btn btn-outline">Back</button><button class="btn btn-primary" style="background:#1a73e8">Reactivate profile</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
