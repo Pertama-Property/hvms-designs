@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Guest Profile · Hendrick Willems</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+     background:#f0f4f7;color:#1c1c1c;font-size:13px;min-height:100vh;display:flex}
+
+/* ── Frappe sidebar ──────────────────────────────────── */
+.fsb{width:180px;flex-shrink:0;background:#fff;border-right:1px solid #e2e6ea;
+     display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0}
+.fsb-top{padding:11px 13px;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;gap:9px}
+.fsb-icon{width:28px;height:28px;background:#6c63ff;border-radius:6px;display:flex;align-items:center;
+          justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.fsb-name{font-size:13px;font-weight:600;line-height:1.2}
+.fsb-sub{font-size:11px;color:#8d95a0;line-height:1.2}
+.fsb-nav{padding:6px 0;flex:1}
+.fsb-sec{font-size:10px;font-weight:600;color:#8d95a0;padding:8px 14px 3px;
+         text-transform:uppercase;letter-spacing:.05em}
+.fsb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12.5px;
+          color:#4a5568;cursor:pointer;line-height:1.3}
+.fsb-item:hover{background:#f4f5f7}
+.fsb-item.on{background:#eaf0fb;color:#1a73e8;font-weight:500}
+.fsb-item .ico{font-size:14px;opacity:.55;flex-shrink:0;width:16px;text-align:center}
+.fsb-item.on .ico{opacity:1}
+.fsb-user{padding:10px 13px;border-top:1px solid #e2e6ea;display:flex;align-items:center;
+          gap:8px;margin-top:auto}
+.fsb-av{width:28px;height:28px;border-radius:50%;background:#6c63ff;color:#fff;
+        display:flex;align-items:center;justify-content:center;font-size:12.5px;
+        font-weight:600;flex-shrink:0}
+.fsb-un{font-size:12px;font-weight:500;line-height:1.2}
+.fsb-ue{font-size:10.5px;color:#8d95a0;white-space:nowrap;overflow:hidden;
+        text-overflow:ellipsis;max-width:115px}
+
+/* ── Main ────────────────────────────────────────────── */
+.fmain{flex:1;display:flex;flex-direction:column;min-width:0}
+.fbc{height:34px;background:#fff;border-bottom:1px solid #e2e6ea;display:flex;
+     align-items:center;padding:0 20px;gap:5px;font-size:12px;color:#6c757d;
+     position:sticky;top:0;z-index:10}
+.fbc a{color:#1a73e8;text-decoration:none}
+.fbc a:hover{text-decoration:underline}
+.sep{color:#c8cbd0}
+
+/* ── Card ────────────────────────────────────────────── */
+.fcard{background:#fff;margin:14px;border-radius:6px;border:1px solid #e2e6ea;
+       overflow:hidden;flex:1}
+
+/* ── Profile header ──────────────────────────────────── */
+.ph{padding:18px 20px 0;border-bottom:1px solid #e2e6ea}
+.ph-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px}
+.ph-left{display:flex;align-items:flex-start;gap:14px}
+.av{width:56px;height:56px;border-radius:50%;background:#4285f4;color:#fff;
+    font-size:20px;font-weight:700;display:flex;align-items:center;
+    justify-content:center;flex-shrink:0;letter-spacing:-1px}
+.ph-name{font-size:21px;font-weight:700;color:#1c1c1c;line-height:1.2;margin-bottom:3px;
+         display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.gst-code{font-size:12.5px;font-weight:400;color:#8d95a0}
+.ph-meta{font-size:13px;color:#6c757d;margin-bottom:7px}
+.ph-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;
+     border-radius:12px;font-size:11.5px;font-weight:500}
+.t-vip{background:#fff3cd;color:#856404;border:1px solid #ffc107}
+.t-rep{background:#cce5ff;color:#004085;border:1px solid #b8daff}
+.ph-actions{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap;flex-shrink:0}
+.btn{padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;
+     cursor:pointer;white-space:nowrap;line-height:1.4}
+.btn-ghost{background:#fff;border:1px solid #ced4da;color:#495057}
+.btn-ghost:hover{background:#f4f5f7}
+.btn-blue{background:#fff;border:1px solid #1a73e8;color:#1a73e8}
+.btn-blue:hover{background:#e8f4fc}
+.btn-green{background:#28a745;border:1px solid #28a745;color:#fff}
+.btn-green:hover{background:#218838}
+.btn-red{background:#fff;border:1px solid #dc3545;color:#dc3545}
+.btn-red:hover{background:#fff5f5}
+
+/* Stat strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e2e6ea}
+.stat{padding:12px 20px;border-right:1px solid #e2e6ea}
+.stat:last-child{border-right:none}
+.stat-val{font-size:19px;font-weight:600;font-family:monospace;
+          color:#1a73e8;line-height:1.2;margin-bottom:2px}
+.stat-val.mono-sm{font-size:14px;padding-top:3px}
+.stat-lbl{font-size:11px;color:#8d95a0}
+
+/* ── Tabs ────────────────────────────────────────────── */
+.ftabs{display:flex;border-bottom:1px solid #e2e6ea;padding:0 20px}
+.ftab{padding:10px 14px;font-size:13px;font-weight:500;color:#6c757d;
+      cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;
+      white-space:nowrap;display:flex;align-items:center;gap:7px}
+.ftab.on{color:#1a73e8;border-bottom-color:#1a73e8}
+.skip-badge{font-size:10px;font-weight:500;background:#fff3cd;color:#856404;
+            border:1px solid #ffc107;padding:1px 7px;border-radius:10px}
+.ftab.skip{color:#adb5bd;cursor:default}
+
+/* ── Content ─────────────────────────────────────────── */
+.content{padding:16px 20px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row1{margin-bottom:12px}
+
+/* Section cards */
+.sc{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden}
+.sc-hd{padding:9px 13px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;
+       font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+       color:#495057;display:flex;align-items:center;justify-content:space-between}
+.sc-body{padding:11px 13px}
+.fr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
+    padding:5px 0;border-bottom:1px solid #f4f5f7;font-size:12.5px;line-height:1.5}
+.fr:last-child{border-bottom:none}
+.fl{color:#6c757d;flex-shrink:0;min-width:118px}
+.fv{font-weight:500;color:#1c1c1c;text-align:right;word-break:break-word}
+.fv-warn{color:#e67e00;font-weight:500}
+.fv-g{color:#155724;font-weight:500}
+.fv-m{color:#adb5bd;font-style:italic;font-weight:400}
+.dietary{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.dbadge{padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:500;
+        background:#d4edda;color:#155724;border:1px solid #b2dfbd}
+
+/* Stack cards vertically in right column */
+.col-stack{display:flex;flex-direction:column;gap:12px}
+
+/* ── Internal notes ──────────────────────────────────── */
+.notes{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden;margin-bottom:12px}
+.notes-hd{padding:9px 13px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;
+          font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+          color:#495057;display:flex;align-items:center;justify-content:space-between}
+.notes-edit{font-size:12px;color:#1a73e8;cursor:pointer;font-weight:500;
+            text-transform:none;letter-spacing:0}
+.notes-body{padding:13px}
+.notes-text{font-size:13px;color:#1c1c1c;line-height:1.75;margin-bottom:7px}
+.notes-meta{font-size:11.5px;color:#8d95a0}
+
+/* ── Stay history ────────────────────────────────────── */
+.sh{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden}
+.sh-hd{padding:9px 13px;background:#f8f9fa;border-bottom:1px solid #e2e6ea;
+       font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+       color:#495057;display:flex;align-items:center;justify-content:space-between}
+.sh-see-all{font-size:12px;color:#1a73e8;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:500}
+.stay{padding:11px 13px;border-bottom:1px solid #f4f5f7}
+.stay:last-child{border-bottom:none}
+.stay:hover{background:#f8f9fa}
+.stay-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.stay-top-l{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.rsv-link{color:#1a73e8;font-weight:600;font-family:monospace;font-size:12.5px;text-decoration:none}
+.rsv-link:hover{text-decoration:underline}
+.stay-dates{font-size:12.5px;font-weight:500;color:#1c1c1c;margin-left:10px}
+.stay-room{font-size:12.5px;color:#6c757d;margin-left:6px}
+.stay-nights{font-size:12px;color:#6c757d;margin-left:8px}
+.stay-bot{display:flex;gap:14px;font-size:12px;color:#6c757d;flex-wrap:wrap}
+.stay-bot strong{color:#1c1c1c;font-weight:500}
+.sbadge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:500}
+.sb-ci{background:#d4edda;color:#155724}
+.sb-co{background:#e2e3e5;color:#495057}
+
+/* ── Footer bar ──────────────────────────────────────── */
+.fbtm{padding:11px 20px;background:#fff;border-top:1px solid #e2e6ea;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;bottom:0}
+.fbtm-l{font-size:11.5px;color:#8d95a0}
+.fbtm-r{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="fsb">
+  <div class="fsb-top">
+    <div class="fsb-icon">F</div>
+    <div><div class="fsb-name">Front Desk</div><div class="fsb-sub">HVMS App</div></div>
+  </div>
+  <div class="fsb-nav">
+    <div class="fsb-sec">Core Operations</div>
+    <div class="fsb-item"><span class="ico">⊡</span>Room Availability</div>
+    <div class="fsb-item"><span class="ico">☰</span>Reservations</div>
+    <div class="fsb-item"><span class="ico">←</span>Check In</div>
+    <div class="fsb-item"><span class="ico">→</span>Check Out</div>
+    <div class="fsb-item"><span class="ico">↗</span>Departures</div>
+    <div class="fsb-sec">Folio &amp; Billing</div>
+    <div class="fsb-item"><span class="ico">📋</span>Guest Folio</div>
+    <div class="fsb-item"><span class="ico">💳</span>Deposit</div>
+    <div class="fsb-sec">Guests</div>
+    <div class="fsb-item on"><span class="ico">👤</span>Guest profiles</div>
+    <div class="fsb-sec">Housekeeping</div>
+    <div class="fsb-item"><span class="ico">🏠</span>Room status</div>
+    <div class="fsb-sec">Settings</div>
+    <div class="fsb-item"><span class="ico">⚙</span>Settings</div>
+  </div>
+  <div class="fsb-user">
+    <div class="fsb-av">R</div>
+    <div><div class="fsb-un">Rina</div><div class="fsb-ue">rina.qa@pertamapro...</div></div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="fmain">
+  <!-- Breadcrumb -->
+  <div class="fbc">
+    🏠 <span class="sep">/</span>
+    <a href="#">Guest profiles</a>
+    <span class="sep">/</span>
+    <span style="color:#1c1c1c">Hendrick Willems</span>
+  </div>
+
+  <div class="fcard">
+    <!-- Profile header -->
+    <div class="ph">
+      <div class="ph-row">
+        <div class="ph-left">
+          <div class="av">HW</div>
+          <div>
+            <div class="ph-name">
+              Hendrick Willems
+              <span class="gst-code">GST-0042</span>
+            </div>
+            <div class="ph-meta">Guest since 12 Jan 2025 &nbsp;·&nbsp; 4 stays &nbsp;·&nbsp; 14 nights &nbsp;·&nbsp; Netherlands</div>
+            <div class="ph-tags">
+              <span class="tag t-vip">⭐ VIP</span>
+              <span class="tag t-rep">↩ Repeat guest</span>
+            </div>
+          </div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-ghost">Back</button>
+          <button class="btn btn-blue">Edit profile</button>
+          <button class="btn btn-green">+ New reservation</button>
+          <button class="btn btn-red">Deactivate</button>
+        </div>
+      </div>
+      <!-- Stat strip -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-val">4</div>
+          <div class="stat-lbl">Total stays</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">14</div>
+          <div class="stat-lbl">Total nights</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val mono-sm">24 May 2026</div>
+          <div class="stat-lbl">Last stay</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val mono-sm">2BR Pool Villa</div>
+          <div class="stat-lbl">Preferred room type</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="ftabs">
+      <div class="ftab on">Overview</div>
+      <div class="ftab">Stay history (4)</div>
+      <div class="ftab skip">Audit log <span class="skip-badge">Skip for now</span></div>
+    </div>
+
+    <!-- Overview content -->
+    <div class="content">
+
+      <!-- Row 1: Identity (left) + Contact stack (right) -->
+      <div class="row2">
+
+        <!-- Identity -->
+        <div class="sc">
+          <div class="sc-hd">Identity</div>
+          <div class="sc-body">
+            <div class="fr"><span class="fl">Full name</span><span class="fv">Hendrick Willems</span></div>
+            <div class="fr"><span class="fl">ID type</span><span class="fv">Passport</span></div>
+            <div class="fr"><span class="fl">ID number</span><span class="fv">A12345678</span></div>
+            <div class="fr"><span class="fl">Nationality</span><span class="fv">Netherlands (NLD)</span></div>
+            <div class="fr"><span class="fl">Date of birth</span><span class="fv">14 Mar 1982 (44 yrs)</span></div>
+            <div class="fr"><span class="fl">Gender</span><span class="fv">Male</span></div>
+            <div class="fr"><span class="fl">ID expiry</span><span class="fv fv-warn">31 Aug 2026 · ⚠ Expiring soon</span></div>
+            <div class="fr"><span class="fl">Country of issue</span><span class="fv">Netherlands</span></div>
+            <div class="fr"><span class="fl">Place of birth</span><span class="fv fv-m">Not captured</span></div>
+          </div>
+        </div>
+
+        <!-- Contact + Emergency stacked -->
+        <div class="col-stack">
+          <div class="sc">
+            <div class="sc-hd">Contact</div>
+            <div class="sc-body">
+              <div class="fr"><span class="fl">Phone</span><span class="fv">+62 812 3456 7890</span></div>
+              <div class="fr"><span class="fl">Email</span><span class="fv">h.willems@email.com</span></div>
+              <div class="fr"><span class="fl">Country of residence</span><span class="fv">Netherlands</span></div>
+              <div class="fr"><span class="fl">Home address</span><span class="fv">Amsterdam, NL</span></div>
+            </div>
+          </div>
+          <div class="sc">
+            <div class="sc-hd">Emergency contact</div>
+            <div class="sc-body">
+              <div class="fr"><span class="fl">Name</span><span class="fv">Maria Willems</span></div>
+              <div class="fr"><span class="fl">Relationship</span><span class="fv">Spouse</span></div>
+              <div class="fr"><span class="fl">Phone</span><span class="fv">+31 6 1234 5678</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Preferences (left) + Data consent (right) -->
+      <div class="row2">
+        <div class="sc">
+          <div class="sc-hd">Preferences</div>
+          <div class="sc-body">
+            <div class="fr"><span class="fl">Room</span><span class="fv">High floor, Wing B, pool view</span></div>
+            <div class="fr"><span class="fl">Pillow</span><span class="fv">Soft</span></div>
+            <div class="fr"><span class="fl">Accessibility</span><span class="fv fv-m">—</span></div>
+            <div class="fr">
+              <span class="fl">Dietary</span>
+              <div class="dietary">
+                <span class="dbadge">No pork</span>
+                <span class="dbadge">No shellfish</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-hd">Data consent &amp; profile</div>
+          <div class="sc-body">
+            <div class="fr"><span class="fl">Consent given</span><span class="fv fv-g">✓ Yes</span></div>
+            <div class="fr"><span class="fl">Consent date</span><span class="fv">24 May 2026 · 14:18</span></div>
+            <div class="fr"><span class="fl">Recorded by</span><span class="fv">Rina Kusuma</span></div>
+            <div class="fr"><span class="fl">Profile created</span><span class="fv">12 Jan 2025</span></div>
+            <div class="fr"><span class="fl">Last updated</span><span class="fv">24 May 2026</span></div>
+            <div class="fr"><span class="fl">Profile status</span><span class="fv fv-g">Active</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Internal notes -->
+      <div class="notes">
+        <div class="notes-hd">
+          Internal notes — staff only
+          <span class="notes-edit">Edit</span>
+        </div>
+        <div class="notes-body">
+          <div class="notes-text">Long-stay repeat guest — usually books 3–4 nights in May/Jun. Prefers Wing B villas. Always requests airport transfer. Wife is vegetarian and allergic to shellfish. Tips generously at checkout. Arrived late last stay (after 18:00) due to flight delay.</div>
+          <div class="notes-meta">Last edited by Rina Kusuma · 24 May 2026 · 14:22</div>
+        </div>
+      </div>
+
+      <!-- Stay history (recent) -->
+      <div class="sh">
+        <div class="sh-hd">
+          <span>Stay history — 4 stays</span>
+          <span class="sh-see-all">See all in Stay history tab →</span>
+        </div>
+
+        <div class="stay">
+          <div class="stay-top">
+            <div class="stay-top-l">
+              <a href="#" class="rsv-link">RSV-2026-0041</a>
+              <span class="stay-dates" style="margin-left:10px">24 May – 27 May 2026</span>
+              <span class="stay-room">· V-03 · 2BR Pool Villa</span>
+              <span class="stay-nights">· 3 nights</span>
+            </div>
+            <span class="sbadge sb-ci">Checked In</span>
+          </div>
+          <div class="stay-bot">
+            <span>2A · 1C</span>
+            <span><strong>IDR 11,400,000</strong></span>
+            <span>Walk-in</span>
+            <span>Standard Rate</span>
+          </div>
+        </div>
+
+        <div class="stay">
+          <div class="stay-top">
+            <div class="stay-top-l">
+              <a href="#" class="rsv-link">RSV-2025-0028</a>
+              <span class="stay-dates" style="margin-left:10px">10 Jun – 14 Jun 2025</span>
+              <span class="stay-room">· V-04 · 2BR Pool Villa</span>
+              <span class="stay-nights">· 4 nights</span>
+            </div>
+            <span class="sbadge sb-co">Checked Out</span>
+          </div>
+          <div class="stay-bot">
+            <span>2A</span>
+            <span><strong>IDR 14,000,000</strong></span>
+            <span>Direct</span>
+            <span>Standard Rate</span>
+          </div>
+        </div>
+
+        <div class="stay">
+          <div class="stay-top">
+            <div class="stay-top-l">
+              <a href="#" class="rsv-link">RSV-2025-0014</a>
+              <span class="stay-dates" style="margin-left:10px">15 Jan – 19 Jan 2025</span>
+              <span class="stay-room">· V-03 · 2BR Pool Villa</span>
+              <span class="stay-nights">· 4 nights</span>
+            </div>
+            <span class="sbadge sb-co">Checked Out</span>
+          </div>
+          <div class="stay-bot">
+            <span>2A · 1C</span>
+            <span><strong>IDR 14,000,000</strong></span>
+            <span>Walk-in</span>
+            <span>Standard Rate</span>
+          </div>
+        </div>
+
+      </div><!-- /stay history -->
+    </div><!-- /content -->
+
+    <!-- Footer bar -->
+    <div class="fbtm">
+      <div class="fbtm-l">Guest ID: GST-0042 · Created 12 Jan 2025 · Updated 24 May 2026</div>
+      <div class="fbtm-r">
+        <button class="btn btn-ghost">Back to guest list</button>
+        <button class="btn btn-green">+ New reservation</button>
+      </div>
+    </div>
+
+  </div><!-- /fcard -->
+</div><!-- /fmain -->
+</body>
+</html>
