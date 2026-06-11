@@ -82,6 +82,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 .ftab{padding:10px 14px;font-size:13px;font-weight:500;color:#6c757d;cursor:pointer;
       border-bottom:2.5px solid transparent;white-space:nowrap;margin-bottom:-1px}
 .ftab.on{color:#1a73e8;border-bottom-color:#1a73e8}
+.ftab.skip{color:#adb5bd;cursor:default;position:relative}
+.ftab.skip .skip-badge{font-size:10px;font-weight:500;background:#fff3cd;color:#856404;
+                        border:1px solid #ffc107;padding:1px 6px;border-radius:10px;
+                        margin-left:6px;vertical-align:middle;white-space:nowrap}
 
 /* ── Content sections ───────────────────────────────────────── */
 .fcontent{padding:16px 20px}
@@ -246,7 +250,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
         <div class="ftabs">
           <div class="ftab on">Overview</div>
           <div class="ftab">Stay history (4)</div>
-          <div class="ftab">Audit log</div>
+          <div class="ftab skip">Audit log <span class="skip-badge">Skip for now</span></div>
         </div>
 
         <!-- Content — Overview tab -->
@@ -440,7 +444,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
             </div>
           </div>
         </div>
-        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab">Audit log</div></div>
+        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab skip">Audit log <span class="skip-badge">Skip for now</span></div></div>
         <div class="fcontent">
 
           <!-- DUPLICATE WARNING BANNER -->
@@ -533,10 +537,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
             </div>
           </div>
         </div>
-        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab">Audit log</div></div>
+        <div class="ftabs"><div class="ftab on">Overview</div><div class="ftab">Stay history (4)</div><div class="ftab skip">Audit log <span class="skip-badge">Skip for now</span></div></div>
         <div class="fcontent">
-
-          <!-- INACTIVE BANNER -->
           <div class="inact-banner">
             <span style="font-size:18px">🚫</span>
             <span><strong>This profile is deactivated.</strong> New reservations cannot be created for this guest. All historical data is preserved. Reactivate the profile to resume bookings.</span>
