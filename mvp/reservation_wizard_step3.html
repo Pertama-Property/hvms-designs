@@ -189,6 +189,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .bb-confirm{padding:7px 16px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
 .bb-confirm:disabled{background:#aaa;cursor:not-allowed}
 
+
+/* Specific room section */
+.specific-room{background:#f8f9fa;border:1px solid #e5e5e5;border-radius:4px;padding:12px 14px;margin-bottom:14px}
+.sr-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sr-title{font-size:13px;font-weight:500;color:#333;display:flex;align-items:center;gap:6px}
+.sr-optional{font-size:11px;color:#aaa;font-weight:400}
+.room-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.room-option{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid #d4d4d4;
+             border-radius:4px;cursor:pointer;background:#fff;transition:border-color .15s}
+.room-option:hover{border-color:#555}
+.room-option.selected{border-color:#1c1c1c;background:#fafafa}
+.room-option.unavail-opt{opacity:.5;cursor:default}
+.ro-radio{width:14px;height:14px;border-radius:50%;border:2px solid #d4d4d4;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ro-radio.checked{border-color:#1c1c1c;background:#1c1c1c}
+.ro-radio.checked::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff}
+.ro-none{width:14px;height:14px;border-radius:50%;border:2px solid #d4d4d4;flex-shrink:0}
+.room-code{font-size:13px;font-weight:600;color:#1c1c1c;min-width:60px}
+.room-details{font-size:12px;color:#666;flex:1}
+.room-status{font-size:11.5px;font-weight:500}
+.rs-ok{color:#2ea44f}.rs-dirty{color:#e8a800}.rs-ooo{color:#d93025}
+.sr-note{font-size:11.5px;color:#888;display:flex;align-items:center;gap:4px}
+/* assign-at-ci option */
+.ci-option{display:flex;align-items:center;gap:10px;padding:7px 10px;border:1.5px dashed #d4d4d4;
+           border-radius:4px;cursor:pointer;background:#fff;margin-bottom:6px}
+.ci-option:hover{border-color:#aaa}
+.ci-option.selected{border-color:#1c1c1c}
+.ci-option-lbl{font-size:13px;color:#555}
+
 /* Notes fields */
 .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
 .notes-ta{border:1px solid #d4d4d4;border-radius:4px;padding:9px;font-size:13px;font-family:inherit;width:100%;height:80px;resize:none}
@@ -323,6 +351,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
               </div>
             </div>
 
+            <!-- ★ SPECIFIC ROOM ASSIGNMENT ───── NEW ─── -->
+            <div class="specific-room">
+              <div class="sr-hd">
+                <div class="sr-title">Specific room <span class="sr-optional">Optional — pre-assignment is advisory</span></div>
+              </div>
+              <!-- Assign at check-in option (default) -->
+              <div class="ci-option">
+                <div class="ro-none"></div>
+                <div class="ci-option-lbl" style="color:#888">— Assign specific room at check-in</div>
+              </div>
+              <!-- Available rooms for Double type -->
+              <div class="room-list">
+                <div class="room-option selected">
+                  <div class="ro-radio checked"></div>
+                  <span class="room-code">Room 201</span>
+                  <span class="room-details">Double · Wing A · Floor 2</span>
+                  <span class="room-status rs-ok">Available</span>
+                </div>
+              </div>
+              <div class="sr-note">ℹ️ Room can be reassigned at check-in Step 3 if needed.</div>
+            </div>
+
             <!-- ★ PRICE OVERRIDE (expanded) ───── NEW ─── -->
             <div class="override-section">
               <div class="override-toggle">▼ Override nightly rate (optional)</div>
@@ -431,7 +481,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
               <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
             </div>
 
-            <!-- ★ NUMBER OF ROOMS counter (appears after tile selected) ── NEW ─── -->
+            <!-- ★ NUMBER OF ROOMS counter ── NEW ─── -->
             <div class="qty-row">
               <div class="qty-lbl">Number of rooms — Double</div>
               <div class="qty-ctrl">
@@ -440,6 +490,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
                 <button class="qty-btn">+</button>
                 <span style="font-size:12px;color:#888;margin-left:4px">(6 available)</span>
               </div>
+            </div>
+
+            <!-- ★ SPECIFIC ROOMS per slot (multi-room) ── NEW ─── -->
+            <div class="specific-room">
+              <div class="sr-hd">
+                <div class="sr-title">Specific rooms per slot <span class="sr-optional">Optional — can be assigned at check-in</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div class="f-group">
+                  <div class="f-lbl">Room 1</div>
+                  <select class="f-sel"><option>— Assign at check-in —</option><option selected>Room 101 (Available)</option><option>Room 102 (Available)</option><option>Room 201 (Available)</option></select>
+                </div>
+                <div class="f-group">
+                  <div class="f-lbl">Room 2</div>
+                  <select class="f-sel"><option selected>— Assign at check-in —</option><option>Room 102 (Available)</option><option>Room 201 (Available)</option><option>Room 202 (Available)</option></select>
+                </div>
+                <div class="f-group">
+                  <div class="f-lbl">Room 3</div>
+                  <select class="f-sel"><option selected>— Assign at check-in —</option><option>Room 202 (Available)</option><option>Room 301 (Available)</option><option>Room 302 (Available)</option></select>
+                </div>
+              </div>
+              <div class="sr-note">ℹ️ Pre-assignment is advisory. Specific rooms can be changed at check-in Step 3.</div>
             </div>
 
             <!-- Override + add type links -->
@@ -517,7 +589,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
               <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
             </div>
             <div class="qty-row" style="margin-bottom:8px"><div class="qty-lbl">Number of rooms — Standard</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button><span style="font-size:12px;color:#888;margin-left:4px">(3 available)</span></div></div>
-            <div style="margin-bottom:14px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+            <div style="margin-bottom:8px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+            <div class="specific-room" style="margin-bottom:14px">
+              <div class="sr-hd">
+                <div class="sr-title">Specific room — Standard <span class="sr-optional">Optional</span></div>
+              </div>
+              <select class="f-sel" style="width:100%;height:35px;margin-bottom:6px">
+                <option selected>— Assign at check-in —</option>
+                <option>Room 105 (Available)</option>
+                <option>Room 106 (Available)</option>
+                <option>Room 205 (Available)</option>
+              </select>
+              <div class="sr-note">ℹ️ Pre-assignment is advisory.</div>
+            </div>
 
             <!-- ─── Divider ─── -->
             <div class="rt-divider" style="margin-bottom:14px;border-top:1.5px dashed #d4d4d4;position:relative">
@@ -538,7 +622,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
               <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
             </div>
             <div class="qty-row" style="margin-bottom:8px"><div class="qty-lbl">Number of rooms — Studio</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button><span style="font-size:12px;color:#888;margin-left:4px">(2 available)</span></div></div>
-            <div style="margin-bottom:14px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+            <div style="margin-bottom:8px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+            <div class="specific-room" style="margin-bottom:14px">
+              <div class="sr-hd">
+                <div class="sr-title">Specific room — Studio <span class="sr-optional">Optional</span></div>
+              </div>
+              <select class="f-sel" style="width:100%;height:35px;margin-bottom:6px">
+                <option selected>Room 301 (Available)</option>
+                <option>Room 302 (Available)</option>
+              </select>
+              <div class="sr-note">ℹ️ Pre-assignment is advisory.</div>
+            </div>
 
             <!-- Add another type link -->
             <div class="add-type-row"><span class="add-type-link">+ Add another room type</span></div>
