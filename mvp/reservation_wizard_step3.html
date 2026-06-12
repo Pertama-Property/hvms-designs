@@ -2,300 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HVMS — New Reservation · Step 3 · Room &amp; Rate</title>
+<title>HVMS — New Reservation · Step 3 · Room</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
-     background:#f0f4f7;color:#1c1c1c;font-size:13px;
-     padding:24px;display:flex;flex-direction:column;gap:32px;max-width:1100px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+     background:#f5f5f5;color:#1c1c1c;font-size:13.5px;
+     padding:24px;display:flex;flex-direction:column;gap:28px;max-width:1060px}
 
-/* State label */
-.state-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
-           padding:4px 12px;border-radius:4px 4px 0 0;display:inline-flex;align-items:center;gap:5px}
-.sl-1{background:#e8f4fc;border:1px solid #b3d1e8;border-bottom:none;color:#1a73e8}
-.sl-2{background:#e6f4ea;border:1px solid #b2dfbd;border-bottom:none;color:#1e7e34}
-.sl-3{background:#fff8ed;border:1px solid #ffd591;border-bottom:none;color:#a05c00}
+/* State label (only visible in the design file, not in real app) */
+.slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+        padding:4px 12px;border-radius:4px 4px 0 0;display:inline-flex;align-items:center;gap:5px}
+.sl-b{background:#e8f4fc;border:1px solid #b3d1e8;border-bottom:none;color:#005b9e}
+.sl-g{background:#e8f9ee;border:1px solid #b2dfc0;border-bottom:none;color:#1a6b35}
+.sl-a{background:#fff8e6;border:1px solid #ffd580;border-bottom:none;color:#7a4c00}
 
-/* Shell = sidebar + main */
-.shell{display:flex;border-radius:0 4px 4px 4px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+/* ── Outer page shell ──────────────────────────────────── */
+.page{background:#fff;border:1px solid #e0e0e0;border-radius:0 4px 4px 4px;overflow:hidden}
+
+/* ── Top nav bar ───────────────────────────────────────── */
+.topnav{height:40px;background:#fff;border-bottom:1px solid #e0e0e0;
+        display:flex;align-items:center;padding:0 20px;gap:6px;font-size:12.5px;color:#666}
+.topnav a{color:#0052cc;text-decoration:none}.topnav a:hover{text-decoration:underline}
+.topnav .sep{color:#bbb}
+
+/* ── Main layout: sidebar + content ───────────────────── */
+.layout{display:flex;min-height:600px}
 
 /* ── Sidebar ───────────────────────────────────────────── */
-.fsb{width:178px;flex-shrink:0;background:#fff;border-right:1px solid #e2e6ea;
-     display:flex;flex-direction:column}
-.fsb-top{padding:10px 12px;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;gap:8px}
-.fsb-icon{width:28px;height:28px;background:#6c63ff;border-radius:6px;display:flex;align-items:center;
-          justify-content:center;color:#fff;font-weight:700;font-size:14px}
-.fsb-name{font-size:13px;font-weight:600}.fsb-sub{font-size:11px;color:#8d95a0}
-.fsb-nav{padding:6px 0;flex:1}
-.fsb-sec{font-size:10px;font-weight:600;color:#8d95a0;padding:8px 14px 3px;text-transform:uppercase;letter-spacing:.05em}
-.fsb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12.5px;color:#4a5568;cursor:pointer}
-.fsb-item:hover{background:#f4f5f7}
-.fsb-item.on{background:#eaf0fb;color:#1a73e8;font-weight:500}
-.fsb-item .ico{font-size:13px;opacity:.55;width:16px;text-align:center}
-.fsb-item.on .ico{opacity:1}
-.fsb-user{padding:10px 12px;border-top:1px solid #e2e6ea;display:flex;align-items:center;gap:8px;margin-top:auto}
-.fsb-av{width:28px;height:28px;border-radius:50%;background:#6c63ff;color:#fff;
-        display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600}
-.fsb-un{font-size:12px;font-weight:500}.fsb-ue{font-size:10.5px;color:#8d95a0;overflow:hidden;max-width:110px;text-overflow:ellipsis;white-space:nowrap}
+.sb{width:160px;flex-shrink:0;background:#fff;border-right:1px solid #e0e0e0;padding-top:12px}
+.sb-logo{display:flex;align-items:center;gap:8px;padding:0 14px 12px;border-bottom:1px solid #e0e0e0;margin-bottom:8px}
+.sb-h{width:26px;height:26px;background:#0052cc;border-radius:4px;color:#fff;
+      font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.sb-title{font-size:13px;font-weight:600;color:#1c1c1c}
+.sb-sec{font-size:10.5px;font-weight:600;color:#aaa;padding:10px 14px 4px;text-transform:uppercase;letter-spacing:.04em}
+.sb-item{display:block;padding:6px 14px;font-size:12.5px;color:#444;cursor:pointer;text-decoration:none}
+.sb-item:hover{background:#f4f5f7;color:#0052cc}
+.sb-item.on{color:#0052cc;font-weight:500;background:#e8f0ff}
 
-/* ── Main ──────────────────────────────────────────────── */
-.fmain{flex:1;display:flex;flex-direction:column;background:#f8f9fa;min-width:0}
-.fbc{height:34px;background:#fff;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;
-     padding:0 20px;gap:5px;font-size:12px;color:#6c757d}
-.fbc a{color:#1a73e8;text-decoration:none}
-.sep{color:#c8cbd0}
-
-/* ── Page header ───────────────────────────────────────── */
-.page-hd{padding:14px 20px;background:#fff;border-bottom:1px solid #e2e6ea;
-         display:flex;align-items:center;justify-content:space-between}
-.ph-title{font-size:20px;font-weight:700;color:#1c1c1c;margin-bottom:2px}
-.ph-sub{font-size:12.5px;color:#6c757d}
-.ph-actions{display:flex;gap:8px}
-.btn{padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap}
-.btn-ghost{background:#fff;border:1px solid #ced4da;color:#495057}
-.btn-black{background:#1c1c1c;border:1px solid #1c1c1c;color:#fff}
-.btn-black:disabled{background:#ced4da;border-color:#ced4da;cursor:not-allowed}
+/* ── Content area ──────────────────────────────────────── */
+.content{flex:1;padding:20px 24px;min-width:0}
+.page-title{font-size:22px;font-weight:600;margin-bottom:3px}
+.page-sub{font-size:12.5px;color:#666;margin-bottom:18px}
 
 /* ── Step indicator ────────────────────────────────────── */
-.steps{display:flex;align-items:center;justify-content:center;padding:14px 24px;
-       background:#fff;border-bottom:1px solid #e2e6ea;gap:0}
-.stp{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px}
-.stp-conn{flex:1;height:2px;background:#28a745;margin-bottom:20px;max-width:50px}
-.stp-conn.dim{background:#dee2e6}
-.stp-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.sd-done{background:#28a745;color:#fff}
-.sd-active{background:#1c1c1c;color:#fff}
-.sd-dim{background:#dee2e6;color:#6c757d}
-.stp-lbl{font-size:11.5px;color:#6c757d;text-align:center;line-height:1.3}
-.stp.active-step .stp-lbl{font-weight:600;color:#1c1c1c}
+.step-bar{display:flex;border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.sbi{flex:1;padding:10px 8px;text-align:center;border-right:1px solid #e0e0e0;background:#fff}
+.sbi:last-child{border-right:none}
+.sbi.done{background:#fff}
+.sbi.active{background:#fff}
+.sbi.locked{background:#fafafa}
+.sbi-circle{width:30px;height:30px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.sc-done{background:#2ea44f;color:#fff}
+.sc-active{background:#0052cc;color:#fff}
+.sc-locked{background:#e0e0e0;color:#999}
+.sbi-lbl{font-size:11px;color:#666;line-height:1.3}
+.sbi.active .sbi-lbl{font-weight:600;color:#0052cc}
+.sbi.done .sbi-lbl{color:#2ea44f}
 
-/* ── Step body ─────────────────────────────────────────── */
-.step-body{padding:16px 20px}
+/* ── Step cards ────────────────────────────────────────── */
+.step{border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:12px}
 
-/* Completed step (collapsed) */
-.step-done{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden;margin-bottom:12px}
-.sd-hd{padding:10px 14px;background:#f0fdf4;display:flex;align-items:center;justify-content:space-between;
-       cursor:pointer}
-.sd-hd-l{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;
-          text-transform:uppercase;letter-spacing:.05em;color:#28a745}
-.sd-hd-r{font-size:12px;color:#6c757d}
-.sd-hd-chev{font-size:13px;color:#adb5bd}
+/* Step header */
+.step-hd{padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sh-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#333}
+.sh-status{font-size:12px;font-weight:500}
 
-/* ── Active step card ──────────────────────────────────── */
-.step-active{border:1px solid #1c1c1c;border-radius:5px;overflow:hidden;margin-bottom:12px}
-.sa-hd{padding:10px 14px;background:#1c1c1c;display:flex;align-items:center;justify-content:space-between}
-.sa-hd-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#fff}
-.sa-hd-r{font-size:12px;color:rgba(255,255,255,.6)}
-.sa-body{padding:16px 14px;background:#fff}
+/* Completed */
+.step.done .step-hd{background:#f0faf4}
+.step.done .sh-title{color:#1a6b35}
+.step.done .sh-status{color:#2ea44f}
 
-/* Room type row */
-.rt-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.rt-row{display:grid;grid-template-columns:24px 1fr 80px 1fr auto;gap:8px;align-items:center}
-.rt-num{width:22px;height:22px;background:#e2e3e5;border-radius:50%;display:flex;align-items:center;
-        justify-content:center;font-size:11px;font-weight:600;color:#495057;flex-shrink:0}
-.rt-num.active{background:#1c1c1c;color:#fff}
-.rt-sel{height:34px;border:1.5px solid #ced4da;border-radius:4px;padding:0 26px 0 9px;
-        font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none;color:#1c1c1c;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23adb5bd' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-        background-repeat:no-repeat;background-position:right 8px center}
-.rt-inp{height:34px;border:1.5px solid #ced4da;border-radius:4px;padding:0 9px;
-        font-size:13px;font-family:inherit;background:#fff;text-align:center}
-.rt-rate-info{display:flex;flex-direction:column;gap:2px;padding:6px 10px;background:#f8f9fa;
-              border:1px solid #e2e6ea;border-radius:4px}
-.rti-name{font-size:11.5px;font-weight:500;color:#1c1c1c}
-.rti-rate{font-size:11.5px;color:#6c757d}
-.rt-del{width:28px;height:28px;background:#fff;border:1px solid #dee2e6;border-radius:4px;
-        display:flex;align-items:center;justify-content:center;cursor:pointer;color:#adb5bd;font-size:14px}
-.rt-del:hover{border-color:#dc3545;color:#dc3545}
+/* Active / current */
+.step.active .step-hd{background:#f0f4ff}
+.step.active .sh-title{color:#0052cc}
+.step.active .sh-status{color:#0052cc}
+
+/* Locked */
+.step.locked .step-hd{background:#fafafa}
+.step.locked .sh-title{color:#aaa}
+.step.locked .sh-status{color:#bbb;font-weight:400}
+
+/* Step body */
+.step-body{padding:16px;background:#fff;border-top:1px solid #e0e0e0}
+.step.locked .step-body{background:#fafafa}
+
+/* Completed step content */
+.done-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f5f5f5;border-radius:3px}
+.done-av{width:28px;height:28px;border-radius:50%;background:#0052cc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex-shrink:0}
+.done-info{font-size:13px;color:#333}
+.done-info strong{font-weight:500}
+.done-info span{color:#666;font-size:12px;margin-left:4px}
+
+/* Form grid */
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:10px}
+.f-group{display:flex;flex-direction:column;gap:5px}
+.f-lbl{font-size:12px;color:#666}
+.f-inp{height:34px;border:1px solid #d0d0d0;border-radius:3px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff;color:#1c1c1c}
+.f-inp:focus{border-color:#0052cc;outline:none;box-shadow:0 0 0 2px rgba(0,82,204,.15)}
+.f-sel{height:34px;border:1px solid #d0d0d0;border-radius:3px;padding:0 24px 0 10px;font-size:13.5px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 9px center;-webkit-appearance:none;color:#1c1c1c}
+.f-sel:focus{border-color:#0052cc;outline:none}
+
+/* Blue helper link */
+.helper-link{font-size:12.5px;color:#0052cc;cursor:pointer;margin-top:6px;display:inline-block}
+.helper-link:hover{text-decoration:underline}
+
+/* Info notice */
+.info-notice{background:#e8f4ff;border:1px solid #b3d4f5;border-radius:3px;padding:9px 12px;
+             font-size:12.5px;color:#0047ab;margin-bottom:12px;line-height:1.5}
+
+/* Multi-room rows */
+.rt-section{margin-bottom:12px}
+.rt-section-hd{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;
+                color:#888;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0f0f0}
+.rt-row{display:grid;grid-template-columns:1fr 80px 1fr auto;gap:10px;align-items:end;margin-bottom:8px}
+.rt-row:last-child{margin-bottom:0}
+.btn-remove{height:34px;width:34px;border:1px solid #e0e0e0;background:#fff;border-radius:3px;
+            color:#999;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-remove:hover{border-color:#d93025;color:#d93025}
 
 /* Add room type link */
-.add-type{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#1a73e8;cursor:pointer;
-          margin-bottom:14px;padding:4px 0}
-.add-type:hover{text-decoration:underline}
+.add-row-link{font-size:13px;color:#0052cc;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;padding:4px 0}
+.add-row-link:hover{text-decoration:underline}
 
-/* Rate override */
-.rate-override{background:#fff8ed;border:1px solid #ffd591;border-radius:4px;padding:10px 12px;
-               margin-bottom:14px;display:flex;align-items:flex-start;gap:8px}
-.ro-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-.ro-text{font-size:12.5px;color:#664d03;line-height:1.5}
-.ro-reason{margin-top:7px;width:100%}
-.ro-reason input{height:32px;border:1px solid #ffd591;border-radius:4px;padding:0 9px;
-                 font-size:12.5px;font-family:inherit;background:#fffcf0;width:100%}
+/* Pre-assign section */
+.pre-section{margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0}
+.pre-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pre-title{font-size:12.5px;font-weight:500;color:#444}
+.pre-optional{font-size:11px;color:#999;margin-left:6px;font-weight:400}
+/* Simple toggle */
+.tog{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.tog-track{width:34px;height:18px;border-radius:9px;background:#ccc;position:relative;transition:background .2s;flex-shrink:0}
+.tog-track.on{background:#0052cc}
+.tog-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+.tog-track.on::after{left:18px}
+.tog-lbl{font-size:12.5px;color:#444}
 
-/* Pre-assignment section */
-.pre-assign{border:1px solid #e2e6ea;border-radius:4px;padding:10px 12px;margin-bottom:14px;background:#f8f9fa}
-.pa-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:0;cursor:pointer}
-.pa-title{font-size:12.5px;font-weight:500;color:#495057;display:flex;align-items:center;gap:6px}
-.pa-toggle{position:relative;width:34px;height:18px;background:#ced4da;border-radius:10px;cursor:pointer;flex-shrink:0;transition:background .2s}
-.pa-toggle.on{background:#28a745}
-.pa-toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;
-                  background:#fff;border-radius:50%;transition:left .2s}
-.pa-toggle.on::after{left:18px}
-.pa-body{margin-top:10px;padding-top:10px;border-top:1px solid #e2e6ea;display:flex;gap:8px;align-items:flex-end}
-.pa-field{display:flex;flex-direction:column;gap:4px;flex:1}
-.pa-lbl{font-size:11.5px;color:#6c757d;font-weight:500}
-.pa-sel{height:34px;border:1.5px solid #ced4da;border-radius:4px;padding:0 26px 0 9px;
-        font-size:13px;font-family:inherit;background:#fff;-webkit-appearance:none}
-.pa-note{font-size:11.5px;color:#8d95a0;margin-top:4px}
+/* Rate summary (in locked Step 4) */
+.rate-preview{font-size:13px;color:#666;line-height:2}
+.rate-preview strong{color:#1c1c1c}
+.rate-preview .total{font-size:14px;font-weight:600;color:#0052cc}
 
-/* Pricing panel */
-.pricing{background:#f0f4f7;border-radius:5px;padding:12px 14px;margin-bottom:14px;border:1px solid #dee2e6}
-.pr-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6c757d;margin-bottom:9px}
-.pr-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px solid #dee2e6}
-.pr-row:last-child{border-bottom:none}
-.pr-l{color:#495057}.pr-r{font-weight:500;font-family:monospace;color:#1c1c1c}
-.pr-divider{border-top:1.5px solid #ced4da;margin:6px 0}
-.pr-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:5px;color:#1c1c1c}
-.pr-total span:last-child{color:#1a73e8}
-
-/* Locked step */
-.step-locked{border:1px solid #e2e6ea;border-radius:5px;overflow:hidden;margin-bottom:8px;background:#f8f9fa}
-.sl-hd{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
-       font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#adb5bd}
-
-/* Bottom bar */
-.bbar{padding:12px 20px;background:#fff;border-top:1px solid #e2e6ea;
-      display:flex;align-items:center;justify-content:space-between}
-.bb-hint{font-size:12px;color:#6c757d}
+/* ── Bottom bar ────────────────────────────────────────── */
+.bbar{padding:12px 24px;background:#fff;border-top:1px solid #e0e0e0;
+      display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bb-prev{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-step{font-size:12.5px;color:#888}
 .bb-r{display:flex;gap:8px}
-
-/* Availability badge */
-.av-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11.5px;font-weight:500}
-.av-ok{background:#d4edda;color:#155724}
-.av-warn{background:#fff3cd;color:#856404}
-.av-none{background:#f8d7da;color:#721c24}
-
-/* Nights pill */
-.nights-pill{background:#e8f4fc;color:#1a73e8;padding:2px 9px;border-radius:12px;font-size:12px;font-weight:500;display:inline-flex;align-items:center}
-
-/* Rate plan auto badge */
-.rp-auto{background:#eaf0fb;color:#1a73e8;padding:1px 7px;border-radius:12px;font-size:10.5px;font-weight:500;margin-left:5px}
-.rp-override{background:#fff8ed;color:#a05c00;padding:1px 7px;border-radius:12px;font-size:10.5px;font-weight:500;margin-left:5px}
+.bb-draft{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-next{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#0052cc;font-weight:500;cursor:pointer}
+.bb-confirm{padding:7px 16px;background:#2ea44f;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:500;cursor:pointer}
+.bb-confirm:disabled{background:#ccc;cursor:not-allowed}
 </style>
 </head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════════
-     STATE 1 — Single room type · 2BR Pool Villa × 1 · Standard
+     STATE 1 — Step 3 active · Single room type · Standard booking
      ═══════════════════════════════════════════════════════ -->
 <div>
-  <div class="state-lbl sl-1">State 1 — Single room · 1× 2BR Pool Villa · Rate auto-selected · Pre-assign optional</div>
-  <div class="shell">
-    <div class="fsb">
-      <div class="fsb-top"><div class="fsb-icon">F</div><div><div class="fsb-name">Front Desk</div><div class="fsb-sub">HVMS App</div></div></div>
-      <div class="fsb-nav">
-        <div class="fsb-sec">Core Operations</div>
-        <div class="fsb-item on"><span class="ico">☰</span>Reservations</div>
-        <div class="fsb-item"><span class="ico">←</span>Check In</div>
-        <div class="fsb-item"><span class="ico">👤</span>Guest profiles</div>
-      </div>
-      <div class="fsb-user"><div class="fsb-av">R</div><div><div class="fsb-un">Rina</div><div class="fsb-ue">rina.qa@pertamapro...</div></div></div>
+  <div class="slabel sl-b">State 1 — Step 3 active · Single room · Standard booking</div>
+  <div class="page">
+    <div class="topnav">
+      <a href="#">Front Desk</a><span class="sep">/</span>
+      <a href="#">Reservations</a><span class="sep">/</span>
+      <span style="color:#333">New reservation</span>
     </div>
-    <div class="fmain">
-      <div class="fbc">🏠 <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#1c1c1c">New reservation</span></div>
-      <!-- Page header -->
-      <div class="page-hd">
-        <div><div class="ph-title">New Reservation</div><div class="ph-sub">Hendrick Willems · GST-0042 &nbsp;·&nbsp; Arrives 20 Jun 2026 &nbsp;·&nbsp; <span class="nights-pill">3 nights</span></div></div>
-        <div class="ph-actions"><button class="btn btn-ghost">Cancel</button></div>
+    <div class="layout">
+      <div class="sb">
+        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
+        <div class="sb-sec">Front Desk</div>
+        <div class="sb-item on">Reservations</div>
+        <div class="sb-item">Check-in</div>
+        <div class="sb-item">Check-out</div>
+        <div class="sb-item">Guest folio</div>
+        <div class="sb-sec">Housekeeping</div>
+        <div class="sb-item">Room status</div>
+        <div class="sb-sec">Settings</div>
+        <div class="sb-item">Settings</div>
       </div>
-      <!-- Step indicator -->
-      <div class="steps">
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Guest</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Stay details</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp active-step"><div class="stp-dot sd-active">3</div><div class="stp-lbl">Room &amp; rate</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">4</div><div class="stp-lbl">Source &amp; deposit</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">5</div><div class="stp-lbl">Summary &amp; confirm</div></div>
-      </div>
-      <div class="step-body">
-        <!-- Steps 1 & 2 collapsed -->
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 1 — Guest</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">Hendrick Willems · GST-0042 · Netherlands · VIP</div><span class="sd-hd-chev">▾</span></div></div></div>
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 2 — Stay details</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">20 Jun – 23 Jun 2026 · 3 nights · 2 adults · 1 child · CI 14:00</div><span class="sd-hd-chev">▾</span></div></div></div>
+      <div class="content">
+        <div class="page-title">New reservation</div>
+        <div class="page-sub">Fill in each step to create a confirmed reservation</div>
 
-        <!-- Step 3 — ACTIVE -->
-        <div class="step-active">
-          <div class="sa-hd"><div class="sa-hd-l">Step 3 — Room &amp; rate</div><div class="sa-hd-r">Select room type and confirm pricing</div></div>
-          <div class="sa-body">
+        <!-- Step indicator -->
+        <div class="step-bar">
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+        </div>
 
-            <!-- Room type row(s) -->
-            <div class="rt-rows">
-              <div class="rt-row">
-                <div class="rt-num active">1</div>
-                <div>
-                  <select class="rt-sel" style="width:100%">
-                    <option selected>2BR Pool Villa</option>
-                    <option>3BR Villa</option>
-                    <option>1BR Garden Villa</option>
-                  </select>
-                </div>
-                <div>
-                  <input class="rt-inp" type="number" value="1" min="1" max="20" title="Quantity">
-                </div>
-                <div class="rt-rate-info">
-                  <div class="rti-name">Standard Rate <span class="rp-auto">Auto-selected</span></div>
-                  <div class="rti-rate">IDR 3,500,000 / night</div>
-                </div>
-                <div></div>
-              </div>
+        <!-- Step 1 — done -->
+        <div class="step done">
+          <div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
+          <div class="step-body">
+            <div class="done-row">
+              <div class="done-av">HW</div>
+              <div class="done-info"><strong>Hendrick Willems</strong><span>+62 812 3456 7890 · Passport: A12345678</span></div>
             </div>
-
-            <!-- Availability indicator -->
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12.5px;color:#495057">
-              <span>2BR Pool Villa availability 20–23 Jun:</span>
-              <span class="av-badge av-ok">✓ 6 rooms available</span>
-            </div>
-
-            <!-- Add another room type -->
-            <div class="add-type">
-              <span style="font-size:16px;line-height:1">+</span> Add another room type
-            </div>
-
-            <!-- Pre-assign specific room (optional) -->
-            <div class="pre-assign">
-              <div class="pa-hd">
-                <div class="pa-title">
-                  <span>Pre-assign a specific room</span>
-                  <span style="font-size:11px;background:#e2e3e5;color:#495057;padding:1px 7px;border-radius:12px;font-weight:400">Optional</span>
-                </div>
-                <div class="pa-toggle on"></div>
-              </div>
-              <div class="pa-body">
-                <div class="pa-field">
-                  <div class="pa-lbl">Specific room (2BR Pool Villa)</div>
-                  <select class="pa-sel" style="width:100%">
-                    <option>V-03 · Wing A · Available</option>
-                    <option>V-01 · Wing A · Available</option>
-                    <option>V-05 · Wing B · Available</option>
-                    <option>V-07 · Wing B · Dirty</option>
-                  </select>
-                </div>
-              </div>
-              <div class="pa-note" style="margin-top:8px">Pre-assignment is advisory — the agent can change this at check-in Step 3 if needed.</div>
-            </div>
-
-            <!-- Live pricing panel -->
-            <div class="pricing">
-              <div class="pr-title">Live pricing</div>
-              <div class="pr-row"><span class="pr-l">2BR Pool Villa × 1 room × 3 nights</span><span class="pr-r">3,500,000 × 3</span></div>
-              <div class="pr-divider"></div>
-              <div class="pr-total"><span>Total accommodation</span><span>IDR 10,500,000</span></div>
-            </div>
-
-            <button class="btn btn-black" style="width:100%;padding:10px">Confirm room &amp; rate</button>
           </div>
         </div>
 
-        <!-- Locked steps -->
-        <div class="step-locked"><div class="sl-hd"><span>Step 4 — Source &amp; deposit</span><span style="font-size:11px">Complete step 3 first</span></div></div>
-        <div class="step-locked"><div class="sl-hd"><span>Step 5 — Summary &amp; confirm</span><span style="font-size:11px">Complete step 3 first</span></div></div>
+        <!-- Step 2 — done -->
+        <div class="step done">
+          <div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
+          <div class="step-body">
+            <div class="form-grid-3" style="margin-bottom:10px">
+              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="20 Jun 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="23 Jun 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="3 nights" readonly></div>
+            </div>
+            <div class="form-grid-3">
+              <div class="f-group"><div class="f-lbl">Adults</div><input class="f-inp" value="2" readonly></div>
+              <div class="f-group"><div class="f-lbl">Children</div><input class="f-inp" value="1" readonly></div>
+              <div class="f-group"><div class="f-lbl">Est. check-in time</div><input class="f-inp" value="14:00" readonly></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 — ACTIVE -->
+        <div class="step active">
+          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
+          <div class="step-body">
+            <div class="form-grid-2" style="margin-bottom:6px">
+              <div class="f-group">
+                <div class="f-lbl">Room type</div>
+                <select class="f-sel">
+                  <option selected>2 Bedroom Pool Villa</option>
+                  <option>3 Bedroom Villa</option>
+                  <option>1 Bedroom Garden Villa</option>
+                </select>
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Specific room <span style="color:#999;font-size:11.5px">(optional)</span></div>
+                <select class="f-sel">
+                  <option value="">— Assign at check-in —</option>
+                  <option selected>V-03 (Available)</option>
+                  <option>V-01 (Available)</option>
+                  <option>V-05 (Available)</option>
+                  <option>V-07 (Dirty)</option>
+                </select>
+              </div>
+            </div>
+            <span class="helper-link">Specific room can be changed at check-in</span>
+
+            <!-- Add another room type -->
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0">
+              <span class="add-row-link">+ Add another room type</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 — locked -->
+        <div class="step locked">
+          <div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div>
+        </div>
+        <!-- Step 5 — locked -->
+        <div class="step locked">
+          <div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div>
+        </div>
+        <!-- Step 6 — locked -->
+        <div class="step locked">
+          <div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div>
+        </div>
       </div>
-      <div class="bbar">
-        <button class="btn btn-ghost">← Previous</button>
-        <div class="bb-hint">Step 3 of 5</div>
-        <div class="bb-r"><button class="btn btn-ghost">Save as draft</button><button class="btn btn-black" disabled>Confirm reservation</button></div>
+    </div>
+    <div class="bbar">
+      <button class="bb-prev">Previous</button>
+      <span class="bb-step">Step 3 of 6</span>
+      <div class="bb-r">
+        <button class="bb-draft">Save as draft</button>
+        <button class="bb-next">Next — Rate &amp; charges</button>
+        <button class="bb-confirm" disabled>Confirm reservation</button>
       </div>
     </div>
   </div>
@@ -306,89 +287,85 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
      STATE 2 — Multi-room same type · 3× 2BR Pool Villa
      ═══════════════════════════════════════════════════════ -->
 <div>
-  <div class="state-lbl sl-2">State 2 — Multi-room same type · 3× 2BR Pool Villa · Group booking</div>
-  <div class="shell">
-    <div class="fsb">
-      <div class="fsb-top"><div class="fsb-icon">F</div><div><div class="fsb-name">Front Desk</div><div class="fsb-sub">HVMS App</div></div></div>
-      <div class="fsb-nav"><div class="fsb-sec">Core Operations</div><div class="fsb-item on"><span class="ico">☰</span>Reservations</div></div>
-      <div class="fsb-user"><div class="fsb-av">R</div><div><div class="fsb-un">Rina</div><div class="fsb-ue">rina.qa@pertamapro...</div></div></div>
-    </div>
-    <div class="fmain">
-      <div class="fbc">🏠 <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#1c1c1c">New reservation</span></div>
-      <div class="page-hd">
-        <div><div class="ph-title">New Reservation</div><div class="ph-sub">Tanaka Group · GST-0055 &nbsp;·&nbsp; Arrives 24 May 2026 &nbsp;·&nbsp; <span class="nights-pill">3 nights</span></div></div>
-        <div class="ph-actions"><button class="btn btn-ghost">Cancel</button></div>
+  <div class="slabel sl-g">State 2 — Multi-room same type · 3× 2 Bedroom Pool Villa</div>
+  <div class="page">
+    <div class="topnav"><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New reservation</span></div>
+    <div class="layout">
+      <div class="sb">
+        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
+        <div class="sb-sec">Front Desk</div>
+        <div class="sb-item on">Reservations</div>
+        <div class="sb-item">Check-in</div>
+        <div class="sb-item">Check-out</div>
+        <div class="sb-item">Guest folio</div>
+        <div class="sb-sec">Housekeeping</div>
+        <div class="sb-item">Room status</div>
       </div>
-      <div class="steps">
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Guest</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Stay details</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp active-step"><div class="stp-dot sd-active">3</div><div class="stp-lbl">Room &amp; rate</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">4</div><div class="stp-lbl">Source &amp; deposit</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">5</div><div class="stp-lbl">Summary &amp; confirm</div></div>
-      </div>
-      <div class="step-body">
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 1 — Guest</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">Tanaka Group · GST-0055 · Japan</div><span class="sd-hd-chev">▾</span></div></div></div>
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 2 — Stay details</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">24 May – 27 May 2026 · 3 nights · 6 adults · CI 14:00</div><span class="sd-hd-chev">▾</span></div></div></div>
-        <div class="step-active">
-          <div class="sa-hd"><div class="sa-hd-l">Step 3 — Room &amp; rate</div><div class="sa-hd-r">3 rooms of same type</div></div>
-          <div class="sa-body">
-            <div class="rt-rows">
-              <div class="rt-row">
-                <div class="rt-num active">1</div>
-                <select class="rt-sel"><option selected>2BR Pool Villa</option><option>3BR Villa</option></select>
-                <input class="rt-inp" type="number" value="3" min="1" max="20" title="Quantity">
-                <div class="rt-rate-info">
-                  <div class="rti-name">Standard Rate <span class="rp-auto">Auto-selected</span></div>
-                  <div class="rti-rate">IDR 3,500,000 / night</div>
-                </div>
-                <div></div>
-              </div>
+      <div class="content">
+        <div class="page-title">New reservation</div>
+        <div class="page-sub">Fill in each step to create a confirmed reservation</div>
+        <div class="step-bar">
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+        </div>
+        <div class="step done"><div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
+          <div class="step-body"><div class="done-row"><div class="done-av">TG</div><div class="done-info"><strong>Tanaka Group</strong><span>GST-0055 · Japan · 6 adults</span></div></div></div>
+        </div>
+        <div class="step done"><div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
+          <div class="step-body">
+            <div class="form-grid-3">
+              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="24 May 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="27 May 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="3 nights" readonly></div>
             </div>
-
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12.5px;color:#495057">
-              <span>2BR Pool Villa availability 24–27 May:</span>
-              <span class="av-badge av-ok">✓ 6 rooms available (3 needed)</span>
-            </div>
-
-            <div class="add-type"><span style="font-size:16px;line-height:1">+</span> Add another room type</div>
-
-            <div style="background:#e8f4fc;border:1px solid #b3d1e8;border-radius:4px;padding:9px 12px;margin-bottom:14px;font-size:12.5px;color:#0c447c">
-              ℹ️ &nbsp;<strong>3 rooms</strong> of the same type will be held. Specific rooms are assigned individually at check-in Step 3 — one per slot.
-            </div>
-
-            <!-- Pre-assign note for multi-room -->
-            <div class="pre-assign">
-              <div class="pa-hd">
-                <div class="pa-title">
-                  <span>Pre-assign specific rooms</span>
-                  <span style="font-size:11px;background:#e2e3e5;color:#495057;padding:1px 7px;border-radius:12px;font-weight:400">Optional · 3 slots</span>
-                </div>
-                <div class="pa-toggle"></div>
-              </div>
-              <div class="pa-note" style="margin-top:6px">Pre-assign one specific room per slot now, or leave this to check-in Step 3.</div>
-            </div>
-
-            <div class="pricing">
-              <div class="pr-title">Live pricing</div>
-              <div class="pr-row"><span class="pr-l">2BR Pool Villa × 3 rooms × 3 nights</span><span class="pr-r">3,500,000 × 3 × 3</span></div>
-              <div class="pr-divider"></div>
-              <div class="pr-total"><span>Total accommodation</span><span>IDR 31,500,000</span></div>
-            </div>
-
-            <button class="btn btn-black" style="width:100%;padding:10px">Confirm room &amp; rate</button>
           </div>
         </div>
-        <div class="step-locked"><div class="sl-hd"><span>Step 4 — Source &amp; deposit</span><span style="font-size:11px">Complete step 3 first</span></div></div>
-        <div class="step-locked"><div class="sl-hd"><span>Step 5 — Summary &amp; confirm</span><span style="font-size:11px">Complete step 3 first</span></div></div>
+
+        <!-- Step 3 — ACTIVE (multi-room same type) -->
+        <div class="step active">
+          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
+          <div class="step-body">
+            <!-- Single row, quantity = 3 -->
+            <div class="form-grid-2" style="grid-template-columns:1fr 100px;margin-bottom:6px">
+              <div class="f-group">
+                <div class="f-lbl">Room type</div>
+                <select class="f-sel">
+                  <option selected>2 Bedroom Pool Villa</option>
+                  <option>3 Bedroom Villa</option>
+                </select>
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Quantity</div>
+                <input class="f-inp" type="number" value="3" min="1" max="20" style="text-align:center">
+              </div>
+            </div>
+
+            <!-- Info notice for multi-room -->
+            <div class="info-notice">
+              3 rooms of the same type will be held. Specific rooms are assigned individually during check-in Step 3 — one per slot.
+            </div>
+
+            <!-- Add another room type link -->
+            <span class="add-row-link">+ Add another room type</span>
+          </div>
+        </div>
+
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div></div>
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div></div>
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div></div>
       </div>
-      <div class="bbar">
-        <button class="btn btn-ghost">← Previous</button>
-        <div class="bb-hint">Step 3 of 5</div>
-        <div class="bb-r"><button class="btn btn-ghost">Save as draft</button><button class="btn btn-black" disabled>Confirm reservation</button></div>
+    </div>
+    <div class="bbar">
+      <button class="bb-prev">Previous</button>
+      <span class="bb-step">Step 3 of 6</span>
+      <div class="bb-r">
+        <button class="bb-draft">Save as draft</button>
+        <button class="bb-next">Next — Rate &amp; charges</button>
+        <button class="bb-confirm" disabled>Confirm reservation</button>
       </div>
     </div>
   </div>
@@ -396,105 +373,104 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 
 
 <!-- ═══════════════════════════════════════════════════════
-     STATE 3 — Mixed room types · 1× 3BR + 2× 2BR Pool Villa
+     STATE 3 — Mixed room types · 1× 3BR + 2× 2BR
      ═══════════════════════════════════════════════════════ -->
 <div>
-  <div class="state-lbl sl-3">State 3 — Mixed room types · 1× 3BR Villa + 2× 2BR Pool Villa · Rate override example</div>
-  <div class="shell">
-    <div class="fsb">
-      <div class="fsb-top"><div class="fsb-icon">F</div><div><div class="fsb-name">Front Desk</div><div class="fsb-sub">HVMS App</div></div></div>
-      <div class="fsb-nav"><div class="fsb-sec">Core Operations</div><div class="fsb-item on"><span class="ico">☰</span>Reservations</div></div>
-      <div class="fsb-user"><div class="fsb-av">R</div><div><div class="fsb-un">Rina</div><div class="fsb-ue">rina.qa@pertamapro...</div></div></div>
-    </div>
-    <div class="fmain">
-      <div class="fbc">🏠 <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#1c1c1c">New reservation</span></div>
-      <div class="page-hd">
-        <div><div class="ph-title">New Reservation</div><div class="ph-sub">Sharma Wedding Party · GST-0061 &nbsp;·&nbsp; Arrives 24 May 2026 &nbsp;·&nbsp; <span class="nights-pill">4 nights</span></div></div>
-        <div class="ph-actions"><button class="btn btn-ghost">Cancel</button></div>
+  <div class="slabel sl-a">State 3 — Mixed room types · 1× 3 Bedroom Villa + 2× 2 Bedroom Pool Villa</div>
+  <div class="page">
+    <div class="topnav"><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New reservation</span></div>
+    <div class="layout">
+      <div class="sb">
+        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
+        <div class="sb-sec">Front Desk</div>
+        <div class="sb-item on">Reservations</div>
+        <div class="sb-item">Check-in</div>
+        <div class="sb-item">Check-out</div>
+        <div class="sb-item">Guest folio</div>
+        <div class="sb-sec">Housekeeping</div>
+        <div class="sb-item">Room status</div>
       </div>
-      <div class="steps">
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Guest</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp"><div class="stp-dot sd-done">✓</div><div class="stp-lbl">Stay details</div></div>
-        <div class="stp-conn"></div>
-        <div class="stp active-step"><div class="stp-dot sd-active">3</div><div class="stp-lbl">Room &amp; rate</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">4</div><div class="stp-lbl">Source &amp; deposit</div></div>
-        <div class="stp-conn dim"></div>
-        <div class="stp"><div class="stp-dot sd-dim">5</div><div class="stp-lbl">Summary &amp; confirm</div></div>
-      </div>
-      <div class="step-body">
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 1 — Guest</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">Sharma Wedding Party · GST-0061 · India</div><span class="sd-hd-chev">▾</span></div></div></div>
-        <div class="step-done"><div class="sd-hd"><div class="sd-hd-l"><span>✓</span> Step 2 — Stay details</div><div style="display:flex;align-items:center;gap:10px"><div class="sd-hd-r">24 May – 28 May 2026 · 4 nights · 8 adults · CI 14:00</div><span class="sd-hd-chev">▾</span></div></div></div>
-        <div class="step-active">
-          <div class="sa-hd"><div class="sa-hd-l">Step 3 — Room &amp; rate</div><div class="sa-hd-r">2 room types · 3 rooms total</div></div>
-          <div class="sa-body">
-            <!-- Two room type rows -->
-            <div class="rt-rows">
-              <!-- Row 1: 3BR Villa x1 -->
-              <div class="rt-row">
-                <div class="rt-num active">1</div>
-                <select class="rt-sel"><option>2BR Pool Villa</option><option selected>3BR Villa</option></select>
-                <input class="rt-inp" type="number" value="1" min="1" max="20">
-                <div class="rt-rate-info">
-                  <div class="rti-name">Wedding Package <span class="rp-override">Override</span></div>
-                  <div class="rti-rate">IDR 4,500,000 / night</div>
-                </div>
-                <div class="rt-del" title="Remove this row">✕</div>
-              </div>
-              <!-- Row 2: 2BR Pool Villa x2 -->
-              <div class="rt-row">
-                <div class="rt-num active">2</div>
-                <select class="rt-sel"><option selected>2BR Pool Villa</option><option>3BR Villa</option></select>
-                <input class="rt-inp" type="number" value="2" min="1" max="20">
-                <div class="rt-rate-info">
-                  <div class="rti-name">Standard Rate <span class="rp-auto">Auto-selected</span></div>
-                  <div class="rti-rate">IDR 3,500,000 / night</div>
-                </div>
-                <div class="rt-del" title="Remove this row">✕</div>
-              </div>
+      <div class="content">
+        <div class="page-title">New reservation</div>
+        <div class="page-sub">Fill in each step to create a confirmed reservation</div>
+        <div class="step-bar">
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+        </div>
+        <div class="step done"><div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
+          <div class="step-body"><div class="done-row"><div class="done-av">SW</div><div class="done-info"><strong>Sharma Wedding Party</strong><span>GST-0061 · India · 8 adults</span></div></div></div>
+        </div>
+        <div class="step done"><div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
+          <div class="step-body">
+            <div class="form-grid-3">
+              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="24 May 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="28 May 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="4 nights" readonly></div>
             </div>
-
-            <!-- Rate override reason (row 1 has override) -->
-            <div class="rate-override">
-              <div class="ro-icon">⚠️</div>
-              <div class="ro-text" style="flex:1">
-                <strong>Row 1 rate was overridden</strong> — agent changed from "Standard Rate (IDR 5,200,000)" to "Wedding Package (IDR 4,500,000)". A reason is required.
-                <div class="ro-reason"><input type="text" placeholder="Enter reason for rate override (required)…" value="Wedding package special rate approved by Manager"></div>
-              </div>
-            </div>
-
-            <!-- Availability for both types -->
-            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-              <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#495057">
-                <span>3BR Villa 24–28 May:</span><span class="av-badge av-warn">⚠ 2 rooms available (1 needed)</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#495057">
-                <span>2BR Pool Villa 24–28 May:</span><span class="av-badge av-ok">✓ 5 rooms available (2 needed)</span>
-              </div>
-            </div>
-
-            <div class="add-type"><span style="font-size:16px;line-height:1">+</span> Add another room type</div>
-
-            <!-- Live pricing — two types -->
-            <div class="pricing">
-              <div class="pr-title">Live pricing</div>
-              <div class="pr-row"><span class="pr-l">3BR Villa × 1 room × 4 nights (Wedding Package)</span><span class="pr-r">4,500,000 × 4 = 18,000,000</span></div>
-              <div class="pr-row"><span class="pr-l">2BR Pool Villa × 2 rooms × 4 nights (Standard Rate)</span><span class="pr-r">3,500,000 × 2 × 4 = 28,000,000</span></div>
-              <div class="pr-divider"></div>
-              <div class="pr-total"><span>Total accommodation</span><span>IDR 46,000,000</span></div>
-            </div>
-
-            <button class="btn btn-black" style="width:100%;padding:10px">Confirm room &amp; rate</button>
           </div>
         </div>
-        <div class="step-locked"><div class="sl-hd"><span>Step 4 — Source &amp; deposit</span><span style="font-size:11px">Complete step 3 first</span></div></div>
-        <div class="step-locked"><div class="sl-hd"><span>Step 5 — Summary &amp; confirm</span><span style="font-size:11px">Complete step 3 first</span></div></div>
+
+        <!-- Step 3 — ACTIVE (mixed types) -->
+        <div class="step active">
+          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
+          <div class="step-body">
+            <!-- Row 1: 3BR Villa × 1 -->
+            <div class="rt-row" style="margin-bottom:10px">
+              <div class="f-group">
+                <div class="f-lbl">Room type</div>
+                <select class="f-sel"><option>2 Bedroom Pool Villa</option><option selected>3 Bedroom Villa</option></select>
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Quantity</div>
+                <input class="f-inp" type="number" value="1" min="1" max="20" style="text-align:center">
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Specific room <span style="color:#999;font-size:11px">(optional)</span></div>
+                <select class="f-sel"><option value="">— Assign at check-in —</option><option>V-10 (Available)</option><option>V-12 (Available)</option></select>
+              </div>
+              <div style="padding-bottom:1px"><button class="btn-remove">✕</button></div>
+            </div>
+            <!-- Row 2: 2BR Pool Villa × 2 -->
+            <div class="rt-row" style="margin-bottom:10px">
+              <div class="f-group">
+                <div class="f-lbl">Room type</div>
+                <select class="f-sel"><option selected>2 Bedroom Pool Villa</option><option>3 Bedroom Villa</option></select>
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Quantity</div>
+                <input class="f-inp" type="number" value="2" min="1" max="20" style="text-align:center">
+              </div>
+              <div class="f-group">
+                <div class="f-lbl">Specific room <span style="color:#999;font-size:11px">(optional)</span></div>
+                <select class="f-sel"><option value="" selected>— Assign at check-in —</option><option>V-03 (Available)</option><option>V-05 (Available)</option></select>
+              </div>
+              <div style="padding-bottom:1px"><button class="btn-remove">✕</button></div>
+            </div>
+
+            <span class="add-row-link">+ Add another room type</span>
+
+            <div style="margin-top:4px">
+              <span class="helper-link">Specific rooms can be changed at check-in</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div></div>
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div></div>
+        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div></div>
       </div>
-      <div class="bbar">
-        <button class="btn btn-ghost">← Previous</button>
-        <div class="bb-hint">Step 3 of 5</div>
-        <div class="bb-r"><button class="btn btn-ghost">Save as draft</button><button class="btn btn-black" disabled>Confirm reservation</button></div>
+    </div>
+    <div class="bbar">
+      <button class="bb-prev">Previous</button>
+      <span class="bb-step">Step 3 of 6</span>
+      <div class="bb-r">
+        <button class="bb-draft">Save as draft</button>
+        <button class="bb-next">Next — Rate &amp; charges</button>
+        <button class="bb-confirm" disabled>Confirm reservation</button>
       </div>
     </div>
   </div>
