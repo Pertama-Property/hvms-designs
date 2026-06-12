@@ -2,476 +2,567 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HVMS — New Reservation · Step 3 · Room</title>
+<title>HVMS — New Reservation · Step 3 · Room &amp; Rate</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-     background:#f5f5f5;color:#1c1c1c;font-size:13.5px;
-     padding:24px;display:flex;flex-direction:column;gap:28px;max-width:1060px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f0f0f0;color:#1c1c1c;font-size:13.5px;
+     padding:20px;display:flex;flex-direction:column;gap:28px;max-width:1020px}
 
-/* State label (only visible in the design file, not in real app) */
-.slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
-        padding:4px 12px;border-radius:4px 4px 0 0;display:inline-flex;align-items:center;gap:5px}
-.sl-b{background:#e8f4fc;border:1px solid #b3d1e8;border-bottom:none;color:#005b9e}
-.sl-g{background:#e8f9ee;border:1px solid #b2dfc0;border-bottom:none;color:#1a6b35}
-.sl-a{background:#fff8e6;border:1px solid #ffd580;border-bottom:none;color:#7a4c00}
+/* ── State label (design annotation only) ─── */
+.ann{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+     padding:3px 10px;border-radius:3px 3px 0 0;display:inline-flex;align-items:center;gap:5px}
+.ann-b{background:#dceeff;border:1px solid #8bbfe8;border-bottom:none;color:#0047a3}
+.ann-g{background:#dcf5e7;border:1px solid #7dc99a;border-bottom:none;color:#1a5c30}
+.ann-a{background:#fff4dc;border:1px solid #e6c96a;border-bottom:none;color:#7a4c00}
 
-/* ── Outer page shell ──────────────────────────────────── */
-.page{background:#fff;border:1px solid #e0e0e0;border-radius:0 4px 4px 4px;overflow:hidden}
+/* ── Outer shell ─────────────────────────────────────────── */
+.shell{display:flex;background:#f0f0f0;border:1px solid #ddd;border-radius:0 5px 5px 5px;overflow:hidden}
 
-/* ── Top nav bar ───────────────────────────────────────── */
-.topnav{height:40px;background:#fff;border-bottom:1px solid #e0e0e0;
-        display:flex;align-items:center;padding:0 20px;gap:6px;font-size:12.5px;color:#666}
-.topnav a{color:#0052cc;text-decoration:none}.topnav a:hover{text-decoration:underline}
-.topnav .sep{color:#bbb}
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sb{width:172px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e5}
+.sb-hd{padding:10px 12px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:7px}
+.sb-logo{width:26px;height:26px;background:#0052cc;border-radius:5px;
+         display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13.5px}
+.sb-app{display:flex;flex-direction:column}
+.sb-app-name{font-size:12.5px;font-weight:600;line-height:1.2}
+.sb-app-sub{font-size:11px;color:#888;line-height:1.2}
+.sb-nav{padding:4px 0}
+.sb-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:12px;color:#444;cursor:pointer}
+.sb-item:hover{background:#f5f5f5;color:#0052cc}
+.sb-item .ico{font-size:13px;opacity:.5;width:15px}
+.sb-footer{padding:10px 12px;border-top:1px solid #e5e5e5;display:flex;align-items:center;gap:7px;margin-top:auto}
+.sb-av{width:26px;height:26px;border-radius:50%;background:#d97706;color:#fff;
+       display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.sb-uname{font-size:12px;font-weight:500}
+.sb-uemail{font-size:10.5px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px}
 
-/* ── Main layout: sidebar + content ───────────────────── */
-.layout{display:flex;min-height:600px}
+/* ── Main content area ───────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topnav{height:34px;background:#fff;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;
+        padding:0 20px;gap:5px;font-size:12px;color:#888}
+.topnav a{color:#0052cc;text-decoration:none}
+.topnav a:hover{text-decoration:underline}
+.topnav .sep{color:#ccc}
 
-/* ── Sidebar ───────────────────────────────────────────── */
-.sb{width:160px;flex-shrink:0;background:#fff;border-right:1px solid #e0e0e0;padding-top:12px}
-.sb-logo{display:flex;align-items:center;gap:8px;padding:0 14px 12px;border-bottom:1px solid #e0e0e0;margin-bottom:8px}
-.sb-h{width:26px;height:26px;background:#0052cc;border-radius:4px;color:#fff;
-      font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
-.sb-title{font-size:13px;font-weight:600;color:#1c1c1c}
-.sb-sec{font-size:10.5px;font-weight:600;color:#aaa;padding:10px 14px 4px;text-transform:uppercase;letter-spacing:.04em}
-.sb-item{display:block;padding:6px 14px;font-size:12.5px;color:#444;cursor:pointer;text-decoration:none}
-.sb-item:hover{background:#f4f5f7;color:#0052cc}
-.sb-item.on{color:#0052cc;font-weight:500;background:#e8f0ff}
+/* Content scroll area */
+.content{padding:20px;overflow-y:auto}
+.page-title{font-size:22px;font-weight:600;margin-bottom:2px}
+.page-sub{font-size:12.5px;color:#777;margin-bottom:18px}
 
-/* ── Content area ──────────────────────────────────────── */
-.content{flex:1;padding:20px 24px;min-width:0}
-.page-title{font-size:22px;font-weight:600;margin-bottom:3px}
-.page-sub{font-size:12.5px;color:#666;margin-bottom:18px}
+/* ── Step indicator ──────────────────────────────────────── */
+.step-bar{display:flex;margin-bottom:20px;gap:0}
+.sbi{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;
+     background:#fff;border:1px solid #e5e5e5;border-right:none}
+.sbi:first-child{border-radius:5px 0 0 5px}
+.sbi:last-child{border-radius:0 5px 5px 0;border-right:1px solid #e5e5e5}
+.sbi-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.sd-done{background:#2ea44f;color:#fff}
+.sd-active{background:#0052cc;color:#fff}
+.sd-lock{background:#e5e5e5;color:#aaa}
+.sbi-lbl{font-size:11px;color:#777;text-align:center;line-height:1.3}
+.sbi.active-sbi .sbi-lbl{font-weight:600;color:#0052cc}
+.sbi.done-sbi .sbi-lbl{color:#2ea44f}
 
-/* ── Step indicator ────────────────────────────────────── */
-.step-bar{display:flex;border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:20px}
-.sbi{flex:1;padding:10px 8px;text-align:center;border-right:1px solid #e0e0e0;background:#fff}
-.sbi:last-child{border-right:none}
-.sbi.done{background:#fff}
-.sbi.active{background:#fff}
-.sbi.locked{background:#fafafa}
-.sbi-circle{width:30px;height:30px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.sc-done{background:#2ea44f;color:#fff}
-.sc-active{background:#0052cc;color:#fff}
-.sc-locked{background:#e0e0e0;color:#999}
-.sbi-lbl{font-size:11px;color:#666;line-height:1.3}
-.sbi.active .sbi-lbl{font-weight:600;color:#0052cc}
-.sbi.done .sbi-lbl{color:#2ea44f}
+/* ── Step accordion cards ────────────────────────────────── */
+.step-card{border:1px solid #e5e5e5;border-radius:5px;overflow:hidden;margin-bottom:10px;background:#fff}
 
-/* ── Step cards ────────────────────────────────────────── */
-.step{border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:12px}
+/* Completed step header */
+.step-card.done .step-hd{background:#f0faf4;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.step-card.done .step-hd .sh-l{font-size:12.5px;font-weight:600;color:#1d6b35;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.04em}
+.step-card.done .step-hd .sh-chev{font-size:14px;color:#888}
 
-/* Step header */
-.step-hd{padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.sh-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#333}
-.sh-status{font-size:12px;font-weight:500}
+/* Active step header */
+.step-card.active .step-hd{background:#f0faf4;padding:11px 16px;display:flex;align-items:center;justify-content:space-between}
+.step-card.active .step-hd .sh-l{font-size:12.5px;font-weight:600;color:#1d6b35;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.04em}
+.step-card.active .step-hd .sh-chev{font-size:14px;color:#888}
 
-/* Completed */
-.step.done .step-hd{background:#f0faf4}
-.step.done .sh-title{color:#1a6b35}
-.step.done .sh-status{color:#2ea44f}
-
-/* Active / current */
-.step.active .step-hd{background:#f0f4ff}
-.step.active .sh-title{color:#0052cc}
-.step.active .sh-status{color:#0052cc}
-
-/* Locked */
-.step.locked .step-hd{background:#fafafa}
-.step.locked .sh-title{color:#aaa}
-.step.locked .sh-status{color:#bbb;font-weight:400}
+/* Locked step header */
+.step-card.locked .step-hd{background:#fafafa;padding:11px 16px;display:flex;align-items:center;justify-content:space-between}
+.step-card.locked .step-hd .sh-l{font-size:12.5px;font-weight:500;color:#aaa;text-transform:uppercase;letter-spacing:.04em}
+.step-card.locked .step-hd .sh-chev{font-size:14px;color:#ddd}
 
 /* Step body */
-.step-body{padding:16px;background:#fff;border-top:1px solid #e0e0e0}
-.step.locked .step-body{background:#fafafa}
+.step-body{padding:16px;border-top:1px solid #e5e5e5}
+.step-card.locked .step-body{display:none}
 
-/* Completed step content */
-.done-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f5f5f5;border-radius:3px}
-.done-av{width:28px;height:28px;border-radius:50%;background:#0052cc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex-shrink:0}
-.done-info{font-size:13px;color:#333}
-.done-info strong{font-weight:500}
-.done-info span{color:#666;font-size:12px;margin-left:4px}
+/* Confirmed button */
+.btn-confirmed{padding:6px 14px;background:#2ea44f;color:#fff;border:none;border-radius:4px;
+               font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.confirmed-row{display:flex;justify-content:flex-end;margin-top:14px}
 
-/* Form grid */
-.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
-.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:10px}
+/* Done guest row */
+.guest-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f5f5f5;border-radius:4px;border:1px solid #e5e5e5;position:relative}
+.g-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;background:#d97706;flex-shrink:0}
+.g-name{font-size:13.5px;font-weight:500}
+.g-meta{font-size:12px;color:#777;margin-top:1px}
+.g-close{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:16px;color:#aaa;cursor:pointer}
+
+/* Stay form grid */
+.form-grid{display:grid;gap:12px;margin-bottom:10px}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
 .f-group{display:flex;flex-direction:column;gap:5px}
-.f-lbl{font-size:12px;color:#666}
-.f-inp{height:34px;border:1px solid #d0d0d0;border-radius:3px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff;color:#1c1c1c}
-.f-inp:focus{border-color:#0052cc;outline:none;box-shadow:0 0 0 2px rgba(0,82,204,.15)}
-.f-sel{height:34px;border:1px solid #d0d0d0;border-radius:3px;padding:0 24px 0 10px;font-size:13.5px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 9px center;-webkit-appearance:none;color:#1c1c1c}
-.f-sel:focus{border-color:#0052cc;outline:none}
+.f-lbl{font-size:12px;color:#666;display:flex;align-items:center;gap:3px}
+.f-req{color:#d93025;font-size:11px}
+.f-inp{height:35px;border:1px solid #d4d4d4;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff}
+.f-inp:focus{border-color:#0052cc;outline:none}
+.f-sel{height:35px;border:1px solid #d4d4d4;border-radius:4px;padding:0 25px 0 10px;font-size:13.5px;font-family:inherit;background:#fff;-webkit-appearance:none}
 
-/* Blue helper link */
-.helper-link{font-size:12.5px;color:#0052cc;cursor:pointer;margin-top:6px;display:inline-block}
-.helper-link:hover{text-decoration:underline}
+/* ── Room type tiles ─────────────────────────────────────── */
+.tile-lbl{font-size:12px;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:3px}
+.tile-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.tile{border:1.5px solid #d4d4d4;border-radius:5px;padding:12px;cursor:pointer;transition:border-color .15s}
+.tile:hover{border-color:#666}
+.tile.selected{border:2px solid #1c1c1c;background:#fafafa}
+.tile.unavail{opacity:.6;cursor:default}
+.tile-name{font-size:14px;font-weight:600;margin-bottom:4px;color:#1c1c1c}
+.tile-guests{font-size:12px;color:#777;margin-bottom:5px}
+.tile-price{font-size:13.5px;font-weight:500;color:#1c1c1c;margin-bottom:4px}
+.tile-avail{font-size:12px;font-weight:500}
+.ta-ok{color:#2ea44f}
+.ta-none{color:#d93025}
 
-/* Info notice */
-.info-notice{background:#e8f4ff;border:1px solid #b3d4f5;border-radius:3px;padding:9px 12px;
-             font-size:12.5px;color:#0047ab;margin-bottom:12px;line-height:1.5}
+/* Quantity section (below tiles when room selected) */
+.qty-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 12px;background:#f5f5f5;border-radius:4px;border:1px solid #e5e5e5}
+.qty-lbl{font-size:13px;color:#444;font-weight:500}
+.qty-ctrl{display:flex;align-items:center;gap:10px}
+.qty-btn{width:28px;height:28px;border:1px solid #d4d4d4;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;color:#333}
+.qty-btn:hover{border-color:#0052cc;color:#0052cc}
+.qty-val{font-size:15px;font-weight:600;min-width:20px;text-align:center}
 
-/* Multi-room rows */
-.rt-section{margin-bottom:12px}
-.rt-section-hd{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;
-                color:#888;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f0f0f0}
-.rt-row{display:grid;grid-template-columns:1fr 80px 1fr auto;gap:10px;align-items:end;margin-bottom:8px}
-.rt-row:last-child{margin-bottom:0}
-.btn-remove{height:34px;width:34px;border:1px solid #e0e0e0;background:#fff;border-radius:3px;
-            color:#999;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.btn-remove:hover{border-color:#d93025;color:#d93025}
+/* Override rate section */
+.override-section{margin-bottom:14px}
+.override-toggle{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#0052cc;cursor:pointer;margin-bottom:0}
+.override-toggle:hover{text-decoration:underline}
+.override-fields{background:#fff8e6;border:1px solid #ffc;border-radius:4px;padding:12px;margin-top:8px}
+.ov-lbl{font-size:11.5px;color:#7a4c00;font-weight:500;margin-bottom:4px}
+.ov-inp-row{display:flex;gap:10px;align-items:flex-end}
+.ov-group{display:flex;flex-direction:column;gap:4px;flex:1}
+.ov-inp{height:35px;border:1.5px solid #ffc;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fffdf5}
+.ov-inp:focus{border-color:#d97706;outline:none}
+.ov-note{font-size:11.5px;color:#a05c00;margin-top:6px}
 
-/* Add room type link */
-.add-row-link{font-size:13px;color:#0052cc;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;padding:4px 0}
-.add-row-link:hover{text-decoration:underline}
+/* Add another room type link */
+.add-type-row{margin-bottom:14px}
+.add-type-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#0052cc;cursor:pointer;padding:5px 0}
+.add-type-link:hover{text-decoration:underline}
 
-/* Pre-assign section */
-.pre-section{margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0}
-.pre-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.pre-title{font-size:12.5px;font-weight:500;color:#444}
-.pre-optional{font-size:11px;color:#999;margin-left:6px;font-weight:400}
-/* Simple toggle */
-.tog{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
-.tog-track{width:34px;height:18px;border-radius:9px;background:#ccc;position:relative;transition:background .2s;flex-shrink:0}
-.tog-track.on{background:#0052cc}
-.tog-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
-.tog-track.on::after{left:18px}
-.tog-lbl{font-size:12.5px;color:#444}
+/* Divider between room type sections */
+.rt-divider{border-top:1.5px dashed #d4d4d4;margin-bottom:14px;position:relative}
+.rt-divider-lbl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:0 10px;font-size:11px;color:#aaa;font-weight:500;white-space:nowrap}
+.rt-section-num{font-size:12px;font-weight:600;color:#444;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.rt-remove-link{font-size:12px;color:#d93025;cursor:pointer}
+.rt-remove-link:hover{text-decoration:underline}
 
-/* Rate summary (in locked Step 4) */
-.rate-preview{font-size:13px;color:#666;line-height:2}
-.rate-preview strong{color:#1c1c1c}
-.rate-preview .total{font-size:14px;font-weight:600;color:#0052cc}
+/* Reservation total section */
+.res-total{background:#f8f9fa;border:1px solid #e5e5e5;border-radius:4px;padding:12px 14px;margin-bottom:14px}
+.rt-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.rt-hd-l{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:#333}
+.rt-hd-r{font-size:11.5px;color:#888}
+.rt-line{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #eee}
+.rt-line:last-of-type{border-bottom:none}
+.rt-line-l{color:#555}
+.rt-line-r{font-weight:500;color:#1c1c1c;font-family:monospace}
+.rt-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:6px;border-top:1.5px solid #ddd}
+.rt-total-l{font-size:14px;font-weight:600;color:#1c1c1c}
+.rt-total-r{font-size:16px;font-weight:700;color:#1c1c1c;font-family:monospace}
 
-/* ── Bottom bar ────────────────────────────────────────── */
-.bbar{padding:12px 24px;background:#fff;border-top:1px solid #e0e0e0;
-      display:flex;align-items:center;justify-content:space-between;gap:10px}
-.bb-prev{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+/* Deposit toggle */
+.deposit-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.dep-track{width:38px;height:20px;border-radius:10px;background:#ccc;position:relative;cursor:pointer;flex-shrink:0}
+.dep-track.on{background:#2ea44f}
+.dep-track::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.dep-track.on::after{left:20px}
+.dep-lbl{font-size:13.5px;color:#333}
+
+/* Deposit form (when toggle on) */
+.deposit-form{background:#f0faf4;border:1px solid #b8dfc0;border-radius:4px;padding:12px;margin-bottom:14px}
+.dep-fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Bottom bar */
+.bbar{padding:12px 20px;background:#fff;border-top:1px solid #e5e5e5;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.bb-prev{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
 .bb-step{font-size:12.5px;color:#888}
-.bb-r{display:flex;gap:8px}
-.bb-draft{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#333;cursor:pointer}
-.bb-next{padding:7px 14px;border:1px solid #d0d0d0;border-radius:3px;font-size:13px;background:#fff;color:#0052cc;font-weight:500;cursor:pointer}
-.bb-confirm{padding:7px 16px;background:#2ea44f;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:500;cursor:pointer}
-.bb-confirm:disabled{background:#ccc;cursor:not-allowed}
+.bb-r{display:flex;gap:8px;align-items:center}
+.bb-draft{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-confirm{padding:7px 16px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.bb-confirm:disabled{background:#aaa;cursor:not-allowed}
+
+/* Notes fields */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.notes-ta{border:1px solid #d4d4d4;border-radius:4px;padding:9px;font-size:13px;font-family:inherit;width:100%;height:80px;resize:none}
+.skip-btn{padding:6px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:12.5px;background:#fff;color:#333;cursor:pointer}
+.notes-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+
+/* Review & confirm */
+.rc-section{margin-bottom:14px}
+.rc-sec-hd{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:8px}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rc-cell-lbl{font-size:11px;color:#888;margin-bottom:2px}
+.rc-cell-val{font-size:13.5px;font-weight:500;color:#1c1c1c}
+.rc-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #e5e5e5;margin-top:4px}
+.rc-total-lbl{font-size:14px;font-weight:600;color:#1c1c1c}
+.rc-total-val{font-size:17px;font-weight:700;color:#0052cc;font-family:monospace}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════
-     STATE 1 — Step 3 active · Single room type · Standard booking
-     ═══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     SCENARIO 1 — Single room + price override
+     ══════════════════════════════════════════ -->
 <div>
-  <div class="slabel sl-b">State 1 — Step 3 active · Single room · Standard booking</div>
-  <div class="page">
-    <div class="topnav">
-      <a href="#">Front Desk</a><span class="sep">/</span>
-      <a href="#">Reservations</a><span class="sep">/</span>
-      <span style="color:#333">New reservation</span>
-    </div>
-    <div class="layout">
-      <div class="sb">
-        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
-        <div class="sb-sec">Front Desk</div>
-        <div class="sb-item on">Reservations</div>
-        <div class="sb-item">Check-in</div>
-        <div class="sb-item">Check-out</div>
-        <div class="sb-item">Guest folio</div>
-        <div class="sb-sec">Housekeeping</div>
-        <div class="sb-item">Room status</div>
-        <div class="sb-sec">Settings</div>
-        <div class="sb-item">Settings</div>
+  <div class="ann ann-b">Scenario 1 — Single room · Double selected · Price override expanded</div>
+  <div class="shell" style="border-radius:0 5px 5px 5px">
+    <!-- Sidebar -->
+    <div class="sb" style="display:flex;flex-direction:column">
+      <div class="sb-hd">
+        <div class="sb-logo">H</div>
+        <div class="sb-app"><div class="sb-app-name">HVMS Setup</div><div class="sb-app-sub">HVMS App</div></div>
       </div>
+      <div class="sb-nav">
+        <div class="sb-item"><span class="ico">🏠</span>Home</div>
+        <div class="sb-item"><span class="ico">🏛</span>Property</div>
+        <div class="sb-item"><span class="ico">🏢</span>Building</div>
+        <div class="sb-item"><span class="ico">🛏</span>Room Type</div>
+        <div class="sb-item"><span class="ico">📋</span>Bed Type</div>
+        <div class="sb-item"><span class="ico">🔵</span>Room Status</div>
+        <div class="sb-item"><span class="ico">⭐</span>Room Amenity</div>
+        <div class="sb-item"><span class="ico">🚪</span>Room</div>
+        <div class="sb-item"><span class="ico">👥</span>Users</div>
+        <div class="sb-item"><span class="ico">✉</span>Email Settings</div>
+      </div>
+      <div class="sb-footer">
+        <div class="sb-av">R</div>
+        <div><div class="sb-uname">Rina</div><div class="sb-uemail">rina.qa@pertamapro...</div></div>
+      </div>
+    </div>
+    <!-- Main -->
+    <div class="main">
+      <div class="topnav">🏠 <span class="sep">/</span> <a href="#">Front Desk</a> <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#333">New</span></div>
       <div class="content">
         <div class="page-title">New reservation</div>
         <div class="page-sub">Fill in each step to create a confirmed reservation</div>
 
         <!-- Step indicator -->
         <div class="step-bar">
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
-          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active-sbi"><div class="sbi-dot sd-active">3</div><div class="sbi-lbl">Room &amp; Rate</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">4</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">5</div><div class="sbi-lbl">Review &amp; confirm</div></div>
         </div>
 
-        <!-- Step 1 — done -->
-        <div class="step done">
-          <div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
-          <div class="step-body">
-            <div class="done-row">
-              <div class="done-av">HW</div>
-              <div class="done-info"><strong>Hendrick Willems</strong><span>+62 812 3456 7890 · Passport: A12345678</span></div>
+        <!-- Step 1 done -->
+        <div class="step-card done">
+          <div class="step-hd"><div class="sh-l">Step 1 — Guest information ✓</div><span class="sh-chev">▲</span></div>
+          <div class="step-body" style="padding:12px 16px">
+            <div class="guest-row">
+              <div class="g-av">BG</div>
+              <div><div class="g-name">Brina Guest</div><div class="g-meta">📞 0121210210210 · Passport: 4332211222567</div></div>
+              <span class="g-close">×</span>
             </div>
+            <div class="confirmed-row"><button class="btn-confirmed">✓ Confirmed</button></div>
           </div>
         </div>
 
-        <!-- Step 2 — done -->
-        <div class="step done">
-          <div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
+        <!-- Step 2 done -->
+        <div class="step-card done">
+          <div class="step-hd"><div class="sh-l">Step 2 — Stay details ✓</div><span class="sh-chev">▲</span></div>
           <div class="step-body">
-            <div class="form-grid-3" style="margin-bottom:10px">
-              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="20 Jun 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="23 Jun 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="3 nights" readonly></div>
+            <div class="form-grid fg-3">
+              <div class="f-group"><div class="f-lbl">Check-in date <span class="f-req">*</span></div><input class="f-inp" value="12 Jun 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Check-out date <span class="f-req">*</span></div><input class="f-inp" value="13 Jun 2026" readonly></div>
+              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="1" readonly></div>
             </div>
-            <div class="form-grid-3">
-              <div class="f-group"><div class="f-lbl">Adults</div><input class="f-inp" value="2" readonly></div>
-              <div class="f-group"><div class="f-lbl">Children</div><input class="f-inp" value="1" readonly></div>
-              <div class="f-group"><div class="f-lbl">Est. check-in time</div><input class="f-inp" value="14:00" readonly></div>
+            <div class="form-grid fg-3">
+              <div class="f-group"><div class="f-lbl">Adults <span class="f-req">*</span></div><input class="f-inp" value="2" readonly></div>
+              <div class="f-group"><div class="f-lbl">Children</div><input class="f-inp" value="0" readonly></div>
+              <div class="f-group"><div class="f-lbl">Booking source</div><select class="f-sel"><option>Walk-in</option></select></div>
             </div>
+            <div class="confirmed-row"><button class="btn-confirmed">✓ Confirmed</button></div>
           </div>
         </div>
 
-        <!-- Step 3 — ACTIVE -->
-        <div class="step active">
-          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
+        <!-- Step 3 — ACTIVE: Room & Rate with price override -->
+        <div class="step-card active">
+          <div class="step-hd"><div class="sh-l">Step 3 — Room &amp; Rate ✓</div><span class="sh-chev">▲</span></div>
           <div class="step-body">
-            <div class="form-grid-2" style="margin-bottom:6px">
-              <div class="f-group">
-                <div class="f-lbl">Room type</div>
-                <select class="f-sel">
-                  <option selected>2 Bedroom Pool Villa</option>
-                  <option>3 Bedroom Villa</option>
-                  <option>1 Bedroom Garden Villa</option>
-                </select>
+            <div class="tile-lbl">Room type <span class="f-req">*</span></div>
+            <!-- Tile grid -->
+            <div class="tile-grid">
+              <div class="tile unavail">
+                <div class="tile-name">Deluxe</div>
+                <div class="tile-guests">Max Guests: 6 Adults, 0 Children</div>
+                <div class="tile-price">IDR 1,500,000 / night</div>
+                <div class="tile-avail ta-none">0 available</div>
               </div>
-              <div class="f-group">
-                <div class="f-lbl">Specific room <span style="color:#999;font-size:11.5px">(optional)</span></div>
-                <select class="f-sel">
-                  <option value="">— Assign at check-in —</option>
-                  <option selected>V-03 (Available)</option>
-                  <option>V-01 (Available)</option>
-                  <option>V-05 (Available)</option>
-                  <option>V-07 (Dirty)</option>
-                </select>
+              <div class="tile selected">
+                <div class="tile-name">Double</div>
+                <div class="tile-guests">Max Guests: 2 Adults, 0 Children</div>
+                <div class="tile-price">IDR 1,750,000 / night</div>
+                <div class="tile-avail ta-ok">1 available</div>
               </div>
-            </div>
-            <span class="helper-link">Specific room can be changed at check-in</span>
-
-            <!-- Add another room type -->
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0">
-              <span class="add-row-link">+ Add another room type</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4 — locked -->
-        <div class="step locked">
-          <div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div>
-        </div>
-        <!-- Step 5 — locked -->
-        <div class="step locked">
-          <div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div>
-        </div>
-        <!-- Step 6 — locked -->
-        <div class="step locked">
-          <div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="bbar">
-      <button class="bb-prev">Previous</button>
-      <span class="bb-step">Step 3 of 6</span>
-      <div class="bb-r">
-        <button class="bb-draft">Save as draft</button>
-        <button class="bb-next">Next — Rate &amp; charges</button>
-        <button class="bb-confirm" disabled>Confirm reservation</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════
-     STATE 2 — Multi-room same type · 3× 2BR Pool Villa
-     ═══════════════════════════════════════════════════════ -->
-<div>
-  <div class="slabel sl-g">State 2 — Multi-room same type · 3× 2 Bedroom Pool Villa</div>
-  <div class="page">
-    <div class="topnav"><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New reservation</span></div>
-    <div class="layout">
-      <div class="sb">
-        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
-        <div class="sb-sec">Front Desk</div>
-        <div class="sb-item on">Reservations</div>
-        <div class="sb-item">Check-in</div>
-        <div class="sb-item">Check-out</div>
-        <div class="sb-item">Guest folio</div>
-        <div class="sb-sec">Housekeeping</div>
-        <div class="sb-item">Room status</div>
-      </div>
-      <div class="content">
-        <div class="page-title">New reservation</div>
-        <div class="page-sub">Fill in each step to create a confirmed reservation</div>
-        <div class="step-bar">
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
-          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
-        </div>
-        <div class="step done"><div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
-          <div class="step-body"><div class="done-row"><div class="done-av">TG</div><div class="done-info"><strong>Tanaka Group</strong><span>GST-0055 · Japan · 6 adults</span></div></div></div>
-        </div>
-        <div class="step done"><div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
-          <div class="step-body">
-            <div class="form-grid-3">
-              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="24 May 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="27 May 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="3 nights" readonly></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3 — ACTIVE (multi-room same type) -->
-        <div class="step active">
-          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
-          <div class="step-body">
-            <!-- Single row, quantity = 3 -->
-            <div class="form-grid-2" style="grid-template-columns:1fr 100px;margin-bottom:6px">
-              <div class="f-group">
-                <div class="f-lbl">Room type</div>
-                <select class="f-sel">
-                  <option selected>2 Bedroom Pool Villa</option>
-                  <option>3 Bedroom Villa</option>
-                </select>
+              <div class="tile">
+                <div class="tile-name">Standard</div>
+                <div class="tile-guests">Max Guests: 2 Adults, 0 Children</div>
+                <div class="tile-price">IDR 1,650,000 / night</div>
+                <div class="tile-avail ta-ok">3 available</div>
               </div>
-              <div class="f-group">
-                <div class="f-lbl">Quantity</div>
-                <input class="f-inp" type="number" value="3" min="1" max="20" style="text-align:center">
+              <div class="tile">
+                <div class="tile-name">Studio</div>
+                <div class="tile-guests">Max Guests: 4 Adults, 0 Children</div>
+                <div class="tile-price">IDR 1,950,000 / night</div>
+                <div class="tile-avail ta-ok">2 available</div>
+              </div>
+              <div class="tile unavail">
+                <div class="tile-name">Suite</div>
+                <div class="tile-guests">Max Guests: 2 Adults, 0 Children</div>
+                <div class="tile-price">IDR 1,800,000 / night</div>
+                <div class="tile-avail ta-none">0 available</div>
               </div>
             </div>
 
-            <!-- Info notice for multi-room -->
-            <div class="info-notice">
-              3 rooms of the same type will be held. Specific rooms are assigned individually during check-in Step 3 — one per slot.
+            <!-- ★ PRICE OVERRIDE (expanded) ───── NEW ─── -->
+            <div class="override-section">
+              <div class="override-toggle">▼ Override nightly rate (optional)</div>
+              <div class="override-fields">
+                <div class="ov-inp-row">
+                  <div class="ov-group">
+                    <div class="ov-lbl">Override nightly rate (IDR)</div>
+                    <input class="ov-inp" value="1,500,000" placeholder="Leave blank to use rate plan rate">
+                  </div>
+                  <div class="ov-group">
+                    <div class="ov-lbl">Reason for override <span class="f-req">*</span></div>
+                    <input class="ov-inp" value="Agent discount — manager approved" placeholder="Required if rate is changed">
+                  </div>
+                </div>
+                <div class="ov-note">⚠ Original rate: IDR 1,750,000/night. Override will be logged in the audit trail.</div>
+              </div>
             </div>
 
-            <!-- Add another room type link -->
-            <span class="add-row-link">+ Add another room type</span>
+            <!-- ★ ADD ANOTHER ROOM TYPE ────────── NEW ─── -->
+            <div class="add-type-row">
+              <span class="add-type-link">+ Add another room type</span>
+            </div>
+
+            <!-- Reservation total -->
+            <div class="res-total">
+              <div class="rt-hd">
+                <div class="rt-hd-l">🗓 Reservation total</div>
+                <div class="rt-hd-r">12 Jun 2026 – 13 Jun 2026 · 1 night · Brina Guest</div>
+              </div>
+              <div class="rt-line">
+                <span class="rt-line-l">Room 1 - Double &nbsp;<span style="color:#d97706;font-size:11.5px">(overridden rate)</span>&nbsp; IDR 1,500,000 × 1 night</span>
+                <span class="rt-line-r">IDR 1,500,000</span>
+              </div>
+              <div class="rt-total-row">
+                <span class="rt-total-l">Total accommodation</span>
+                <span class="rt-total-r">IDR 1,500,000</span>
+              </div>
+            </div>
+
+            <!-- Deposit toggle (off) -->
+            <div class="deposit-row">
+              <div class="dep-track"></div>
+              <span class="dep-lbl">Collect deposit at reservation</span>
+            </div>
+
+            <div class="confirmed-row"><button class="btn-confirmed">✓ Confirmed</button></div>
           </div>
         </div>
 
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div></div>
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div></div>
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div></div>
+        <!-- Steps 4 + 5 locked -->
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 4 — Notes &amp; requests</div><span class="sh-chev">▾</span></div></div>
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 5 — Review &amp; confirm</div><span class="sh-chev">▾</span></div></div>
       </div>
-    </div>
-    <div class="bbar">
-      <button class="bb-prev">Previous</button>
-      <span class="bb-step">Step 3 of 6</span>
-      <div class="bb-r">
-        <button class="bb-draft">Save as draft</button>
-        <button class="bb-next">Next — Rate &amp; charges</button>
-        <button class="bb-confirm" disabled>Confirm reservation</button>
+      <div class="bbar">
+        <button class="bb-prev">Previous</button>
+        <span class="bb-step">Step 3 of 5</span>
+        <div class="bb-r">
+          <button class="bb-draft">Save as draft</button>
+          <button class="bb-confirm" disabled>Confirm reservation ✓</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     STATE 3 — Mixed room types · 1× 3BR + 2× 2BR
-     ═══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     SCENARIO 2 — Multiple rooms same type (×3 Double)
+     ══════════════════════════════════════════ -->
 <div>
-  <div class="slabel sl-a">State 3 — Mixed room types · 1× 3 Bedroom Villa + 2× 2 Bedroom Pool Villa</div>
-  <div class="page">
-    <div class="topnav"><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New reservation</span></div>
-    <div class="layout">
-      <div class="sb">
-        <div class="sb-logo"><div class="sb-h">H</div><div class="sb-title">HVMS</div></div>
-        <div class="sb-sec">Front Desk</div>
-        <div class="sb-item on">Reservations</div>
-        <div class="sb-item">Check-in</div>
-        <div class="sb-item">Check-out</div>
-        <div class="sb-item">Guest folio</div>
-        <div class="sb-sec">Housekeeping</div>
-        <div class="sb-item">Room status</div>
+  <div class="ann ann-g">Scenario 2 — Multiple rooms · Same type · 3× Double</div>
+  <div class="shell" style="border-radius:0 5px 5px 5px">
+    <div class="sb" style="display:flex;flex-direction:column">
+      <div class="sb-hd"><div class="sb-logo">H</div><div class="sb-app"><div class="sb-app-name">HVMS Setup</div><div class="sb-app-sub">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item"><span class="ico">🚪</span>Room</div>
+        <div class="sb-item"><span class="ico">👥</span>Users</div>
       </div>
+      <div class="sb-footer"><div class="sb-av">R</div><div><div class="sb-uname">Rina</div><div class="sb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠 <span class="sep">/</span> <a href="#">Front Desk</a> <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#333">New</span></div>
       <div class="content">
         <div class="page-title">New reservation</div>
         <div class="page-sub">Fill in each step to create a confirmed reservation</div>
         <div class="step-bar">
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Guest info</div></div>
-          <div class="sbi done"><div class="sbi-circle sc-done">✓</div><div class="sbi-lbl">Stay details</div></div>
-          <div class="sbi active"><div class="sbi-circle sc-active">3</div><div class="sbi-lbl">Room</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">4</div><div class="sbi-lbl">Rate &amp; charges</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">5</div><div class="sbi-lbl">Notes</div></div>
-          <div class="sbi locked"><div class="sbi-circle sc-locked">6</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active-sbi"><div class="sbi-dot sd-active">3</div><div class="sbi-lbl">Room &amp; Rate</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">4</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">5</div><div class="sbi-lbl">Review &amp; confirm</div></div>
         </div>
-        <div class="step done"><div class="step-hd"><div class="sh-title">Step 1 — Guest information</div><div class="sh-status">Completed</div></div>
-          <div class="step-body"><div class="done-row"><div class="done-av">SW</div><div class="done-info"><strong>Sharma Wedding Party</strong><span>GST-0061 · India · 8 adults</span></div></div></div>
-        </div>
-        <div class="step done"><div class="step-hd"><div class="sh-title">Step 2 — Stay details</div><div class="sh-status">Completed</div></div>
+        <div class="step-card done"><div class="step-hd"><div class="sh-l">Step 1 — Guest information ✓</div><span class="sh-chev">▲</span></div></div>
+        <div class="step-card done"><div class="step-hd"><div class="sh-l">Step 2 — Stay details ✓</div><span class="sh-chev">▲</span></div></div>
+
+        <!-- Step 3 active — multi-room same type -->
+        <div class="step-card active">
+          <div class="step-hd"><div class="sh-l">Step 3 — Room &amp; Rate ✓</div><span class="sh-chev">▲</span></div>
           <div class="step-body">
-            <div class="form-grid-3">
-              <div class="f-group"><div class="f-lbl">Check-in date</div><input class="f-inp" value="24 May 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Check-out date</div><input class="f-inp" value="28 May 2026" readonly></div>
-              <div class="f-group"><div class="f-lbl">Nights</div><input class="f-inp" value="4 nights" readonly></div>
+            <div class="tile-lbl">Room type <span class="f-req">*</span></div>
+            <div class="tile-grid">
+              <div class="tile unavail"><div class="tile-name">Deluxe</div><div class="tile-guests">Max Guests: 6 Adults, 0 Children</div><div class="tile-price">IDR 1,500,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
+              <div class="tile selected"><div class="tile-name">Double</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,750,000 / night</div><div class="tile-avail ta-ok">6 available</div></div>
+              <div class="tile"><div class="tile-name">Standard</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,650,000 / night</div><div class="tile-avail ta-ok">3 available</div></div>
+              <div class="tile"><div class="tile-name">Studio</div><div class="tile-guests">Max Guests: 4 Adults, 0 Children</div><div class="tile-price">IDR 1,950,000 / night</div><div class="tile-avail ta-ok">2 available</div></div>
+              <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
             </div>
+
+            <!-- ★ NUMBER OF ROOMS counter (appears after tile selected) ── NEW ─── -->
+            <div class="qty-row">
+              <div class="qty-lbl">Number of rooms — Double</div>
+              <div class="qty-ctrl">
+                <button class="qty-btn">−</button>
+                <span class="qty-val">3</span>
+                <button class="qty-btn">+</button>
+                <span style="font-size:12px;color:#888;margin-left:4px">(6 available)</span>
+              </div>
+            </div>
+
+            <!-- Override + add type links -->
+            <div style="display:flex;gap:20px;margin-bottom:14px">
+              <span class="override-toggle">▶ Override nightly rate (optional)</span>
+              <span class="add-type-link">+ Add another room type</span>
+            </div>
+
+            <!-- Reservation total: 3× Double -->
+            <div class="res-total">
+              <div class="rt-hd">
+                <div class="rt-hd-l">🗓 Reservation total</div>
+                <div class="rt-hd-r">24 May 2026 – 27 May 2026 · 3 nights · Tanaka Group</div>
+              </div>
+              <div class="rt-line"><span class="rt-line-l">Room 1 - Double &nbsp; IDR 1,750,000 × 3 nights</span><span class="rt-line-r">IDR 5,250,000</span></div>
+              <div class="rt-line"><span class="rt-line-l">Room 2 - Double &nbsp; IDR 1,750,000 × 3 nights</span><span class="rt-line-r">IDR 5,250,000</span></div>
+              <div class="rt-line"><span class="rt-line-l">Room 3 - Double &nbsp; IDR 1,750,000 × 3 nights</span><span class="rt-line-r">IDR 5,250,000</span></div>
+              <div class="rt-total-row"><span class="rt-total-l">Total accommodation</span><span class="rt-total-r">IDR 15,750,000</span></div>
+            </div>
+            <div class="deposit-row"><div class="dep-track"></div><span class="dep-lbl">Collect deposit at reservation</span></div>
+            <div class="confirmed-row"><button class="btn-confirmed">✓ Confirmed</button></div>
           </div>
         </div>
-
-        <!-- Step 3 — ACTIVE (mixed types) -->
-        <div class="step active">
-          <div class="step-hd"><div class="sh-title">Step 3 — Room</div><div class="sh-status">Current step</div></div>
-          <div class="step-body">
-            <!-- Row 1: 3BR Villa × 1 -->
-            <div class="rt-row" style="margin-bottom:10px">
-              <div class="f-group">
-                <div class="f-lbl">Room type</div>
-                <select class="f-sel"><option>2 Bedroom Pool Villa</option><option selected>3 Bedroom Villa</option></select>
-              </div>
-              <div class="f-group">
-                <div class="f-lbl">Quantity</div>
-                <input class="f-inp" type="number" value="1" min="1" max="20" style="text-align:center">
-              </div>
-              <div class="f-group">
-                <div class="f-lbl">Specific room <span style="color:#999;font-size:11px">(optional)</span></div>
-                <select class="f-sel"><option value="">— Assign at check-in —</option><option>V-10 (Available)</option><option>V-12 (Available)</option></select>
-              </div>
-              <div style="padding-bottom:1px"><button class="btn-remove">✕</button></div>
-            </div>
-            <!-- Row 2: 2BR Pool Villa × 2 -->
-            <div class="rt-row" style="margin-bottom:10px">
-              <div class="f-group">
-                <div class="f-lbl">Room type</div>
-                <select class="f-sel"><option selected>2 Bedroom Pool Villa</option><option>3 Bedroom Villa</option></select>
-              </div>
-              <div class="f-group">
-                <div class="f-lbl">Quantity</div>
-                <input class="f-inp" type="number" value="2" min="1" max="20" style="text-align:center">
-              </div>
-              <div class="f-group">
-                <div class="f-lbl">Specific room <span style="color:#999;font-size:11px">(optional)</span></div>
-                <select class="f-sel"><option value="" selected>— Assign at check-in —</option><option>V-03 (Available)</option><option>V-05 (Available)</option></select>
-              </div>
-              <div style="padding-bottom:1px"><button class="btn-remove">✕</button></div>
-            </div>
-
-            <span class="add-row-link">+ Add another room type</span>
-
-            <div style="margin-top:4px">
-              <span class="helper-link">Specific rooms can be changed at check-in</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 4 — Rate &amp; charges</div><div class="sh-status">Complete step 3 first</div></div></div>
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 5 — Notes &amp; requests</div><div class="sh-status">Complete step 3 first</div></div></div>
-        <div class="step locked"><div class="step-hd"><div class="sh-title">Step 6 — Review &amp; confirm</div><div class="sh-status">Complete all steps first</div></div></div>
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 4 — Notes &amp; requests</div><span class="sh-chev">▾</span></div></div>
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 5 — Review &amp; confirm</div><span class="sh-chev">▾</span></div></div>
       </div>
+      <div class="bbar"><button class="bb-prev">Previous</button><span class="bb-step">Step 3 of 5</span><div class="bb-r"><button class="bb-draft">Save as draft</button><button class="bb-confirm" disabled>Confirm reservation ✓</button></div></div>
     </div>
-    <div class="bbar">
-      <button class="bb-prev">Previous</button>
-      <span class="bb-step">Step 3 of 6</span>
-      <div class="bb-r">
-        <button class="bb-draft">Save as draft</button>
-        <button class="bb-next">Next — Rate &amp; charges</button>
-        <button class="bb-confirm" disabled>Confirm reservation</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCENARIO 3 — Mixed room types (1× Standard + 1× Studio)
+     ══════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-a">Scenario 3 — Mixed room types · 1× Standard + 1× Studio</div>
+  <div class="shell" style="border-radius:0 5px 5px 5px">
+    <div class="sb" style="display:flex;flex-direction:column">
+      <div class="sb-hd"><div class="sb-logo">H</div><div class="sb-app"><div class="sb-app-name">HVMS Setup</div><div class="sb-app-sub">HVMS App</div></div></div>
+      <div class="sb-nav"><div class="sb-item"><span class="ico">🚪</span>Room</div></div>
+      <div class="sb-footer"><div class="sb-av">R</div><div><div class="sb-uname">Rina</div><div class="sb-uemail">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠 <span class="sep">/</span> <a href="#">Front Desk</a> <span class="sep">/</span> <a href="#">Reservations</a> <span class="sep">/</span> <span style="color:#333">New</span></div>
+      <div class="content">
+        <div class="page-title">New reservation</div>
+        <div class="page-sub">Fill in each step to create a confirmed reservation</div>
+        <div class="step-bar">
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Guest info</div></div>
+          <div class="sbi done-sbi"><div class="sbi-dot sd-done">✓</div><div class="sbi-lbl">Stay details</div></div>
+          <div class="sbi active-sbi"><div class="sbi-dot sd-active">3</div><div class="sbi-lbl">Room &amp; Rate</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">4</div><div class="sbi-lbl">Notes</div></div>
+          <div class="sbi"><div class="sbi-dot sd-lock">5</div><div class="sbi-lbl">Review &amp; confirm</div></div>
+        </div>
+        <div class="step-card done"><div class="step-hd"><div class="sh-l">Step 1 — Guest information ✓</div><span class="sh-chev">▲</span></div></div>
+        <div class="step-card done"><div class="step-hd"><div class="sh-l">Step 2 — Stay details ✓</div><span class="sh-chev">▲</span></div></div>
+
+        <!-- Step 3 — mixed types -->
+        <div class="step-card active">
+          <div class="step-hd"><div class="sh-l">Step 3 — Room &amp; Rate ✓</div><span class="sh-chev">▲</span></div>
+          <div class="step-body">
+
+            <!-- ─── Room type section 1 ─── -->
+            <div class="rt-section-num">
+              <span>Room type 1</span>
+              <span class="rt-remove-link" style="visibility:hidden">Remove</span>
+            </div>
+            <div class="tile-lbl">Room type <span class="f-req">*</span></div>
+            <div class="tile-grid">
+              <div class="tile unavail"><div class="tile-name">Deluxe</div><div class="tile-guests">Max Guests: 6 Adults, 0 Children</div><div class="tile-price">IDR 1,500,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
+              <div class="tile"><div class="tile-name">Double</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,750,000 / night</div><div class="tile-avail ta-ok">6 available</div></div>
+              <div class="tile selected"><div class="tile-name">Standard</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,650,000 / night</div><div class="tile-avail ta-ok">3 available</div></div>
+              <div class="tile"><div class="tile-name">Studio</div><div class="tile-guests">Max Guests: 4 Adults, 0 Children</div><div class="tile-price">IDR 1,950,000 / night</div><div class="tile-avail ta-ok">2 available</div></div>
+              <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
+            </div>
+            <div class="qty-row" style="margin-bottom:8px"><div class="qty-lbl">Number of rooms — Standard</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button><span style="font-size:12px;color:#888;margin-left:4px">(3 available)</span></div></div>
+            <div style="margin-bottom:14px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+
+            <!-- ─── Divider ─── -->
+            <div class="rt-divider" style="margin-bottom:14px;border-top:1.5px dashed #d4d4d4;position:relative">
+              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:0 10px;font-size:11px;color:#aaa;font-weight:500;white-space:nowrap">Room type 2 added</span>
+            </div>
+
+            <!-- ─── Room type section 2 ─── -->
+            <div class="rt-section-num">
+              <span>Room type 2</span>
+              <span class="rt-remove-link">Remove</span>
+            </div>
+            <div class="tile-lbl">Room type <span class="f-req">*</span></div>
+            <div class="tile-grid">
+              <div class="tile unavail"><div class="tile-name">Deluxe</div><div class="tile-guests">Max Guests: 6 Adults, 0 Children</div><div class="tile-price">IDR 1,500,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
+              <div class="tile"><div class="tile-name">Double</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,750,000 / night</div><div class="tile-avail ta-ok">6 available</div></div>
+              <div class="tile"><div class="tile-name">Standard</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,650,000 / night</div><div class="tile-avail ta-ok">3 available</div></div>
+              <div class="tile selected"><div class="tile-name">Studio</div><div class="tile-guests">Max Guests: 4 Adults, 0 Children</div><div class="tile-price">IDR 1,950,000 / night</div><div class="tile-avail ta-ok">2 available</div></div>
+              <div class="tile unavail"><div class="tile-name">Suite</div><div class="tile-guests">Max Guests: 2 Adults, 0 Children</div><div class="tile-price">IDR 1,800,000 / night</div><div class="tile-avail ta-none">0 available</div></div>
+            </div>
+            <div class="qty-row" style="margin-bottom:8px"><div class="qty-lbl">Number of rooms — Studio</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-val">1</span><button class="qty-btn">+</button><span style="font-size:12px;color:#888;margin-left:4px">(2 available)</span></div></div>
+            <div style="margin-bottom:14px"><span class="override-toggle">▶ Override nightly rate (optional)</span></div>
+
+            <!-- Add another type link -->
+            <div class="add-type-row"><span class="add-type-link">+ Add another room type</span></div>
+
+            <!-- Reservation total: both types -->
+            <div class="res-total">
+              <div class="rt-hd">
+                <div class="rt-hd-l">🗓 Reservation total</div>
+                <div class="rt-hd-r">12 Jun 2026 – 14 Jun 2026 · 2 nights · Brina Guest</div>
+              </div>
+              <div class="rt-line"><span class="rt-line-l">Room 1 - Standard &nbsp; IDR 1,650,000 × 2 nights</span><span class="rt-line-r">IDR 3,300,000</span></div>
+              <div class="rt-line"><span class="rt-line-l">Room 2 - Studio &nbsp; IDR 1,950,000 × 2 nights</span><span class="rt-line-r">IDR 3,900,000</span></div>
+              <div class="rt-total-row"><span class="rt-total-l">Total accommodation</span><span class="rt-total-r">IDR 7,200,000</span></div>
+            </div>
+
+            <div class="deposit-row"><div class="dep-track"></div><span class="dep-lbl">Collect deposit at reservation</span></div>
+            <div class="confirmed-row"><button class="btn-confirmed">✓ Confirmed</button></div>
+          </div>
+        </div>
+
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 4 — Notes &amp; requests</div><span class="sh-chev">▾</span></div></div>
+        <div class="step-card locked"><div class="step-hd"><div class="sh-l">Step 5 — Review &amp; confirm</div><span class="sh-chev">▾</span></div></div>
       </div>
+      <div class="bbar"><button class="bb-prev">Previous</button><span class="bb-step">Step 3 of 5</span><div class="bb-r"><button class="bb-draft">Save as draft</button><button class="bb-confirm" disabled>Confirm reservation ✓</button></div></div>
     </div>
   </div>
 </div>
