@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — New Reservation · Step 3 Room + Step 4 Rate</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f0f0f0;color:#1c1c1c;font-size:13.5px;
+     padding:20px;display:flex;flex-direction:column;gap:24px;max-width:1020px}
+
+.ann{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+     padding:3px 10px;border-radius:3px 3px 0 0;display:inline-flex;align-items:center;gap:5px}
+.ann-b{background:#dceeff;border:1px solid #8bbfe8;border-bottom:none;color:#0047a3}
+.ann-g{background:#dcf5e7;border:1px solid #7dc99a;border-bottom:none;color:#1a5c30}
+
+.shell{display:flex;background:#fff;border:1px solid #ddd;border-radius:0 5px 5px 5px;overflow:hidden;min-height:500px}
+
+/* ── Sidebar ─────────────────────────────────────── */
+.sb{width:168px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e5;display:flex;flex-direction:column}
+.sb-hd{padding:10px 12px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:7px}
+.sb-logo{width:26px;height:26px;background:#0052cc;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sb-an{font-size:12.5px;font-weight:600;line-height:1.2}
+.sb-as{font-size:11px;color:#888;line-height:1.2}
+.sb-nav{padding:4px 0;flex:1}
+.sb-item{padding:6px 12px;font-size:12px;color:#444;cursor:pointer;display:flex;align-items:center;gap:6px}
+.sb-item:hover{background:#f5f5f5}
+.sb-foot{padding:9px 12px;border-top:1px solid #e5e5e5;display:flex;align-items:center;gap:7px;margin-top:auto}
+.sb-av{width:26px;height:26px;border-radius:50%;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.sb-un{font-size:12px;font-weight:500}
+.sb-ue{font-size:10.5px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px}
+
+/* ── Main ────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column}
+.topnav{height:34px;background:#fff;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;
+        padding:0 20px;gap:4px;font-size:12px;color:#888}
+.topnav a{color:#0052cc;text-decoration:none}.sep{color:#ccc}
+.content{padding:18px 20px;flex:1}
+.pg-title{font-size:21px;font-weight:600;margin-bottom:2px}
+.pg-sub{font-size:12.5px;color:#777;margin-bottom:16px}
+
+/* Step bar */
+.step-bar{display:flex;margin-bottom:18px}
+.sbi{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;
+     background:#fff;border:1px solid #e5e5e5;border-right:none}
+.sbi:first-child{border-radius:4px 0 0 4px}
+.sbi:last-child{border-radius:0 4px 4px 0;border-right:1px solid #e5e5e5}
+.sd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.sd-ok{background:#2ea44f;color:#fff}
+.sd-on{background:#0052cc;color:#fff}
+.sd-off{background:#e5e5e5;color:#aaa}
+.sl{font-size:11px;color:#777;text-align:center;line-height:1.3}
+.sbi.on .sl{font-weight:600;color:#0052cc}
+.sbi.done .sl{color:#2ea44f}
+
+/* Step cards */
+.sc{border:1px solid #e5e5e5;border-radius:4px;overflow:hidden;margin-bottom:8px;background:#fff}
+.sc.done .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sc.done .sc-hd .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.done .sc-hd .sh-r{font-size:12px;color:#888}
+.sc.active .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.active .sc-hd .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.active .sc-hd .sh-r{font-size:12px;color:#888}
+.sc.locked .sc-hd{background:#fafafa;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.locked .sc-hd .sh-l{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:#bbb}
+.sc.locked .sc-hd .sh-r{font-size:12px;color:#ccc}
+.sc-body{padding:16px;border-top:1px solid #e5e5e5}
+.sc.locked .sc-body{display:none}
+.chevron{font-size:14px;color:#bbb}
+.confirmed-row{display:flex;justify-content:flex-end;margin-top:14px}
+.btn-conf{padding:6px 14px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+
+/* Forms */
+.fg{display:grid;gap:12px;margin-bottom:12px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg2{grid-template-columns:1fr 1fr}
+.fgr{display:flex;align-items:center;gap:10px}
+.f-g{display:flex;flex-direction:column;gap:4px}
+.f-l{font-size:12px;color:#666;display:flex;align-items:center;gap:3px}
+.f-req{color:#d93025;font-size:11px}
+.f-i{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff}
+.f-i:focus{border-color:#0052cc;outline:none}
+.f-s{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 25px 0 10px;font-size:13.5px;font-family:inherit;background:#fff;-webkit-appearance:none}
+
+/* Done guest row */
+.gr{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f5f5f5;border-radius:4px;border:1px solid #e5e5e5;position:relative}
+.g-av{width:30px;height:30px;border-radius:50%;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex-shrink:0}
+.g-name{font-size:13px;font-weight:500}
+.g-meta{font-size:11.5px;color:#777;margin-top:1px}
+.g-x{position:absolute;right:12px;color:#aaa;font-size:16px;cursor:pointer}
+
+/* ── Room tiles ──────────────────────────────────── */
+.tile-lbl{font-size:12px;color:#555;margin-bottom:9px;font-weight:500}
+.tile-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.tile{border:1.5px solid #d4d4d4;border-radius:5px;padding:11px;cursor:pointer}
+.tile:hover{border-color:#666}
+.tile.sel{border:2px solid #1c1c1c;background:#fafafa}
+.tile.dim{opacity:.55;cursor:default}
+.t-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.t-guests{font-size:11.5px;color:#777;margin-bottom:4px}
+.t-price{font-size:13px;font-weight:500;color:#1c1c1c;margin-bottom:3px}
+.t-avail{font-size:12px;font-weight:500}
+.av-ok{color:#2ea44f}.av-no{color:#d93025}
+
+/* Number of rooms */
+.qty-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+         background:#f5f5f5;border:1px solid #e5e5e5;border-radius:4px;margin-bottom:12px}
+.qty-l{font-size:13px;color:#444;font-weight:500}
+.qty-ctrl{display:flex;align-items:center;gap:9px}
+.qty-btn{width:27px;height:27px;border:1px solid #d4d4d4;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;color:#333}
+.qty-btn:hover{border-color:#0052cc;color:#0052cc}
+.qty-v{font-size:15px;font-weight:600;min-width:18px;text-align:center}
+.qty-hint{font-size:11.5px;color:#888}
+
+/* Specific room selection */
+.spec-room{border:1px solid #e5e5e5;border-radius:4px;padding:12px;margin-bottom:12px;background:#f8f9fa}
+.sr-hd{font-size:12.5px;font-weight:500;color:#444;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.sr-opt{font-size:11px;color:#aaa;font-weight:400}
+.room-list{display:flex;flex-direction:column;gap:6px}
+.room-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border:1.5px solid #d4d4d4;border-radius:4px;cursor:pointer;background:#fff}
+.room-item:hover{border-color:#555}
+.room-item.ri-sel{border:1.5px solid #1c1c1c;background:#fff}
+.room-item.ri-dim{opacity:.5;cursor:default}
+.ri-radio{width:14px;height:14px;border-radius:50%;border:2px solid #d4d4d4;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ri-radio.checked{border-color:#1c1c1c;background:#1c1c1c}
+.ri-radio.checked::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff;border-radius:50%}
+.ri-code{font-size:13px;font-weight:600;color:#1c1c1c;min-width:55px}
+.ri-detail{font-size:12px;color:#666;flex:1}
+.ri-status{font-size:11.5px;font-weight:500}
+.rs-ok{color:#2ea44f}.rs-dirty{color:#e8a800}.rs-ooo{color:#d93025}
+.sr-note{font-size:11.5px;color:#888;margin-top:8px;display:flex;align-items:center;gap:4px}
+
+/* Multi-room spec room dropdowns */
+.spec-multi{border:1px solid #e5e5e5;border-radius:4px;padding:12px;margin-bottom:12px;background:#f8f9fa}
+.sm-hd{font-size:12.5px;font-weight:500;color:#444;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+
+/* Add type link */
+.add-type{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#0052cc;cursor:pointer;margin-bottom:0}
+.add-type:hover{text-decoration:underline}
+
+/* Bottom bar */
+.bbar{padding:11px 20px;background:#fff;border-top:1px solid #e5e5e5;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bb-prev{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-step{font-size:12px;color:#888}
+.bb-r{display:flex;gap:7px}
+.bb-draft{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-next{padding:7px 14px;border:1.5px solid #0052cc;border-radius:4px;font-size:13px;background:#fff;color:#0052cc;font-weight:500;cursor:pointer}
+.bb-confirm{padding:7px 15px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.bb-confirm:disabled{background:#c0c0c0;cursor:not-allowed}
+
+/* ── STEP 4 specific ─────────────────────────────── */
+.rate-summary{background:#f8f9fa;border:1px solid #e5e5e5;border-radius:4px;padding:14px;margin-bottom:14px}
+.rs-hd{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#888;margin-bottom:10px}
+.rs-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #eee}
+.rs-row:last-child{border-bottom:none}
+.rs-l{color:#555}.rs-r{font-weight:500;font-family:monospace;color:#1c1c1c}
+.rs-div{border-top:1.5px solid #ddd;margin:8px 0}
+.rs-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:6px}
+
+/* Override section */
+.ov-toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:#0052cc;cursor:pointer;margin-bottom:0;padding:4px 0}
+.ov-toggle:hover{text-decoration:underline}
+.ov-panel{background:#fff8e6;border:1px solid #ffd580;border-radius:4px;padding:12px;margin-top:8px;margin-bottom:14px}
+.ov-warn{background:#fff3cd;border:1px solid #ffd580;border-radius:3px;padding:7px 10px;font-size:12px;color:#7a4c00;margin-bottom:10px;display:flex;align-items:flex-start;gap:6px}
+.ov-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ov-l{font-size:11.5px;color:#7a4c00;font-weight:500;margin-bottom:4px}
+.ov-i{height:34px;border:1.5px solid #ffd580;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fffdf5;color:#1c1c1c}
+.ov-i:focus{border-color:#d97706;outline:none}
+
+/* Deposit */
+.dep-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dep-track{width:38px;height:20px;border-radius:10px;background:#ccc;position:relative;cursor:pointer;flex-shrink:0}
+.dep-track.on{background:#2ea44f}
+.dep-track::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.dep-track.on::after{left:20px}
+.dep-lbl{font-size:13.5px;color:#333}
+.dep-form{background:#f0faf4;border:1px solid #b8dfc0;border-radius:4px;padding:12px;margin-bottom:12px}
+.dep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     STEP 3 — ROOM ASSIGNMENT ONLY
+     3 sub-scenarios shown:
+     A) Single room + specific room
+     B) Multiple same type + specific rooms
+     C) Multiple types + specific rooms
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-b">Step 3 — Room assignment · 3 sub-scenarios: A) single, B) same type ×3, C) mixed types</div>
+  <div class="shell">
+    <div class="sb">
+      <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item">🏠 Home</div>
+        <div class="sb-item">🏢 Building</div>
+        <div class="sb-item">🛏 Room Type</div>
+        <div class="sb-item">🚪 Room</div>
+        <div class="sb-item">👥 Users</div>
+      </div>
+      <div class="sb-foot"><div class="sb-av">R</div><div><div class="sb-un">Rina</div><div class="sb-ue">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New</span></div>
+      <div class="content">
+        <div class="pg-title">New reservation</div>
+        <div class="pg-sub">Fill in each step to create a confirmed reservation</div>
+        <!-- Step bar: 6 steps -->
+        <div class="step-bar">
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Guest info</div></div>
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Stay details</div></div>
+          <div class="sbi on"><div class="sd sd-on">3</div><div class="sl">Room</div></div>
+          <div class="sbi"><div class="sd sd-off">4</div><div class="sl">Rate &amp; charges</div></div>
+          <div class="sbi"><div class="sd sd-off">5</div><div class="sl">Notes</div></div>
+          <div class="sbi"><div class="sd sd-off">6</div><div class="sl">Review &amp; confirm</div></div>
+        </div>
+
+        <!-- Steps 1+2 collapsed -->
+        <div class="sc done"><div class="sc-hd"><div class="sh-l"><span>✓</span> Step 1 — Guest information</div><div class="sh-r">Brina Guest · GST-0042</div></div></div>
+        <div class="sc done"><div class="sc-hd"><div class="sh-l"><span>✓</span> Step 2 — Stay details</div><div class="sh-r">12 Jun – 14 Jun 2026 · 2 nights · 2 adults</div></div></div>
+
+        <!-- STEP 3 ACTIVE -->
+        <div class="sc active">
+          <div class="sc-hd"><div class="sh-l">Step 3 — Room</div><div class="sh-r" style="color:#0052cc">Current step</div></div>
+          <div class="sc-body">
+
+            <!-- ─ Sub-scenario A: Single room ─ -->
+            <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1.5px dashed #e0e0e0">
+              <div style="font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">A — Single room</div>
+              <div class="tile-lbl">Room type <span style="color:#d93025;font-size:11px">*</span></div>
+              <div class="tile-grid">
+                <div class="tile dim"><div class="t-name">Deluxe</div><div class="t-guests">Max: 6A, 0C</div><div class="t-price">IDR 1,500,000 / night</div><div class="t-avail av-no">0 available</div></div>
+                <div class="tile sel"><div class="t-name">Double</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,750,000 / night</div><div class="t-avail av-ok">3 available</div></div>
+                <div class="tile"><div class="t-name">Standard</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,650,000 / night</div><div class="t-avail av-ok">4 available</div></div>
+                <div class="tile"><div class="t-name">Studio</div><div class="t-guests">Max: 4A, 0C</div><div class="t-price">IDR 1,950,000 / night</div><div class="t-avail av-ok">2 available</div></div>
+                <div class="tile dim"><div class="t-name">Suite</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,800,000 / night</div><div class="t-avail av-no">0 available</div></div>
+              </div>
+              <!-- Specific room for single -->
+              <div class="spec-room">
+                <div class="sr-hd">Specific room — Double &nbsp;<span class="sr-opt">Optional · pre-assignment is advisory</span></div>
+                <div class="room-list">
+                  <div class="room-item" style="border-color:#ccc">
+                    <div class="ri-radio"></div>
+                    <span class="ri-code" style="color:#888">—</span>
+                    <span class="ri-detail" style="color:#888">Assign specific room at check-in</span>
+                  </div>
+                  <div class="room-item ri-sel">
+                    <div class="ri-radio checked"></div>
+                    <span class="ri-code">Room 201</span>
+                    <span class="ri-detail">Double · Wing A · Floor 2</span>
+                    <span class="ri-status rs-ok">Available</span>
+                  </div>
+                  <div class="room-item">
+                    <div class="ri-radio"></div>
+                    <span class="ri-code">Room 202</span>
+                    <span class="ri-detail">Double · Wing A · Floor 2</span>
+                    <span class="ri-status rs-dirty">Dirty</span>
+                  </div>
+                  <div class="room-item">
+                    <div class="ri-radio"></div>
+                    <span class="ri-code">Room 301</span>
+                    <span class="ri-detail">Double · Wing B · Floor 3</span>
+                    <span class="ri-status rs-ok">Available</span>
+                  </div>
+                </div>
+                <div class="sr-note">ℹ️ Room can be changed at check-in Step 3 if unavailable.</div>
+              </div>
+              <div style="margin-bottom:0"><span class="add-type">+ Add another room type</span></div>
+            </div>
+
+            <!-- ─ Sub-scenario B: Same type ×3 ─ -->
+            <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1.5px dashed #e0e0e0">
+              <div style="font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">B — Multiple rooms · same type (3× Double)</div>
+              <div class="tile-lbl">Room type <span style="color:#d93025;font-size:11px">*</span></div>
+              <div class="tile-grid">
+                <div class="tile dim"><div class="t-name">Deluxe</div><div class="t-guests">Max: 6A, 0C</div><div class="t-price">IDR 1,500,000 / night</div><div class="t-avail av-no">0 available</div></div>
+                <div class="tile sel"><div class="t-name">Double</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,750,000 / night</div><div class="t-avail av-ok">6 available</div></div>
+                <div class="tile"><div class="t-name">Standard</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,650,000 / night</div><div class="t-avail av-ok">4 available</div></div>
+                <div class="tile"><div class="t-name">Studio</div><div class="t-guests">Max: 4A, 0C</div><div class="t-price">IDR 1,950,000 / night</div><div class="t-avail av-ok">2 available</div></div>
+                <div class="tile dim"><div class="t-name">Suite</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,800,000 / night</div><div class="t-avail av-no">0 available</div></div>
+              </div>
+              <!-- Quantity -->
+              <div class="qty-row">
+                <div class="qty-l">Number of Double rooms</div>
+                <div class="qty-ctrl">
+                  <button class="qty-btn">−</button>
+                  <span class="qty-v">3</span>
+                  <button class="qty-btn">+</button>
+                  <span class="qty-hint">(6 available)</span>
+                </div>
+              </div>
+              <!-- Specific rooms per slot -->
+              <div class="spec-multi">
+                <div class="sm-hd">Specific rooms — per slot &nbsp;<span class="sr-opt">Optional · leave blank to assign at check-in</span></div>
+                <div class="fg" style="grid-template-columns:1fr 1fr 1fr">
+                  <div class="f-g"><div class="f-l">Room slot 1</div><select class="f-s"><option>— Assign at check-in —</option><option selected>Room 201 (Available)</option><option>Room 202 (Dirty)</option><option>Room 301 (Available)</option></select></div>
+                  <div class="f-g"><div class="f-l">Room slot 2</div><select class="f-s"><option selected>— Assign at check-in —</option><option>Room 202 (Dirty)</option><option>Room 301 (Available)</option><option>Room 302 (Available)</option></select></div>
+                  <div class="f-g"><div class="f-l">Room slot 3</div><select class="f-s"><option selected>— Assign at check-in —</option><option>Room 302 (Available)</option><option>Room 401 (Available)</option><option>Room 402 (Available)</option></select></div>
+                </div>
+                <div class="sr-note">ℹ️ Pre-assignment is advisory. All rooms can be changed at check-in.</div>
+              </div>
+              <span class="add-type">+ Add another room type</span>
+            </div>
+
+            <!-- ─ Sub-scenario C: Mixed types ─ -->
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">C — Mixed room types (1× Standard + 1× Studio)</div>
+              <!-- Room type 1 -->
+              <div style="font-size:12.5px;font-weight:500;color:#444;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between">
+                <span>Room type 1</span>
+              </div>
+              <div class="tile-lbl">Room type <span style="color:#d93025;font-size:11px">*</span></div>
+              <div class="tile-grid">
+                <div class="tile dim"><div class="t-name">Deluxe</div><div class="t-guests">Max: 6A, 0C</div><div class="t-price">IDR 1,500,000 / night</div><div class="t-avail av-no">0 available</div></div>
+                <div class="tile"><div class="t-name">Double</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,750,000 / night</div><div class="t-avail av-ok">6 available</div></div>
+                <div class="tile sel"><div class="t-name">Standard</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,650,000 / night</div><div class="t-avail av-ok">4 available</div></div>
+                <div class="tile"><div class="t-name">Studio</div><div class="t-guests">Max: 4A, 0C</div><div class="t-price">IDR 1,950,000 / night</div><div class="t-avail av-ok">2 available</div></div>
+                <div class="tile dim"><div class="t-name">Suite</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,800,000 / night</div><div class="t-avail av-no">0 available</div></div>
+              </div>
+              <div class="qty-row" style="margin-bottom:8px"><div class="qty-l">Number of Standard rooms</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-v">1</span><button class="qty-btn">+</button><span class="qty-hint">(4 available)</span></div></div>
+              <div class="spec-multi" style="margin-bottom:10px">
+                <div class="sm-hd">Specific room — Standard &nbsp;<span class="sr-opt">Optional</span></div>
+                <div class="f-g"><select class="f-s" style="width:100%"><option selected>— Assign at check-in —</option><option>Room 105 (Available)</option><option>Room 106 (Available)</option><option>Room 205 (Available)</option></select></div>
+              </div>
+              <!-- Divider -->
+              <div style="border-top:1.5px dashed #ddd;margin:12px 0;position:relative">
+                <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#fff;padding:0 10px;font-size:11px;color:#aaa;white-space:nowrap">Room type 2 added</span>
+              </div>
+              <!-- Room type 2 -->
+              <div style="font-size:12.5px;font-weight:500;color:#444;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between">
+                <span>Room type 2</span>
+                <span style="font-size:12px;color:#d93025;cursor:pointer">Remove</span>
+              </div>
+              <div class="tile-lbl">Room type <span style="color:#d93025;font-size:11px">*</span></div>
+              <div class="tile-grid">
+                <div class="tile dim"><div class="t-name">Deluxe</div><div class="t-guests">Max: 6A, 0C</div><div class="t-price">IDR 1,500,000 / night</div><div class="t-avail av-no">0 available</div></div>
+                <div class="tile"><div class="t-name">Double</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,750,000 / night</div><div class="t-avail av-ok">6 available</div></div>
+                <div class="tile"><div class="t-name">Standard</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,650,000 / night</div><div class="t-avail av-ok">4 available</div></div>
+                <div class="tile sel"><div class="t-name">Studio</div><div class="t-guests">Max: 4A, 0C</div><div class="t-price">IDR 1,950,000 / night</div><div class="t-avail av-ok">2 available</div></div>
+                <div class="tile dim"><div class="t-name">Suite</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,800,000 / night</div><div class="t-avail av-no">0 available</div></div>
+              </div>
+              <div class="qty-row" style="margin-bottom:8px"><div class="qty-l">Number of Studio rooms</div><div class="qty-ctrl"><button class="qty-btn">−</button><span class="qty-v">1</span><button class="qty-btn">+</button><span class="qty-hint">(2 available)</span></div></div>
+              <div class="spec-multi" style="margin-bottom:12px">
+                <div class="sm-hd">Specific room — Studio &nbsp;<span class="sr-opt">Optional</span></div>
+                <div class="f-g"><select class="f-s" style="width:100%"><option>— Assign at check-in —</option><option selected>Room 301 (Available)</option><option>Room 302 (Available)</option></select></div>
+              </div>
+              <span class="add-type">+ Add another room type</span>
+            </div>
+
+            <div class="confirmed-row"><button class="btn-conf">✓ Confirmed</button></div>
+          </div>
+        </div>
+
+        <!-- Steps 4–6 locked -->
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 4 — Rate &amp; charges</div><div class="sh-r">Complete step 3 first</div></div></div>
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 5 — Notes &amp; requests</div><div class="sh-r">Complete step 3 first</div></div></div>
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 6 — Review &amp; confirm</div><div class="sh-r">Complete all steps first</div></div></div>
+      </div>
+      <div class="bbar">
+        <button class="bb-prev">Previous</button>
+        <span class="bb-step">Step 3 of 6</span>
+        <div class="bb-r">
+          <button class="bb-draft">Save as draft</button>
+          <button class="bb-next">Next — Rate &amp; charges</button>
+          <button class="bb-confirm" disabled>Confirm reservation ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     STEP 4 — RATE & CHARGES (with price override)
+     Shows: rate plan + total + override + deposit
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-g">Step 4 — Rate &amp; charges · Rate plan auto-selected + price override expanded</div>
+  <div class="shell">
+    <div class="sb">
+      <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item">🚪 Room</div>
+        <div class="sb-item">👥 Users</div>
+      </div>
+      <div class="sb-foot"><div class="sb-av">R</div><div><div class="sb-un">Rina</div><div class="sb-ue">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New</span></div>
+      <div class="content">
+        <div class="pg-title">New reservation</div>
+        <div class="pg-sub">Fill in each step to create a confirmed reservation</div>
+        <div class="step-bar">
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Guest info</div></div>
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Stay details</div></div>
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Room</div></div>
+          <div class="sbi on"><div class="sd sd-on">4</div><div class="sl">Rate &amp; charges</div></div>
+          <div class="sbi"><div class="sd sd-off">5</div><div class="sl">Notes</div></div>
+          <div class="sbi"><div class="sd sd-off">6</div><div class="sl">Review &amp; confirm</div></div>
+        </div>
+
+        <!-- Steps 1–3 collapsed -->
+        <div class="sc done"><div class="sc-hd"><div class="sh-l"><span>✓</span> Step 1 — Guest information</div><div class="sh-r">Brina Guest · GST-0042</div></div></div>
+        <div class="sc done"><div class="sc-hd"><div class="sh-l"><span>✓</span> Step 2 — Stay details</div><div class="sh-r">12 Jun – 14 Jun 2026 · 2 nights · 2 adults</div></div></div>
+        <div class="sc done"><div class="sc-hd"><div class="sh-l"><span>✓</span> Step 3 — Room</div><div class="sh-r">Double × 1 · Room 201 pre-assigned</div></div></div>
+
+        <!-- STEP 4 ACTIVE -->
+        <div class="sc active">
+          <div class="sc-hd"><div class="sh-l">Step 4 — Rate &amp; charges</div><div class="sh-r" style="color:#0052cc">Current step</div></div>
+          <div class="sc-body">
+
+            <!-- Auto-selected rate plan display -->
+            <div class="rate-summary">
+              <div class="rs-hd">Rate plan — auto-selected for Double · 12 Jun 2026</div>
+              <div class="rs-row"><span class="rs-l">Rate plan</span><span class="rs-r">Standard Rate</span></div>
+              <div class="rs-row"><span class="rs-l">Room type</span><span class="rs-r">Double</span></div>
+              <div class="rs-row"><span class="rs-l">Nightly rate</span><span class="rs-r">IDR 1,750,000 / night</span></div>
+              <div class="rs-row"><span class="rs-l">Duration</span><span class="rs-r">2 nights (12–14 Jun 2026)</span></div>
+              <div class="rs-row"><span class="rs-l">Number of rooms</span><span class="rs-r">1</span></div>
+              <div class="rs-div"></div>
+              <div class="rs-total"><span>Total accommodation</span><span style="color:#1c1c1c">IDR 3,500,000</span></div>
+            </div>
+
+            <!-- Override section -->
+            <div style="margin-bottom:14px">
+              <div class="ov-toggle">▼ Override nightly rate (optional)</div>
+              <div class="ov-panel">
+                <div class="ov-warn">⚠️ Changing the rate will override the rate plan. The original rate and the override reason will be logged in the audit trail.</div>
+                <div class="ov-fields">
+                  <div class="f-g">
+                    <div class="ov-l">Override nightly rate (IDR) <span style="color:#d93025">*</span></div>
+                    <input class="ov-i" value="1,500,000" placeholder="Leave blank to use rate plan">
+                  </div>
+                  <div class="f-g">
+                    <div class="ov-l">Reason for override <span style="color:#d93025">*</span></div>
+                    <input class="ov-i" value="Manager approved discount for VIP guest" placeholder="Required when rate is changed">
+                  </div>
+                </div>
+                <!-- Updated total after override -->
+                <div style="margin-top:10px;padding-top:10px;border-top:1px solid #ffd580;display:flex;justify-content:space-between;font-size:13px">
+                  <span style="color:#7a4c00">Total with override rate:</span>
+                  <span style="font-weight:700;color:#7a4c00;font-family:monospace">IDR 3,000,000 &nbsp;<span style="font-size:11.5px;color:#aaa;text-decoration:line-through">IDR 3,500,000</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Deposit section -->
+            <div class="dep-row">
+              <div class="dep-track on"></div>
+              <span class="dep-lbl">Collect deposit at reservation</span>
+            </div>
+            <div class="dep-form">
+              <div class="dep-grid">
+                <div class="f-g"><div class="f-l">Deposit amount (IDR) <span class="f-req">*</span></div><input class="f-i" value="1,000,000"></div>
+                <div class="f-g"><div class="f-l">Payment method <span class="f-req">*</span></div><select class="f-s"><option selected>Cash</option><option>Bank transfer</option><option>Card EDC</option><option>QRIS</option></select></div>
+                <div class="f-g"><div class="f-l">Reference number</div><input class="f-i" placeholder="Optional — receipt or bank ref"></div>
+                <div class="f-g"><div class="f-l">Deposit date</div><input class="f-i" value="12 Jun 2026"></div>
+              </div>
+            </div>
+
+            <div class="confirmed-row"><button class="btn-conf">✓ Confirmed</button></div>
+          </div>
+        </div>
+
+        <!-- Steps 5–6 locked -->
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 5 — Notes &amp; requests</div><div class="sh-r">Complete step 4 first</div></div></div>
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 6 — Review &amp; confirm</div><div class="sh-r">Complete all steps first</div></div></div>
+      </div>
+      <div class="bbar">
+        <button class="bb-prev">Previous</button>
+        <span class="bb-step">Step 4 of 6</span>
+        <div class="bb-r">
+          <button class="bb-draft">Save as draft</button>
+          <button class="bb-next">Next — Notes</button>
+          <button class="bb-confirm" disabled>Confirm reservation ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
