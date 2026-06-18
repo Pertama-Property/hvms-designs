@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Accommodation Paid at Check-In · End-to-End Example</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f0f0f0;color:#1c1c1c;font-size:13.5px;padding:20px;
+     display:flex;flex-direction:column;gap:0;max-width:1020px}
+
+/* Flow header */
+.flow-hd{background:#1c1c1c;color:#fff;padding:10px 16px;font-size:12px;font-weight:600;
+         display:flex;align-items:center;gap:8px;border-radius:5px 5px 0 0}
+.flow-step{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:12px;font-size:11px}
+.flow-step.active{background:#2ea44f;color:#fff}
+.flow-arr{color:rgba(255,255,255,.4);font-size:13px}
+
+/* Shell */
+.shell{display:flex;background:#fff;border:1px solid #ddd;border-top:none;overflow:hidden}
+
+/* Sidebar */
+.sb{width:168px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e5;display:flex;flex-direction:column}
+.sb-hd{padding:10px 12px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:7px}
+.sb-logo{width:26px;height:26px;background:#0052cc;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sb-an{font-size:12.5px;font-weight:600;line-height:1.2}
+.sb-as{font-size:11px;color:#888;line-height:1.2}
+.sb-nav{padding:4px 0;flex:1}
+.sb-item{padding:6px 12px;font-size:12px;color:#444;display:flex;align-items:center;gap:6px;cursor:pointer}
+.sb-item:hover{background:#f5f5f5}
+.sb-item.on{color:#0052cc;background:#eaf0fb;font-weight:500}
+.sb-foot{padding:9px 12px;border-top:1px solid #e5e5e5;display:flex;align-items:center;gap:7px;margin-top:auto}
+.sb-av{width:26px;height:26px;border-radius:50%;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topnav{height:34px;background:#fff;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;
+        padding:0 20px;gap:4px;font-size:12px;color:#888}
+.topnav a{color:#0052cc;text-decoration:none}.sep{color:#ccc}
+.content{padding:18px 20px;flex:1}
+.pg-title{font-size:21px;font-weight:600;margin-bottom:2px}
+.pg-sub{font-size:12.5px;color:#777;margin-bottom:14px}
+
+/* Context badge */
+.ctx-badge{display:inline-flex;align-items:center;gap:6px;background:#fff8ed;border:1px solid #ffd580;
+           border-radius:4px;padding:6px 12px;font-size:12.5px;color:#7a4c00;margin-bottom:14px}
+
+/* Step bar */
+.step-bar{display:flex;margin-bottom:16px}
+.sbi{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;
+     background:#fff;border:1px solid #e5e5e5;border-right:none}
+.sbi:first-child{border-radius:4px 0 0 4px}
+.sbi:last-child{border-radius:0 4px 4px 0;border-right:1px solid #e5e5e5}
+.sd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.sd-ok{background:#2ea44f;color:#fff}
+.sd-on{background:#0052cc;color:#fff}
+.sd-off{background:#e5e5e5;color:#aaa}
+.sl{font-size:11px;color:#777;text-align:center;line-height:1.3}
+.sbi.on .sl{font-weight:600;color:#0052cc}
+.sbi.done .sl{color:#2ea44f}
+
+/* Step cards */
+.sc{border:1px solid #e5e5e5;border-radius:4px;overflow:hidden;margin-bottom:8px;background:#fff}
+.sc.done .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sc.done .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.done .sh-r{font-size:12px;color:#888}
+.sc.active .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.active .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.active .sh-r{font-size:12px;color:#0052cc}
+.sc.locked .sc-hd{background:#fafafa;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.locked .sh-l{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:#bbb}
+.sc.locked .sh-r{font-size:12px;color:#ccc}
+.sc-body{padding:14px 16px;border-top:1px solid #e5e5e5}
+.sc.locked .sc-body{display:none}
+.chevron{font-size:14px;color:#bbb}
+.conf-row{display:flex;justify-content:flex-end;margin-top:12px}
+.btn-conf{padding:6px 14px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+
+/* Forms */
+.fg{display:grid;gap:10px;margin-bottom:10px}
+.fg3{grid-template-columns:1fr 1fr 1fr}.fg2{grid-template-columns:1fr 1fr}
+.f-g{display:flex;flex-direction:column;gap:4px}
+.f-l{font-size:12px;color:#666}
+.f-i{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff}
+.f-s{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 25px 0 10px;font-size:13.5px;font-family:inherit;background:#fff;-webkit-appearance:none}
+
+/* Review summary */
+.review-section{margin-bottom:12px}
+.rev-sec-hd{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin-bottom:7px}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rev-cell-l{font-size:11.5px;color:#888;margin-bottom:2px}
+.rev-cell-v{font-size:13.5px;font-weight:500;color:#1c1c1c}
+.rev-total{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;
+           background:#f8f9fa;border-radius:4px;border:1px solid #e5e5e5;margin-top:4px}
+.rt-l{font-size:13.5px;font-weight:600;color:#1c1c1c}
+.rt-r{font-size:16px;font-weight:700;color:#0052cc;font-family:monospace}
+
+/* Balance due at CI banner */
+.ci-balance{background:#fff8ed;border:1px solid #ffd580;border-radius:4px;padding:10px 14px;
+            display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+.cib-l{font-size:13px;color:#7a4c00;display:flex;align-items:center;gap:7px}
+.cib-r{font-size:16px;font-weight:700;color:#7a4c00;font-family:monospace}
+
+/* ── PAYMENT CARD (CI Step 5) ──────────────── */
+.pay-card{border:1px solid #e5e5e5;border-radius:5px;overflow:hidden;margin-bottom:10px}
+.pc-hd{padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.pc-hd.card1{background:#e8f4ff}
+.pc-hd.card2-locked{background:#f5f5f5}
+.pc-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex-shrink:0;margin-right:8px}
+.pn-blue{background:#0052cc;color:#fff}
+.pn-grey{background:#d4d4d4;color:#fff}
+.pc-title{font-size:13.5px;font-weight:600;color:#1c1c1c;display:flex;align-items:center;gap:7px}
+.pc-amount{font-size:14px;font-weight:700;font-family:monospace;color:#1c1c1c}
+.pc-body{padding:14px;border-top:1px solid #e5e5e5;background:#fff}
+
+/* Pay now vs Defer options */
+.pay-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pay-opt{border:1.5px solid #d4d4d4;border-radius:4px;padding:10px 12px;cursor:pointer}
+.pay-opt.selected{border-color:#0052cc;background:#f0f7ff}
+.pay-opt.defer-opt{background:#f9f9f9}
+.po-title{font-size:13px;font-weight:600;color:#1c1c1c;margin-bottom:3px}
+.po-desc{font-size:12px;color:#666;line-height:1.5}
+.po-amount{font-size:16px;font-weight:700;font-family:monospace;margin-top:6px}
+.poa-now{color:#0052cc}
+.poa-defer{color:#d93025;font-size:14px}
+
+/* Payment form */
+.pay-form{background:#f5f5f5;border-radius:4px;padding:12px;margin-bottom:10px}
+.pf-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#777;margin-bottom:8px}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px}
+.change-banner{background:#d4edda;border:1px solid #b2dfbd;border-radius:4px;padding:9px 12px;
+               display:flex;align-items:center;justify-content:space-between}
+.cb-l{font-size:12px;color:#155724}
+.cb-r{font-size:20px;font-weight:700;font-family:monospace;color:#155724}
+
+.btn-confirm-ci{width:100%;padding:11px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer}
+
+/* Locked card 2 */
+.card2-note{padding:12px 14px;font-size:12.5px;color:#999;font-style:italic}
+
+/* Folio preview */
+.folio-preview{border:1px solid #e5e5e5;border-radius:4px;overflow:hidden;margin-top:12px}
+.fp-hd{padding:9px 12px;background:#f8f9fa;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#888}
+.fp-row{display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid #f0f0f0;font-size:12.5px}
+.fp-row:last-child{border-bottom:none}
+.fp-l{color:#555}
+.fp-r{font-family:monospace;font-weight:500}
+.fp-r.collecting{color:#0052cc;font-style:italic}
+.fp-r.pending{color:#bbb;font-style:italic}
+.fp-r.credit{color:#2ea44f}
+.fp-balance{display:flex;justify-content:space-between;padding:8px 12px;background:#f8f9fa;border-top:1.5px solid #e5e5e5;font-size:13.5px;font-weight:600}
+.fp-bal-r{color:#d97706;font-family:monospace}
+
+/* Bottom bar */
+.bbar{padding:11px 20px;background:#fff;border-top:1px solid #e5e5e5;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bb-prev{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-step{font-size:12px;color:#888}
+.bb-r{display:flex;gap:7px}
+.bb-nosho{padding:7px 14px;border:1px solid #d93025;border-radius:4px;font-size:13px;background:#fff;color:#d93025;cursor:pointer}
+.bb-confirm{padding:7px 15px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.bb-confirm:disabled{background:#c0c0c0;cursor:not-allowed}
+
+/* Section divider */
+.section-divider{display:flex;align-items:center;gap:10px;margin:22px 0 18px}
+.sd-line{flex:1;height:1px;background:#ddd}
+.sd-lbl{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     PART 1 — RESERVATION (Step 6 Review & Confirm)
+     Shows: No deposit · Balance due at check-in
+     ════════════════════════════════════════════ -->
+<div class="flow-hd">
+  <span class="flow-step active">① Reservation created</span>
+  <span class="flow-arr">→</span>
+  <span class="flow-step">② Guest arrives</span>
+  <span class="flow-arr">→</span>
+  <span class="flow-step">③ Check-in Step 5 — collect accommodation</span>
+</div>
+<div class="shell" style="border-bottom:none">
+  <div class="sb">
+    <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+    <div class="sb-nav">
+      <div class="sb-item on">☰ Reservations</div>
+      <div class="sb-item">← Check-in</div>
+      <div class="sb-item">→ Check-out</div>
+    </div>
+    <div class="sb-foot"><div class="sb-av">R</div><div><div style="font-size:12px;font-weight:500">Rina</div><div style="font-size:10.5px;color:#888">rina.qa@pertamapro...</div></div></div>
+  </div>
+  <div class="main">
+    <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Reservations</a><span class="sep">/</span><span style="color:#333">New</span></div>
+    <div class="content">
+      <div class="pg-title">New reservation</div>
+      <div class="pg-sub">Fill in each step to create a confirmed reservation</div>
+      <div class="ctx-badge">⚠ No deposit collected at reservation — guest will pay accommodation at check-in</div>
+
+      <div class="step-bar">
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Guest info</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Stay details</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Room</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Rate &amp; charges</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Notes</div></div>
+        <div class="sbi on"><div class="sd sd-on">6</div><div class="sl">Review &amp; confirm</div></div>
+      </div>
+
+      <!-- Steps 1–5 collapsed -->
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 1 — Guest information</div><div class="sh-r">Hendrick Willems · GST-0042 · Netherlands · VIP</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 2 — Stay details</div><div class="sh-r">24 May – 27 May 2026 · 3 nights · 2 adults · CI 14:00</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 3 — Room</div><div class="sh-r">Double × 1 · Room 201 pre-assigned</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 4 — Rate &amp; charges</div><div class="sh-r">Standard Rate · IDR 1,750,000/night · No deposit</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 5 — Notes &amp; requests</div><div class="sh-r">Special request: Late check-in after 18:00</div></div></div>
+
+      <!-- Step 6 — Review & Confirm (active) -->
+      <div class="sc active">
+        <div class="sc-hd"><div class="sh-l">Step 6 — Review &amp; confirm</div><div class="sh-r" style="color:#0052cc">Final step</div></div>
+        <div class="sc-body">
+          <!-- Guest + Stay summary -->
+          <div class="review-section">
+            <div class="rev-sec-hd">Guest</div>
+            <div class="rev-grid">
+              <div><div class="rev-cell-l">Name</div><div class="rev-cell-v">Hendrick Willems</div></div>
+              <div><div class="rev-cell-l">Contact</div><div class="rev-cell-v">+62 812 3456 7890</div></div>
+            </div>
+          </div>
+          <div class="review-section">
+            <div class="rev-sec-hd">Stay</div>
+            <div class="rev-grid">
+              <div><div class="rev-cell-l">Check-in</div><div class="rev-cell-v">24 May 2026 · 14:00</div></div>
+              <div><div class="rev-cell-l">Check-out</div><div class="rev-cell-v">27 May 2026 · 12:00</div></div>
+              <div><div class="rev-cell-l">Duration</div><div class="rev-cell-v">3 nights</div></div>
+              <div><div class="rev-cell-l">Guests</div><div class="rev-cell-v">2 adults</div></div>
+            </div>
+          </div>
+          <div class="review-section">
+            <div class="rev-sec-hd">Room</div>
+            <div class="rev-grid">
+              <div><div class="rev-cell-l">Room type</div><div class="rev-cell-v">Double</div></div>
+              <div><div class="rev-cell-l">Pre-assigned room</div><div class="rev-cell-v">Room 201 (advisory)</div></div>
+            </div>
+          </div>
+          <div class="review-section">
+            <div class="rev-sec-hd">Rate</div>
+            <div class="rev-grid">
+              <div><div class="rev-cell-l">Rate plan</div><div class="rev-cell-v">Standard Rate</div></div>
+              <div><div class="rev-cell-l">Nightly rate</div><div class="rev-cell-v">IDR 1,750,000 / night</div></div>
+              <div><div class="rev-cell-l">Deposit</div><div class="rev-cell-v" style="color:#888">None collected</div></div>
+            </div>
+          </div>
+
+          <div class="rev-total">
+            <div class="rt-l">Total accommodation</div>
+            <div class="rt-r">IDR 5,250,000</div>
+          </div>
+
+          <!-- Balance due at CI banner -->
+          <div style="margin-top:10px">
+            <div class="ci-balance">
+              <div class="cib-l">⏰ Balance due at check-in — no deposit collected. Guest will pay IDR 5,250,000 + adds on at check-in or defer to check-out.</div>
+              <div class="cib-r">IDR 5,250,000</div>
+            </div>
+          </div>
+
+          <div class="conf-row" style="margin-top:12px">
+            <button class="btn-conf" style="background:#0052cc;font-size:13.5px;padding:8px 20px">Confirm reservation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bbar">
+      <button class="bb-prev">Previous</button>
+      <span class="bb-step">Step 6 of 6</span>
+      <div class="bb-r">
+        <button style="padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer">Save as draft</button>
+        <button class="bb-confirm" style="background:#0052cc">Confirm reservation</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PART 2 — CHECK-IN Step 5: Collect accommodation
+     Guest arrives · State A · No prior deposit
+     ════════════════════════════════════════════ -->
+<div class="flow-hd" style="border-radius:0;margin-top:0">
+  <span class="flow-step">① Reservation created</span>
+  <span class="flow-arr">→</span>
+  <span class="flow-step">② Guest arrives</span>
+  <span class="flow-arr">→</span>
+  <span class="flow-step active">③ Check-in Step 5 — collect accommodation</span>
+</div>
+<div class="shell" style="border-top:none;border-radius:0 0 5px 5px">
+  <div class="sb">
+    <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+    <div class="sb-nav">
+      <div class="sb-item on">← Check-in</div>
+      <div class="sb-item">☰ Reservations</div>
+      <div class="sb-item">📋 Guest Folio</div>
+      <div class="sb-item">🏠 Room status</div>
+    </div>
+    <div class="sb-foot"><div class="sb-av">R</div><div><div style="font-size:12px;font-weight:500">Rina</div><div style="font-size:10.5px;color:#888">rina.qa@pertamapro...</div></div></div>
+  </div>
+  <div class="main">
+    <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><a href="#">Check-in</a><span class="sep">/</span><span style="color:#333">Hendrick Willems</span>
+      <span style="margin-left:auto;font-size:11.5px;background:#e5e5e5;padding:2px 8px;border-radius:12px;color:#555">RSV-2026-0041</span>
+    </div>
+    <div class="content">
+      <div class="pg-title">Check-in</div>
+      <div class="pg-sub">Complete each step to check the guest in</div>
+
+      <!-- 6-step indicator for check-in -->
+      <div class="step-bar">
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Booking details</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Identity</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Room assign</div></div>
+        <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Adds on</div></div>
+        <div class="sbi on"><div class="sd sd-on">5</div><div class="sl">Payment</div></div>
+        <div class="sbi"><div class="sd sd-off">6</div><div class="sl">Key card &amp; confirm</div></div>
+      </div>
+
+      <!-- Steps 1–4 collapsed -->
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 1 — Booking details</div><div class="sh-r">RSV-2026-0041 · 24–27 May 2026 · Double · 3 nights</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 2 — Identity verification</div><div class="sh-r">Hendrick Willems · Passport A12345678 · Netherlands</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 3 — Room assignment</div><div class="sh-r">Room 201 · Double · Wing A · Available ✓</div></div></div>
+      <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 4 — Adds on</div><div class="sh-r">Airport transfer IDR 150,000 · Welcome basket IDR 75,000</div></div></div>
+
+      <!-- Step 5 — PAYMENT (active) -->
+      <div class="sc active">
+        <div class="sc-hd"><div class="sh-l">Step 5 — Payment</div><div class="sh-r" style="color:#0052cc">Collect room charge · then security deposit</div></div>
+        <div class="sc-body">
+
+          <!-- Card 1: Room Charge -->
+          <div class="pay-card">
+            <div class="pc-hd card1">
+              <div style="display:flex;align-items:center">
+                <div class="pc-num pn-blue">1</div>
+                <div class="pc-title">Room charge — Accommodation</div>
+              </div>
+              <div class="pc-amount">IDR 5,250,000</div>
+            </div>
+            <div class="pc-body">
+              <!-- Pay now vs Defer -->
+              <div class="pay-options">
+                <div class="pay-opt selected">
+                  <div class="po-title">✓ Pay now at check-in</div>
+                  <div class="po-desc">Collect full accommodation today. Guest owes IDR 0 at check-out for room.</div>
+                  <div class="po-amount poa-now">IDR 5,250,000</div>
+                </div>
+                <div class="pay-opt defer-opt">
+                  <div class="po-title">Defer to check-out</div>
+                  <div class="po-desc">No room payment now. Guest settles full accommodation at departure.</div>
+                  <div class="po-amount poa-defer">IDR 5,250,000 at departure</div>
+                </div>
+              </div>
+
+              <!-- Payment collection form -->
+              <div class="pay-form">
+                <div class="pf-lbl">Collect room payment</div>
+                <div class="pf-grid">
+                  <div class="f-g"><div class="f-l">Payment method</div><select class="f-s"><option selected>Cash</option><option>Card EDC</option><option>QRIS</option></select></div>
+                  <div class="f-g"><div class="f-l">Amount tendered (IDR) *</div><input class="f-i" value="6,000,000"></div>
+                  <div class="f-g"><div class="f-l">Change to return</div><input class="f-i" value="IDR 750,000" style="background:#d4edda;border-color:#b2dfbd;color:#155724;font-weight:600" readonly></div>
+                </div>
+                <div class="change-banner">
+                  <div class="cb-l">Change to give back to guest<br><span style="font-size:11px;color:#888">IDR 6,000,000 tendered − IDR 5,250,000 room charge</span></div>
+                  <div class="cb-r">IDR 750,000</div>
+                </div>
+              </div>
+
+              <button class="btn-confirm-ci">Confirm room charge collected — IDR 5,250,000</button>
+            </div>
+          </div>
+
+          <!-- Card 2: Security Deposit (locked) -->
+          <div class="pay-card">
+            <div class="pc-hd card2-locked">
+              <div style="display:flex;align-items:center">
+                <div class="pc-num pn-grey">2</div>
+                <div class="pc-title" style="color:#aaa">Deposit — Security deposit</div>
+              </div>
+              <div style="font-size:13px;color:#aaa">IDR 1,000,000 — Unlocks after room charge</div>
+            </div>
+            <div class="card2-note">Complete room charge collection above — deposit will unlock automatically.</div>
+          </div>
+
+          <!-- Folio preview -->
+          <div class="folio-preview">
+            <div class="fp-hd">
+              <span>Guest folio — what gets posted on check-in confirm</span>
+              <span style="color:#0052cc;text-transform:none;letter-spacing:0;font-weight:500;cursor:pointer">Updates as you collect</span>
+            </div>
+            <div class="fp-row"><span class="fp-l">Accommodation — Standard Rate · 3 nights × IDR 1,750,000</span><span class="fp-r">5,250,000</span></div>
+            <div class="fp-row"><span class="fp-l">Airport transfer &nbsp;<span style="font-size:11px;color:#0052cc">adds on · folio</span></span><span class="fp-r">150,000</span></div>
+            <div class="fp-row"><span class="fp-l">Welcome basket &nbsp;<span style="font-size:11px;color:#0052cc">adds on · folio</span></span><span class="fp-r">75,000</span></div>
+            <div class="fp-row"><span class="fp-l">Room charge — Cash ✓</span><span class="fp-r collecting">Collecting now ↑</span></div>
+            <div class="fp-row"><span class="fp-l">Security deposit — Cash</span><span class="fp-r pending">Pending ↓</span></div>
+            <div class="fp-balance">
+              <span>Balance due at check-out</span>
+              <span class="fp-bal-r">IDR 225,000 <span style="font-size:11.5px;color:#888;font-weight:400">(adds on only)</span></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Step 6 locked -->
+      <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 6 — Key card &amp; confirm</div><div class="sh-r">Complete payment step first</div></div></div>
+    </div>
+    <div class="bbar">
+      <button class="bb-prev">← Previous</button>
+      <span class="bb-step">Step 5 of 6 — collect room charge first, then deposit</span>
+      <div class="bb-r">
+        <button class="bb-nosho">Mark no-show</button>
+        <button class="bb-confirm" disabled>Confirm check-in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
