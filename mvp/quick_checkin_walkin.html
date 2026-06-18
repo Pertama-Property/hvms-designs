@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HVMS — Quick Check-in (Walk-in)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f0f0f0;color:#1c1c1c;font-size:13.5px;
+     padding:20px;display:flex;flex-direction:column;gap:24px;max-width:1020px}
+
+.ann{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+     padding:3px 10px;border-radius:3px 3px 0 0;display:inline-flex;align-items:center;gap:5px}
+.ann-b{background:#dceeff;border:1px solid #8bbfe8;border-bottom:none;color:#0047a3}
+.ann-g{background:#dcf5e7;border:1px solid #7dc99a;border-bottom:none;color:#1a5c30}
+
+.shell{display:flex;background:#fff;border:1px solid #ddd;border-radius:0 5px 5px 5px;overflow:hidden;min-height:500px}
+
+.sb{width:168px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e5;display:flex;flex-direction:column}
+.sb-hd{padding:10px 12px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:7px}
+.sb-logo{width:26px;height:26px;background:#0052cc;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sb-an{font-size:12.5px;font-weight:600;line-height:1.2}
+.sb-as{font-size:11px;color:#888;line-height:1.2}
+.sb-nav{padding:4px 0;flex:1}
+.sb-item{padding:6px 12px;font-size:12px;color:#444;cursor:pointer;display:flex;align-items:center;gap:6px}
+.sb-item:hover{background:#f5f5f5}
+.sb-item.on{background:#e6efff;color:#0052cc;font-weight:500}
+.sb-foot{padding:9px 12px;border-top:1px solid #e5e5e5;display:flex;align-items:center;gap:7px;margin-top:auto}
+.sb-av{width:26px;height:26px;border-radius:50%;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+
+.main{flex:1;display:flex;flex-direction:column}
+.topnav{height:34px;background:#fff;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;
+        padding:0 20px;gap:4px;font-size:12px;color:#888}
+.topnav a{color:#0052cc;text-decoration:none}.sep{color:#ccc}
+.content{padding:18px 20px;flex:1}
+.pg-title{font-size:21px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:9px}
+.pg-badge{font-size:11px;font-weight:600;background:#fff3cd;color:#7a4100;padding:3px 9px;border-radius:12px}
+.pg-sub{font-size:12.5px;color:#777;margin-bottom:16px}
+
+/* Quick check-in: 3-step bar */
+.step-bar{display:flex;margin-bottom:18px}
+.sbi{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px;
+     background:#fff;border:1px solid #e5e5e5;border-right:none}
+.sbi:first-child{border-radius:4px 0 0 4px}
+.sbi:last-child{border-radius:0 4px 4px 0;border-right:1px solid #e5e5e5}
+.sd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.sd-ok{background:#2ea44f;color:#fff}
+.sd-on{background:#0052cc;color:#fff}
+.sd-off{background:#e5e5e5;color:#aaa}
+.sl{font-size:11px;color:#777;text-align:center;line-height:1.3}
+.sbi.on .sl{font-weight:600;color:#0052cc}
+.sbi.done .sl{color:#2ea44f}
+
+.sc{border:1px solid #e5e5e5;border-radius:4px;overflow:hidden;margin-bottom:8px;background:#fff}
+.sc.done .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.done .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.done .sh-r{font-size:12px;color:#888}
+.sc.active .sc-hd{background:#f0faf4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.active .sh-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#1d6b35;display:flex;align-items:center;gap:7px}
+.sc.active .sh-r{font-size:12px;color:#888}
+.sc.locked .sc-hd{background:#fafafa;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.sc.locked .sh-l{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:#bbb}
+.sc.locked .sh-r{font-size:12px;color:#ccc}
+.sc-body{padding:16px;border-top:1px solid #e5e5e5}
+.sc.locked .sc-body{display:none}
+.conf-row{display:flex;justify-content:flex-end;margin-top:14px}
+.btn-conf{padding:6px 14px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+
+.fg{display:grid;gap:12px;margin-bottom:12px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg2{grid-template-columns:1fr 1fr}
+.f-g{display:flex;flex-direction:column;gap:4px}
+.f-l{font-size:12px;color:#666;display:flex;align-items:center;gap:3px}
+.f-req{color:#d93025;font-size:11px}
+.f-i{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 10px;font-size:13.5px;font-family:inherit;background:#fff}
+.f-i:focus{border-color:#0052cc;outline:none}
+.f-s{height:34px;border:1px solid #d4d4d4;border-radius:4px;padding:0 25px 0 10px;font-size:13.5px;font-family:inherit;background:#fff;-webkit-appearance:none}
+
+/* Step 1 — Quick guest capture */
+.scan-row{display:flex;gap:10px;margin-bottom:14px}
+.scan-btn{flex:1;border:1.5px dashed #b3c5e8;border-radius:5px;padding:16px;text-align:center;cursor:pointer;background:#f5f9ff}
+.scan-btn:hover{border-color:#0052cc}
+.scan-icon{font-size:22px;margin-bottom:4px}
+.scan-lbl{font-size:12.5px;font-weight:500;color:#0052cc}
+.scan-sub{font-size:11px;color:#888;margin-top:2px}
+.or-div{display:flex;align-items:center;gap:10px;margin:14px 0;color:#aaa;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#e5e5e5}
+
+.dup-warning{background:#fff8e6;border:1px solid #ffd580;border-radius:4px;padding:9px 12px;font-size:12px;color:#7a4c00;margin-top:10px;display:flex;align-items:flex-start;gap:6px}
+.dup-warning a{color:#0052cc;text-decoration:underline;cursor:pointer}
+
+/* Step 2 — Room + Rate combined (single screen for speed) */
+.tile-lbl{font-size:12px;color:#555;margin-bottom:9px;font-weight:500}
+.tile-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.tile{border:1.5px solid #d4d4d4;border-radius:5px;padding:11px;cursor:pointer}
+.tile:hover{border-color:#666}
+.tile.sel{border:2px solid #1c1c1c;background:#fafafa}
+.tile.dim{opacity:.55;cursor:default}
+.t-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.t-guests{font-size:11.5px;color:#777;margin-bottom:4px}
+.t-price{font-size:13px;font-weight:500;color:#1c1c1c;margin-bottom:3px}
+.t-avail{font-size:12px;font-weight:500}
+.av-ok{color:#2ea44f}.av-no{color:#d93025}
+
+.quick-total{background:#f8f9fa;border:1px solid #e5e5e5;border-radius:4px;padding:12px 14px;margin-bottom:12px}
+.qt-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.qt-l{color:#555}.qt-r{font-weight:500;font-family:monospace}
+.qt-div{border-top:1.5px solid #ddd;margin:6px 0}
+.qt-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700}
+
+/* Step 3 — Payment (collapsed, paid in full pattern for walk-in) */
+.pay-card{border:1.5px solid #0052cc;border-radius:5px;overflow:hidden;margin-bottom:10px}
+.pc-hd{padding:11px 14px;background:#e8f4ff;display:flex;align-items:center;justify-content:space-between}
+.pc-title{font-size:13.5px;font-weight:600;color:#1c1c1c}
+.pc-amount{font-size:15px;font-weight:700;font-family:monospace;color:#1c1c1c}
+.pc-body{padding:14px;border-top:1px solid #c5dffb;background:#fff}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.change-banner{background:#d4edda;border:1px solid #b2dfbd;border-radius:4px;padding:9px 12px;
+               display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cb-l{font-size:12px;color:#155724}
+.cb-r{font-size:18px;font-weight:700;font-family:monospace;color:#155724}
+.btn-confirm-ci{width:100%;padding:11px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer}
+
+/* Deposit toggle small */
+.dep-row{display:flex;align-items:center;gap:10px;margin:12px 0}
+.dep-track{width:34px;height:18px;border-radius:9px;background:#ccc;position:relative;cursor:pointer;flex-shrink:0}
+.dep-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff}
+.dep-lbl{font-size:12.5px;color:#333}
+
+.bbar{padding:11px 20px;background:#fff;border-top:1px solid #e5e5e5;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bb-prev{padding:7px 14px;border:1px solid #d4d4d4;border-radius:4px;font-size:13px;background:#fff;color:#333;cursor:pointer}
+.bb-step{font-size:12px;color:#888}
+.bb-r{display:flex;gap:7px}
+.bb-confirm{padding:7px 15px;background:#2ea44f;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.bb-confirm:disabled{background:#c0c0c0;cursor:not-allowed}
+
+/* Entry point banner */
+.entry-banner{background:#1c1c1c;color:#fff;padding:9px 16px;font-size:12px;display:flex;align-items:center;gap:8px;border-radius:5px 5px 0 0}
+.entry-pill{background:rgba(255,255,255,.15);padding:2px 9px;border-radius:10px;font-size:11px}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     ENTRY POINT — where Quick Check-in is launched from
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="entry-banner">
+    <span>Entry point:</span>
+    <span class="entry-pill">Front Desk → Check-in → "+ Quick check-in (walk-in)" button</span>
+    <span style="margin-left:auto;opacity:.6">No prior reservation required</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     STEP 1 — GUEST + STAY (combined for speed)
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-b">Step 1 — Guest &amp; stay details (combined)</div>
+  <div class="shell">
+    <div class="sb">
+      <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item on">⚡ Quick check-in</div>
+        <div class="sb-item">← Check-in</div>
+        <div class="sb-item">☰ Reservations</div>
+      </div>
+      <div class="sb-foot"><div class="sb-av">R</div><div><div style="font-size:12px;font-weight:500">Rina</div><div style="font-size:10.5px;color:#888">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><span style="color:#333">Quick check-in</span></div>
+      <div class="content">
+        <div class="pg-title">Quick check-in <span class="pg-badge">⚡ Walk-in</span></div>
+        <div class="pg-sub">For guests arriving without a prior reservation — 3 steps instead of 12</div>
+
+        <div class="step-bar">
+          <div class="sbi on"><div class="sd sd-on">1</div><div class="sl">Guest &amp; stay</div></div>
+          <div class="sbi"><div class="sd sd-off">2</div><div class="sl">Room &amp; rate</div></div>
+          <div class="sbi"><div class="sd sd-off">3</div><div class="sl">Payment &amp; confirm</div></div>
+        </div>
+
+        <div class="sc active">
+          <div class="sc-hd"><div class="sh-l">Step 1 — Guest &amp; stay details</div><div class="sh-r" style="color:#0052cc">Current step</div></div>
+          <div class="sc-body">
+
+            <!-- ID scan options -->
+            <div class="scan-row">
+              <div class="scan-btn">
+                <div class="scan-icon">📷</div>
+                <div class="scan-lbl">Scan ID / Passport</div>
+                <div class="scan-sub">Camera or upload — auto-fills name, ID, nationality</div>
+              </div>
+              <div class="scan-btn">
+                <div class="scan-icon">🔍</div>
+                <div class="scan-lbl">Search existing guest</div>
+                <div class="scan-sub">Repeat guest? Find by name or phone</div>
+              </div>
+            </div>
+            <div class="or-div">or enter manually</div>
+
+            <div class="fg fg3">
+              <div class="f-g"><div class="f-l">Full name <span class="f-req">*</span></div><input class="f-i" value="Marco Lindqvist" placeholder="Guest full name"></div>
+              <div class="f-g"><div class="f-l">Phone <span class="f-req">*</span></div><input class="f-i" value="+62 813 9876 5432"></div>
+              <div class="f-g"><div class="f-l">Nationality</div><input class="f-i" value="Sweden"></div>
+            </div>
+            <div class="fg fg3">
+              <div class="f-g"><div class="f-l">ID type</div><select class="f-s"><option selected>Passport</option><option>KTP</option><option>Driver's License</option></select></div>
+              <div class="f-g"><div class="f-l">ID number</div><input class="f-i" value="SE8847291"></div>
+              <div class="f-g"><div class="f-l">Email <span style="font-size:10.5px;color:#aaa">(optional)</span></div><input class="f-i" placeholder="for receipt"></div>
+            </div>
+
+            <div class="dup-warning">⚠️ A guest profile with a similar name exists: <strong>Marco Lindgren</strong> (GST-0019, last stay Mar 2026). <a>Use this profile instead</a> or continue as new guest.</div>
+
+            <div style="border-top:1px solid #eee;margin:16px 0"></div>
+
+            <div class="tile-lbl" style="margin-bottom:9px">Stay details</div>
+            <div class="fg fg3">
+              <div class="f-g"><div class="f-l">Nights <span class="f-req">*</span></div>
+                <div style="display:flex;align-items:center;gap:9px">
+                  <button style="width:27px;height:27px;border:1px solid #d4d4d4;border-radius:4px;background:#fff;cursor:pointer;font-size:16px;color:#333">−</button>
+                  <span style="font-size:15px;font-weight:600;min-width:18px;text-align:center">2</span>
+                  <button style="width:27px;height:27px;border:1px solid #d4d4d4;border-radius:4px;background:#fff;cursor:pointer;font-size:16px;color:#333">+</button>
+                </div>
+              </div>
+              <div class="f-g"><div class="f-l">Check-out date</div><input class="f-i" value="14 Jun 2026" readonly style="background:#f5f5f5;color:#888"></div>
+              <div class="f-g"><div class="f-l">Guests</div><input class="f-i" value="2 adults"></div>
+            </div>
+            <div style="font-size:11.5px;color:#888;margin-top:-4px;margin-bottom:8px">ℹ️ Check-in date defaults to right now (12 Jun 2026 · 16:40). Check-out auto-calculated from nights.</div>
+
+            <div class="conf-row"><button class="btn-conf">Next: Room &amp; rate →</button></div>
+          </div>
+        </div>
+
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 2 — Room &amp; rate</div><div class="sh-r">Complete step 1 first</div></div></div>
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 3 — Payment &amp; confirm</div><div class="sh-r">Complete step 2 first</div></div></div>
+      </div>
+      <div class="bbar">
+        <button class="bb-prev">Cancel</button>
+        <span class="bb-step">Step 1 of 3</span>
+        <div class="bb-r"><button class="bb-confirm">Next: Room &amp; rate →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     STEP 2 — ROOM + RATE (combined — only AVAILABLE rooms shown, no pre-assignment ambiguity)
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-b">Step 2 — Room &amp; rate (combined, available-now only)</div>
+  <div class="shell">
+    <div class="sb">
+      <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item on">⚡ Quick check-in</div>
+        <div class="sb-item">← Check-in</div>
+      </div>
+      <div class="sb-foot"><div class="sb-av">R</div><div><div style="font-size:12px;font-weight:500">Rina</div><div style="font-size:10.5px;color:#888">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><span style="color:#333">Quick check-in</span></div>
+      <div class="content">
+        <div class="pg-title">Quick check-in <span class="pg-badge">⚡ Walk-in</span></div>
+        <div class="pg-sub">For guests arriving without a prior reservation — 3 steps instead of 12</div>
+
+        <div class="step-bar">
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Guest &amp; stay</div></div>
+          <div class="sbi on"><div class="sd sd-on">2</div><div class="sl">Room &amp; rate</div></div>
+          <div class="sbi"><div class="sd sd-off">3</div><div class="sl">Payment &amp; confirm</div></div>
+        </div>
+
+        <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 1 — Guest &amp; stay</div><div class="sh-r">Marco Lindqvist · Sweden · 2 nights · 2 adults</div></div></div>
+
+        <div class="sc active">
+          <div class="sc-hd"><div class="sh-l">Step 2 — Room &amp; rate</div><div class="sh-r" style="color:#0052cc">Current step</div></div>
+          <div class="sc-body">
+
+            <div class="tile-lbl">Room type — showing rooms available <strong>right now</strong> only <span style="color:#d93025;font-size:11px">*</span></div>
+            <div class="tile-grid">
+              <div class="tile dim"><div class="t-name">Deluxe</div><div class="t-guests">Max: 6A, 0C</div><div class="t-price">IDR 1,500,000 / night</div><div class="t-avail av-no">0 available now</div></div>
+              <div class="tile sel"><div class="t-name">Double</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,750,000 / night</div><div class="t-avail av-ok">2 available now</div></div>
+              <div class="tile"><div class="t-name">Standard</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,650,000 / night</div><div class="t-avail av-ok">1 available now</div></div>
+              <div class="tile dim"><div class="t-name">Studio</div><div class="t-guests">Max: 4A, 0C</div><div class="t-price">IDR 1,950,000 / night</div><div class="t-avail av-no">0 available now</div></div>
+              <div class="tile dim"><div class="t-name">Suite</div><div class="t-guests">Max: 2A, 0C</div><div class="t-price">IDR 1,800,000 / night</div><div class="t-avail av-no">0 available now</div></div>
+            </div>
+            <div style="font-size:11.5px;color:#888;margin-bottom:14px">ℹ️ Only room types with availability for tonight are selectable. No pre-assignment step — room is assigned automatically to the next clean+available unit of this type.</div>
+
+            <div class="fg fg2">
+              <div class="f-g"><div class="f-l">Room (auto-assigned)</div><input class="f-i" value="Room 201 — Double, Wing A" readonly style="background:#f5f5f5;color:#444;font-weight:500"></div>
+              <div class="f-g"><div class="f-l">Rate plan</div><input class="f-i" value="Walk-in Rate (Standard +10%)" readonly style="background:#f5f5f5;color:#444"></div>
+            </div>
+
+            <div class="quick-total">
+              <div class="qt-row"><span class="qt-l">Double · Walk-in Rate · 2 nights × IDR 1,925,000</span><span class="qt-r">3,850,000</span></div>
+              <div class="qt-div"></div>
+              <div class="qt-total"><span>Total due</span><span style="color:#1c1c1c">IDR 3,850,000</span></div>
+            </div>
+            <div style="font-size:11.5px;color:#888;margin-top:-6px;margin-bottom:10px">ℹ️ Walk-in bookings use the Walk-in Rate by default (no advance booking discount). Manager can override on Step 3 if needed.</div>
+
+            <div class="conf-row"><button class="btn-conf">Next: Payment →</button></div>
+          </div>
+        </div>
+
+        <div class="sc locked"><div class="sc-hd"><div class="sh-l">Step 3 — Payment &amp; confirm</div><div class="sh-r">Complete step 2 first</div></div></div>
+      </div>
+      <div class="bbar">
+        <button class="bb-prev">← Previous</button>
+        <span class="bb-step">Step 2 of 3</span>
+        <div class="bb-r"><button class="bb-confirm">Next: Payment →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     STEP 3 — PAYMENT + CONFIRM (full payment required for walk-in — no defer option)
+     ════════════════════════════════════════════ -->
+<div>
+  <div class="ann ann-g">Step 3 — Payment &amp; confirm (full payment required, no defer-to-checkout)</div>
+  <div class="shell">
+    <div class="sb">
+      <div class="sb-hd"><div class="sb-logo">H</div><div><div class="sb-an">HVMS Setup</div><div class="sb-as">HVMS App</div></div></div>
+      <div class="sb-nav">
+        <div class="sb-item on">⚡ Quick check-in</div>
+      </div>
+      <div class="sb-foot"><div class="sb-av">R</div><div><div style="font-size:12px;font-weight:500">Rina</div><div style="font-size:10.5px;color:#888">rina.qa@pertamapro...</div></div></div>
+    </div>
+    <div class="main">
+      <div class="topnav">🏠<span class="sep">/</span><a href="#">Front Desk</a><span class="sep">/</span><span style="color:#333">Quick check-in</span></div>
+      <div class="content">
+        <div class="pg-title">Quick check-in <span class="pg-badge">⚡ Walk-in</span></div>
+        <div class="pg-sub">For guests arriving without a prior reservation — 3 steps instead of 12</div>
+
+        <div class="step-bar">
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Guest &amp; stay</div></div>
+          <div class="sbi done"><div class="sd sd-ok">✓</div><div class="sl">Room &amp; rate</div></div>
+          <div class="sbi on"><div class="sd sd-on">3</div><div class="sl">Payment &amp; confirm</div></div>
+        </div>
+
+        <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 1 — Guest &amp; stay</div><div class="sh-r">Marco Lindqvist · Sweden · 2 nights · 2 adults</div></div></div>
+        <div class="sc done"><div class="sc-hd"><div class="sh-l">✓ Step 2 — Room &amp; rate</div><div class="sh-r">Double · Room 201 · IDR 3,850,000</div></div></div>
+
+        <div class="sc active">
+          <div class="sc-hd"><div class="sh-l">Step 3 — Payment &amp; confirm</div><div class="sh-r" style="color:#0052cc">Final step</div></div>
+          <div class="sc-body">
+
+            <div class="pay-card">
+              <div class="pc-hd">
+                <span class="pc-title">Total due now — Accommodation</span>
+                <span class="pc-amount">IDR 3,850,000</span>
+              </div>
+              <div class="pc-body">
+                <div style="font-size:11.5px;color:#888;margin-bottom:10px">ℹ️ Walk-in guests pay in full at check-in — no folio billing relationship exists yet, so deferred payment is not available.</div>
+                <div class="pf-grid">
+                  <div class="f-g"><div class="f-l">Payment method</div><select class="f-s"><option selected>Cash</option><option>Card EDC</option><option>QRIS</option></select></div>
+                  <div class="f-g"><div class="f-l">Amount tendered (IDR) *</div><input class="f-i" value="4,000,000"></div>
+                  <div class="f-g"><div class="f-l">Change to return</div><input class="f-i" value="IDR 150,000" readonly style="background:#d4edda;border-color:#b2dfbd;color:#155724;font-weight:600"></div>
+                </div>
+                <div class="change-banner">
+                  <div class="cb-l">Change to give back to guest</div>
+                  <div class="cb-r">IDR 150,000</div>
+                </div>
+
+                <div class="dep-row">
+                  <div class="dep-track"></div>
+                  <span class="dep-lbl">Collect security deposit too (optional — can also be added at checkout)</span>
+                </div>
+
+                <button class="btn-confirm-ci">Confirm check-in — IDR 3,850,000 collected</button>
+              </div>
+            </div>
+
+            <div style="font-size:11.5px;color:#888;margin-top:8px">On confirm: a reservation record (RSV-YYYY-NNNN, source = Walk-in) and a guest folio are created simultaneously. Reservation status starts directly at <strong>Checked In</strong> — there is no separate Confirmed/On Hold stage for walk-ins.</div>
+
+          </div>
+        </div>
+      </div>
+      <div class="bbar">
+        <button class="bb-prev">← Previous</button>
+        <span class="bb-step">Step 3 of 3 — final step</span>
+        <div class="bb-r"><button class="bb-confirm">Confirm check-in ✓</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
